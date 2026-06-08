@@ -1,0 +1,189 @@
+'use client';
+
+import { useEffect  } from 'react';
+import Link from 'next/link';
+import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap, LayoutGrid,   } from 'lucide-react';
+import { useDevices, DEVICES_KEY } from '@/hooks/useDevices';
+import { useSocket } from '@/hooks/useSocket';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/Toast';
+import AppLayout from '@/components/AppLayout';
+import { useQueryClient } from '@tanstack/react-query';
+import type { Device } from '@/types'; 
+ 
+function DeviceCard({ device }: { device: Device }) {
+  const platform = device.platform === 'darwin' ? '🍎' : device.platform === 'win32' ? '🪟' : '🐧';
+ 
+  return (
+    <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750]   rounded-2xl p-5 transition-all   group
+      ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/15 to-purple-500/15 border border-indigo-500/10 flex items-center justify-center text-lg">
+            {platform}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white leading-tight capitalize"> {device?.user}'s {device.name}</p>
+            <p className="text-xs text-slate-500 mt-0.5">{device.platform} · {device.arch}</p>
+          </div>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full
+          ${device.isOnline
+            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/15'
+            : 'bg-slate-800 text-slate-500 border border-slate-700'
+          }`}
+        >
+          <span className={device.isOnline ? 'dot-online' : 'dot-offline'} />
+          {device.isOnline ? 'Online' : 'Offline'}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="bg-slate-900/40 rounded-xl p-3 flex items-center gap-2">
+          <Cpu size={13} className="text-indigo-400" />
+          <div>
+            <p className="text-[10px] text-slate-500">Platform</p>
+            <p className="text-xs font-semibold text-slate-200">{device.platform}</p>
+          </div>
+        </div>
+        <div className="bg-slate-900/40 rounded-xl p-3 flex items-center gap-2">
+          <HardDrive size={13} className="text-purple-400" />
+          <div>
+            <p className="text-[10px] text-slate-500">Arch</p>
+            <p className="text-xs font-semibold text-slate-200">{device.arch}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <Link
+          href={`/control/${device.id}`}
+          className={`btn flex-1 text-xs py-2 ${device.isOnline ? 'btn-primary' : 'btn-ghost opacity-40 pointer-events-none'}`}
+        >
+          <Zap size={13} /> Control
+        </Link>
+        <Link
+          href={`/apps/${device.id}`}
+          className={`btn btn-ghost px-3 py-2 text-xs ${device.isOnline ? '' : 'opacity-40 pointer-events-none'}`}
+          title="Browse & launch apps"
+        >
+          <LayoutGrid size={13} /> Apps
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  const { data: devices, isLoading, isError, error, refetch } = useDevices();
+  const { socket } = useSocket();
+  const { toasts, toast, dismiss } = useToast();
+  const qc = useQueryClient();
+
+  // Live device status updates via socket
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (data: { deviceId: string; isOnline: boolean }) => {
+      qc.setQueryData<Device[]>(DEVICES_KEY, prev =>
+        prev?.map(d => d.id === data.deviceId ? { ...d, isOnline: data.isOnline } : d)
+      );
+      toast(`Device ${data.isOnline ? 'came online' : 'went offline'}`, data.isOnline ? 'success' : 'info');
+    };
+    socket.on('device-status-changed', handler);
+    return () => { socket.off('device-status-changed', handler); };
+  }, [socket, qc, toast]);
+
+  const online  = devices?.filter(d => d.isOnline).length ?? 0;
+  const total   = devices?.length ?? 0;
+ 
+  return (
+    <AppLayout>
+      <div className=" !p-7 max-w-5xl mx-auto">
+ 
+
+     
+        {/* Header */}
+        <div className="flex items-center justify-between mb-7 animate-fade-up">
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Home</h1>
+            <p className="text-slate-400 text-sm mt-1">Monitor and control your remote devices</p>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={() => refetch()} className="btn btn-ghost text-xs gap-1.5 px-3 py-2">
+              <RefreshCw size={13} /> Refresh
+            </button>
+            <Link href="/pair" className="btn btn-primary text-xs gap-1.5">
+              <Plus size={14} /> Pair Device
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-7 animate-fade-up delay-1">
+          {[
+            { label: 'Total Devices', value: total, icon: Monitor, color: 'text-indigo-400' },
+            { label: 'Online Now',    value: online, icon: Circle,  color: 'text-emerald-400' },
+            { label: 'Offline',       value: total - online, icon: Circle, color: 'text-slate-500' },
+          ].map(s => (
+            <div key={s.label} className="glass rounded-2xl p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-900/60 flex items-center justify-center">
+                <s.icon size={18} className={s.color} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{isLoading ? '—' : s.value}</p>
+                <p className="text-xs text-slate-500">{s.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Device list */}
+        <div className="animate-fade-up delay-2">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Devices</h2>
+
+          {isLoading && (
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2].map(i => (
+                <div key={i} className="glass rounded-2xl p-5 space-y-3">
+                  <div className="skeleton h-5 w-2/3" />
+                  <div className="skeleton h-4 w-1/3" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="skeleton h-14 rounded-xl" />
+                    <div className="skeleton h-14 rounded-xl" />
+                  </div>
+                  <div className="skeleton h-9 rounded-xl" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isError && (
+            <div className="glass rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
+              <p className="text-sm font-medium">Failed to load devices</p>
+              <p className="text-xs text-red-400/60 mt-1">{(error as Error).message}</p>
+            </div>
+          )}
+
+          {!isLoading && !isError && devices?.length === 0 && (
+            <div className="glass rounded-2xl p-12 text-center border border-dashed border-white/[0.06]">
+              <Monitor size={36} className="text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400 font-medium">No devices yet</p>
+              <p className="text-slate-600 text-sm mt-1">Pair your Mac to get started</p>
+              <Link href="/pair" className="btn btn-primary mx-auto mt-4 text-sm">
+                <Plus size={14} /> Pair Device
+              </Link>
+            </div>
+          )}
+
+          {!isLoading && !isError && devices && devices.length > 0 && (
+            <div className="grid grid-cols-2 gap-4">
+              {devices.map(d => <DeviceCard key={d.id} device={d} />)}
+            </div>
+          )}
+        </div>
+      </div>
+      <ToastContainer toasts={toasts} dismiss={dismiss} />
+    </AppLayout>
+  );
+}
