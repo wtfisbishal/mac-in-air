@@ -1,0 +1,109 @@
+{
+  "name": "MACinWIND",
+  "version": "1.0.0",
+  "description": "A MAC app ",
+  "author": "Bishal Kandi",
+  "license": "MIT",
+  "main": "dist/electron/main/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bisxxal/mac-in-wind"
+  },
+  "scripts": {
+    "dev:next": "next dev --port 3000",
+    "dev:electron": "tsc -p tsconfig.main.json && electron .",
+    "dev": "concurrently --kill-others \"npm run dev:next\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
+    "build:next": "next build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build": "npm run build:next && npm run build:main",
+    "release": "npm run build && electron-builder --publish always",
+    "package": "npm run build && electron-builder",
+    "package:mac": "npm run build && electron-builder --mac",
+    "postinstall": "electron-builder install-app-deps"
+  },
+    "keywords": [
+      "mac-in-wind",
+      "remote-desktop-control",
+      "mac screen sharing"
+  ],
+  "dependencies": {
+    "electron-serve": "^2.1.1",
+    "lucide-react": "^1.17.0",
+    "robotjs": "^0.7.1",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "autoprefixer": "^10.5.0",
+    "concurrently": "^9.1.2",
+    "electron": "^35.1.2",
+    "electron-builder": "^26.0.0",
+    "next": "^15.3.2",
+    "postcss": "^8.5.15",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.8.3",
+    "wait-on": "^8.0.3"
+  },
+   "build": {
+    "appId": "com.bisxxal.fuckdsa",
+    "productName": "MAC in WIND",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "out/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "mac-in-wind-${arch}.${ext}",
+      "icon": "assets/icons/mac/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "identity": null,
+      "notarize": false,
+      "protocols": {
+        "name": "fuckdsa-protocol",
+        "schemes": [
+          "fuckdsa"
+        ]
+      }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "bisxxal",
+        "repo": "mac-in-wind",
+        "private": false,
+        "releaseType": "release",
+        "publishAutoUpdate": true
+      }
+    ],
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  }
+}

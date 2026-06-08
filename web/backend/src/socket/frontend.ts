@@ -1,0 +1,222 @@
+import { Server as SocketServer, Socket } from 'socket.io';
+import { deviceManager } from '../managers/devices';
+import { roomManager } from '../managers/rooms';
+import { pairTokenManager } from '../managers/pairTokens';
+import { CommandPayload } from '../types';
+
+export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
+
+  // join-device Frontend has paired and joins the device's control room.
+  // SECURITY: Requires a valid one-time pairToken issued by POST /pair.
+  socket.on(
+    'join-device',
+    (
+      data: { deviceId: string; pairToken?: string },
+      callback?: (res: { success: boolean; message?: string }) => void
+    ) => {
+      const { deviceId, pairToken } = data;
+
+      //  Token validation 
+      if (!pairToken) {
+        console.warn(`[Frontend] join-device rejected: no pairToken (socket ${socket.id})`);
+        callback?.({ success: false, message: 'Authorization required. Please pair the device first.' });
+        return;
+      }
+
+      const tokenEntry = pairTokenManager.consumeToken(pairToken, socket.id);
+      if (!tokenEntry) {
+        console.warn(`[Frontend] join-device rejected: invalid/expired token (socket ${socket.id})`);
+        callback?.({ success: false, message: 'Pairing token invalid or expired. Please pair again.' });
+        return;
+      }
+
+      if (tokenEntry.deviceId !== deviceId) {
+        console.warn(`[Frontend] join-device rejected: token device mismatch`);
+        callback?.({ success: false, message: 'Token does not match device.' });
+        return;
+      }
+      // End token validation 
+
+      const device = deviceManager.getDevice(deviceId);
+      if (!device) {
+        callback?.({ success: false, message: 'Device not found' });
+        return;
+      }
+
+      if (!device.isOnline) {
+        callback?.({ success: false, message: 'Device is offline' });
+        return;
+      }
+
+      roomManager.join(deviceId, socket.id);
+      deviceManager.addPairedRoom(deviceId, socket.id);
+      socket.join(deviceId);
+
+      console.log(`[Frontend] ${socket.id} joined device room: ${deviceId} (token verified)`);
+
+      // Notify the desktop agent that a web client connected
+      const desktopSocket = io.sockets.sockets.get(device.socketId);
+      desktopSocket?.emit('web-client-connected', {
+        socketId: socket.id,
+        connectedAt: Date.now(),
+      });
+
+      callback?.({ success: true });
+    }
+  );
+
+  //   Generic command relay 
+  // Routes any typed command to the desktop agent.
+  socket.on('command', async (command: CommandPayload, callback?: (res: unknown) => void) => {
+    const deviceId = roomManager.getDeviceForSocket(socket.id);
+    if (!deviceId) {
+      callback?.({ success: false, message: 'Not in a device room. Join a device first.' });
+      return;
+    }
+
+    const device = deviceManager.getDevice(deviceId);
+    if (!device || !device.isOnline) {
+      callback?.({ success: false, message: 'Device offline' });
+      return;
+    }
+
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    if (!desktopSocket) {
+      callback?.({ success: false, message: 'Desktop agent not connected' });
+      return;
+    }
+
+    console.log(`[Frontend] → Desktop [${deviceId}] command: ${command.type}`);
+
+    if (callback) {
+      desktopSocket.timeout(10000).emit('command', command, (_err: Error | null, result: unknown) => {
+        callback(result ?? { success: false, message: 'No response' });
+      });
+    } else {
+      desktopSocket.emit('command', command);
+    }
+  });
+
+  // ── Mouse Move (fire-and-forget, no callback for low latency
+  socket.on('mouse-move', (data: { x: number; y: number }) => {
+    relayToDesktop(io, socket, { type: 'MOUSE_MOVE', payload: data });
+  });
+
+  // ── Mouse Click 
+  socket.on('mouse-click', (data: { button?: string; doubleClick?: boolean }) => {
+    relayToDesktop(io, socket, { type: 'MOUSE_CLICK', payload: data });
+  });
+
+  // ── Mouse Scroll 
+  socket.on('mouse-scroll', (data: { x: number; y: number }) => {
+    relayToDesktop(io, socket, { type: 'MOUSE_SCROLL', payload: data });
+  });
+
+  // ── Keyboard Type 
+  socket.on('keyboard-type', (data: { text: string }) => {
+    relayToDesktop(io, socket, { type: 'KEYBOARD_TYPE', payload: data });
+  });
+
+  // ── Keyboard Shortcut 
+  socket.on('keyboard-shortcut', (data: { key: string; modifier?: string | string[] }) => {
+    relayToDesktop(io, socket, { type: 'KEYBOARD_SHORTCUT', payload: data });
+  });
+
+  // ── Open App 
+  socket.on('open-app', (data: { app: string }, callback?: (res: unknown) => void) => {
+    relayToDesktop(io, socket, { type: 'OPEN_APP', payload: data }, callback);
+  });
+
+  // ── System Commands 
+  socket.on('system-command', (data: { action: 'SHUTDOWN' | 'RESTART' | 'SLEEP' | 'LOCK_SCREEN' }, callback?: (res: unknown) => void) => {
+    relayToDesktop(io, socket, { type: data.action }, callback);
+  });
+
+  // ── Screenshot 
+  socket.on('request-screenshot', (callback?: (res: unknown) => void) => {
+    relayToDesktop(io, socket, { type: 'SCREENSHOT' }, callback);
+  });
+
+  // ── Screen Share 
+  socket.on('screen-share-start', (data: { sessionId: string; frameRate?: number; quality?: number }) => {
+    const deviceId = roomManager.getDeviceForSocket(socket.id);
+    if (!deviceId) return;
+
+    const device = deviceManager.getDevice(deviceId);
+    if (!device?.isOnline) return;
+
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    desktopSocket?.emit('screen-share-request', data);
+
+    console.log(`[Frontend] Screen share requested for device ${deviceId}`);
+  });
+
+  // ── Screen Share Stop 
+  socket.on('screen-share-stop', (data: { sessionId: string }) => {
+    const deviceId = roomManager.getDeviceForSocket(socket.id);
+    if (!deviceId) return;
+
+    const device = deviceManager.getDevice(deviceId);
+    if (!device?.isOnline) return;
+
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    desktopSocket?.emit('screen-share-stop', data);
+  });
+
+  // ── WebRTC Signaling relay 
+  // Relay WebRTC offer/answer/ICE between frontend and desktop
+  socket.on('webrtc-offer', (data: { sdp: unknown; deviceId: string }) => {
+    const device = deviceManager.getDevice(data.deviceId);
+    if (!device?.isOnline) return;
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    desktopSocket?.emit('webrtc-offer', { ...data, fromSocketId: socket.id });
+  });
+
+  socket.on('webrtc-ice-candidate', (data: { candidate: unknown; deviceId: string }) => {
+    const device = deviceManager.getDevice(data.deviceId);
+    if (!device?.isOnline) return;
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    desktopSocket?.emit('webrtc-ice-candidate', { ...data, fromSocketId: socket.id });
+  });
+
+  // ── disconnect 
+  socket.on('disconnect', (reason) => {
+    console.log(`[Frontend] Disconnected: ${socket.id} (reason: ${reason})`);
+    const deviceId = roomManager.leave(socket.id);
+    if (deviceId) {
+      deviceManager.removePairedRoom(deviceId, socket.id);
+
+      // Notify the desktop agent that its web client disconnected
+      const device = deviceManager.getDevice(deviceId);
+      if (device?.isOnline) {
+        const desktopSocket = io.sockets.sockets.get(device.socketId);
+        desktopSocket?.emit('web-client-disconnected', { socketId: socket.id });
+      }
+    }
+  });
+}
+
+// ─── Helper: relay a command to the desktop agent for a socket's paired device ─
+function relayToDesktop(
+  io: SocketServer,
+  socket: Socket,
+  command: CommandPayload,
+  callback?: (res: unknown) => void
+): void {
+  const deviceId = roomManager.getDeviceForSocket(socket.id);
+  if (!deviceId) return;
+
+  const device = deviceManager.getDevice(deviceId);
+  if (!device?.isOnline) return;
+
+  const desktopSocket = io.sockets.sockets.get(device.socketId);
+  if (!desktopSocket) return;
+
+  if (callback) {
+    desktopSocket.timeout(10000).emit('command', command, (_err: Error | null, result: unknown) => {
+      callback(result ?? { success: false, message: 'No response' });
+    });
+  } else {
+    desktopSocket.emit('command', command);
+  }
+}

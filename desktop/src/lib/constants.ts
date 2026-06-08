@@ -1,0 +1,8 @@
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+
+export const COMMAND_TYPES = {
+  OPEN_APP: 'OPEN_APP',
+  MOUSE_MOVE: 'MOUSE_MOVE',
+  MOUSE_CLICK: 'MOUSE_CLICK',
+  KEYBOARD_TYPE: 'KEYBOARD_TYPE',
+};
