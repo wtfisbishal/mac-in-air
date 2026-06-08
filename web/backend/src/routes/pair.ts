@@ -36,10 +36,9 @@ router.post('/', (req: Request, res: Response): void => {
     deviceManager.addPairedRoom(entry.deviceId, frontendSocketId);
   }
 
-  // Issue a one-time session token the frontend must use when calling join-device via socket
-  const pairToken = frontendSocketId
-    ? pairTokenManager.issueToken(entry.deviceId, frontendSocketId)
-    : null;
+  // Issue a 15-min pairToken the frontend stores in localStorage.
+  // This token can be reused on page refresh / window reopen.
+  const pairToken = pairTokenManager.issueToken(entry.deviceId);
 
   // Notify the desktop agent
   const io = getIo();

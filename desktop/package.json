@@ -12,7 +12,7 @@
   "scripts": {
     "dev:next": "next dev --port 3000",
     "dev:electron": "tsc -p tsconfig.main.json && electron .",
-    "dev": "concurrently --kill-others \"npm run dev:next\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
+    "dev": "npm run build:main && concurrently --kill-others \"npm run dev:next\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
     "build:next": "next build",
     "build:main": "tsc -p tsconfig.main.json",
     "build": "npm run build:next && npm run build:main",

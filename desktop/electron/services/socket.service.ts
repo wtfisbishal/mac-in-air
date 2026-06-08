@@ -9,9 +9,12 @@ export interface WebClient {
   connectedAt: number;
 }
 
+// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
+
 export class SocketService {
   private socket: Socket | null = null;
-  private backendUrl: string = 'http://localhost:4000';
+  private backendUrl: string = BACKEND_URL;
   private _isConnected: boolean = false;
   private pairingCode: string | null = null;
   private deviceId: string = 'mac-01';
@@ -47,7 +50,7 @@ export class SocketService {
         },
         () => {
           // device-online acknowledged — now safe to request pairing code
-          this.requestPairingCode();
+          // this.requestPairingCode();
         }
       );
     });
@@ -178,6 +181,8 @@ export class SocketService {
   }
 
   public async refreshPairingCode(): Promise<string | null> {
+
+    console.log("calling refresh ")
     if (!this.socket) return null;
 
     if (!this.socket.connected) {
@@ -193,7 +198,7 @@ export class SocketService {
     }
 
     return new Promise<string | null>((resolve) => {
-      this.socket?.emit('request-pairing-code', { deviceId: this.deviceId }, (response: any) => {
+      this.socket?.emit('request-pairing-code', { deviceId: this.deviceId, forceRefresh: true }, (response: any) => {
         if (response?.success) {
           this.pairingCode = response.code;
           logInfo('SocketService', 'Refreshed pairing code');

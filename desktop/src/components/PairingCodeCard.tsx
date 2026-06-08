@@ -49,13 +49,15 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
     fetchCode();
   }, []);
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (e) => {
+    e.preventDefault();
     navigator.clipboard.writeText(pairingCode);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = async (e) => {
+    e.preventDefault();
     setLoading(true);
     try {
       const code = await window.electronAPI.refreshPairingCode();
@@ -117,9 +119,9 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
           <p className="text-gray-300 text-xs mt-7">Click to copy</p>
         </div>
 
-        { copySuccess &&  (
+        {copySuccess && (
           <div className="absolute w-[560px]  text-3xl inset-0 rounded-xl bg-indigo-200/20 flex items-center justify-center text-green-400 font-semibold animate-pulse">
-             
+
           </div>
         )}
       </div>

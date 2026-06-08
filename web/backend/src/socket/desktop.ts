@@ -1,6 +1,7 @@
 import { Server as SocketServer, Socket } from 'socket.io';
 import { deviceManager } from '../managers/devices';
 import { pairingManager } from '../managers/pairing';
+import { pairTokenManager } from '../managers/pairTokens';
 import { roomManager } from '../managers/rooms';
 
 export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
@@ -44,10 +45,10 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
   // request-pairing-code
   // Desktop agent requests (or refreshes) its pairing code.
-  socket.on(
-    'request-pairing-code',
-    (data: { deviceId: string }, callback: (res: { success: boolean; code?: string; error?: string }) => void) => {
-      const { deviceId } = data;
+  socket.on( 'request-pairing-code',
+    (data: { deviceId: string; forceRefresh?: boolean }, callback: (res: { success: boolean; code?: string; error?: string }) => void) => {
+
+      const { deviceId, forceRefresh } = data;
 
       if (!deviceId) {
         callback({ success: false, error: 'deviceId is required' });
@@ -55,9 +56,14 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
       }
 
       try {
-        const code = pairingManager.createCode(deviceId, socket.id);
+        let code = pairingManager.getCodeForDevice(deviceId);
+        if (!code || forceRefresh) {
+          code = pairingManager.createCode(deviceId, socket.id);
+          console.log(`[Desktop] New pairing code issued: ${code} → ${deviceId}`);
+        } else {
+          console.log(`[Desktop] Reused existing pairing code: ${code} → ${deviceId}`);
+        }
         callback({ success: true, code });
-        console.log(`[Desktop] Pairing code issued: ${code} → ${deviceId}`);
       } catch (err: any) {
         callback({ success: false, error: err.message });
       }
@@ -121,8 +127,9 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
     const device = deviceManager.markOffline(socket.id);
     if (device) {
-      // Revoke pairing codes
-      pairingManager.revokeDevice(device.id);
+      // Commented out to prevent pairing code from changing on momentary disconnects
+      // pairingManager.revokeDevice(device.id);
+      // pairTokenManager.revokeDevice(device.id);
 
       // Notify frontends
       io.emit('device-status-changed', { deviceId: device.id, isOnline: false });

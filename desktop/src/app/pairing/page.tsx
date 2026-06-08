@@ -50,8 +50,7 @@ export default function PairingPage() {
             Share this code with your web dashboard to connect your Mac
           </p>
         </div>
-
-         
+ 
         {deviceInfo && (
           <div className="bg-gradient-to-t w-[560px] h-[160px] from-[#0E161B] to-[#374750]  rounded-lg p-4 ">
             <p className="text-gray-400 text-xs mb-2 uppercase font-semibold">Device</p>

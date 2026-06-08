@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Remote desktop control backend — pure Node.js + TypeScript relay server",
+  "description": "Remote desktop control  ",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",

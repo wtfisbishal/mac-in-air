@@ -36,8 +36,10 @@ export default function PairPage() {
       setPaired({ name: device.name, id: device.id });
       toast('Device paired successfully!', 'success');
  
+      // Store in localStorage so it survives page refresh AND window close/reopen.
+      // Token is valid for 15 min; revoked server-side when desktop goes offline.
       if (data?.pairToken) {
-        sessionStorage.setItem(`rmac_pair_${device.id}`, data.pairToken);
+        localStorage.setItem(`rmac_pair_${device.id}`, data.pairToken);
       }
 
       // Seed the React Query cache so the control page renders immediately

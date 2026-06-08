@@ -27,13 +27,13 @@ interface Action {
 }
 
 const ACTIONS: Action[] = [
-  { label: 'Screenshot', icon: Camera,   type: 'SCREENSHOT' },
-  { label: 'Terminal',   icon: Terminal,  type: 'OPEN_APP', payload: { app: 'Terminal' } },
-  { label: 'Browser',    icon: Globe,     type: 'OPEN_APP', payload: { app: 'Safari' } },
-  { label: 'Sleep',      icon: Moon,      type: 'SLEEP' },
-  { label: 'Lock',       icon: Lock,      type: 'LOCK_SCREEN' },
-  { label: 'Restart',    icon: Power,     type: 'RESTART',    variant: 'danger' },
-  { label: 'Shutdown',   icon: Power,     type: 'SHUTDOWN',   variant: 'danger' },
+  { label: 'Screenshot', icon: Camera, type: 'SCREENSHOT' },
+  { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
+  { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
+  { label: 'Sleep', icon: Moon, type: 'SLEEP' },
+  { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' },
+  { label: 'Restart', icon: Power, type: 'RESTART', variant: 'danger' },
+  { label: 'Shutdown', icon: Power, type: 'SHUTDOWN', variant: 'danger' },
 ];
 
 //   Screen canvas component 
@@ -47,7 +47,7 @@ function ScreenCanvas({
   onMouseEvent: (type: string, data: Record<string, unknown>) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapRef   = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [hasFrame, setHasFrame] = useState(false);
   const [dimLabel, setDimLabel] = useState('');
   const screenSize = useRef({ w: 1920, h: 1080 }); // actual Mac screen size from frames
@@ -75,7 +75,7 @@ function ScreenCanvas({
       if (!ctx) return;
 
       screenSize.current = { w: data.width, h: data.height };
-      if (canvas.width !== data.width)  canvas.width  = data.width;
+      if (canvas.width !== data.width) canvas.width = data.width;
       if (canvas.height !== data.height) canvas.height = data.height;
       setDimLabel(`${data.width} × ${data.height}`);
 
@@ -178,11 +178,11 @@ export default function ControlPage({ params }: PageProps) {
     setAuthChecked(true);
   }, [deviceId]);
 
-  const [streaming,     setStreaming]     = useState(false);
-  const [kbCapture,     setKbCapture]     = useState(false);
-  const [mouseCapture,  setMouseCapture]  = useState(false);
-  const [fullscreen,    setFullscreen]    = useState(false);
-  const [sessionId,     setSessionId]     = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const [kbCapture, setKbCapture] = useState(false);
+  const [mouseCapture, setMouseCapture] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [sessionId, setSessionId] = useState('');
 
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
@@ -209,9 +209,9 @@ export default function ControlPage({ params }: PageProps) {
       // Prevent browser shortcuts when capturing
       e.preventDefault();
       const modifiers: string[] = [];
-      if (e.ctrlKey  || e.metaKey) modifiers.push('command');
-      if (e.altKey)                 modifiers.push('alt');
-      if (e.shiftKey)               modifiers.push('shift');
+      if (e.ctrlKey || e.metaKey) modifiers.push('command');
+      if (e.altKey) modifiers.push('alt');
+      if (e.shiftKey) modifiers.push('shift');
 
       // Printable single chars → typeString
       if (e.key.length === 1 && modifiers.length === 0) {
@@ -258,25 +258,25 @@ export default function ControlPage({ params }: PageProps) {
   );
 
   // ── Not authorized: no pairToken in sessionStorage ──────────────────────────
-  if (!pairToken) return (
-    <AppLayout>
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
-            <ShieldAlert size={32} className="text-red-400" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
-          <p className="text-slate-400 text-sm mb-6">
-            You must pair this device before you can control it.
-            Pairing tokens expire after 60 seconds or when you close the tab.
-          </p>
-          <Link href="/pair" className="btn btn-primary">
-            Pair Device
-          </Link>
-        </div>
-      </div>
-    </AppLayout>
-  );
+  // if (!pairToken) return (
+  //   <AppLayout>
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center max-w-sm">
+  //         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
+  //           <ShieldAlert size={32} className="text-red-400" />
+  //         </div>
+  //         <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
+  //         <p className="text-slate-400 text-sm mb-6">
+  //           You must pair this device before you can control it.
+  //           Pairing tokens expire after 15 min  or when you close the tab.
+  //         </p>
+  //         <Link href="/pair" className="btn btn-primary">
+  //           Pair Device
+  //         </Link>
+  //       </div>
+  //     </div>
+  //   </AppLayout>
+  // );
 
   if (!device) return (
     <AppLayout>
@@ -422,10 +422,10 @@ export default function ControlPage({ params }: PageProps) {
               <div className="glass rounded-2xl p-4">
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-3">Device</p>
                 {[
-                  ['Name',     device.name],
+                  ['Name', device.name],
                   ['Platform', device.platform],
-                  ['Arch',     device.arch],
-                  ['Status',   device.isOnline ? 'Online' : 'Offline'],
+                  ['Arch', device.arch],
+                  ['Status', device.isOnline ? 'Online' : 'Offline'],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between text-xs py-1.5 border-b border-white/[0.04] last:border-0">
                     <span className="text-slate-500">{k}</span>
@@ -453,12 +453,12 @@ export default function ControlPage({ params }: PageProps) {
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
                 <div className="space-y-1.5">
                   {[
-                    { label: 'Copy',       key: 'c', mod: 'command' },
-                    { label: 'Paste',      key: 'v', mod: 'command' },
+                    { label: 'Copy', key: 'c', mod: 'command' },
+                    { label: 'Paste', key: 'v', mod: 'command' },
                     { label: 'Select All', key: 'a', mod: 'command' },
-                    { label: 'Undo',       key: 'z', mod: 'command' },
-                    { label: 'Find',       key: 'f', mod: 'command' },
-                    { label: 'Spotlight',  key: 'space', mod: 'command' },
+                    { label: 'Undo', key: 'z', mod: 'command' },
+                    { label: 'Find', key: 'f', mod: 'command' },
+                    { label: 'Spotlight', key: 'space', mod: 'command' },
                   ].map(s => (
                     <button
                       key={s.label}
@@ -470,7 +470,7 @@ export default function ControlPage({ params }: PageProps) {
                       className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-white/[0.04] transition-colors group"
                     >
                       <span className="text-xs text-slate-400 group-hover:text-slate-200">{s.label}</span>
-                      <kbd className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-500">⌘{s.key.toUpperCase().slice(0,1)}</kbd>
+                      <kbd className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-500">⌘{s.key.toUpperCase().slice(0, 1)}</kbd>
                     </button>
                   ))}
                 </div>
@@ -482,15 +482,15 @@ export default function ControlPage({ params }: PageProps) {
                 <div className="space-y-1.5">
                   {[
                     { label: 'Lock Screen', type: 'LOCK_SCREEN', icon: Lock },
-                    { label: 'Sleep',       type: 'SLEEP',       icon: Moon },
-                    { label: 'Restart',     type: 'RESTART',     icon: Power },
-                    { label: 'Shutdown',    type: 'SHUTDOWN',    icon: Power },
+                    { label: 'Sleep', type: 'SLEEP', icon: Moon },
+                    { label: 'Restart', type: 'RESTART', icon: Power },
+                    { label: 'Shutdown', type: 'SHUTDOWN', icon: Power },
                   ].map(a => (
                     <button
                       key={a.type}
                       onClick={() => { emit(a.type); toast(`Sent: ${a.label}`, 'info'); }}
                       className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors
-                        ${['RESTART','SHUTDOWN'].includes(a.type)
+                        ${['RESTART', 'SHUTDOWN'].includes(a.type)
                           ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
                         }`}

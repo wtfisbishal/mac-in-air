@@ -6,8 +6,10 @@ import { CommandPayload } from '../types';
 
 export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
 
-  // join-device Frontend has paired and joins the device's control room.
-  // SECURITY: Requires a valid one-time pairToken issued by POST /pair.
+  // join-device — Frontend joins the device's control room.
+  // SECURITY: Requires a valid pairToken issued by POST /pair.
+  // The token is valid for 15 minutes and can be reused across page refreshes
+  // and window reopens. It is revoked when the desktop agent goes offline.
   socket.on(
     'join-device',
     (
@@ -16,26 +18,25 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     ) => {
       const { deviceId, pairToken } = data;
 
-      //  Token validation 
       if (!pairToken) {
         console.warn(`[Frontend] join-device rejected: no pairToken (socket ${socket.id})`);
-        callback?.({ success: false, message: 'Authorization required. Please pair the device first.' });
+        callback?.({ success: false, message: 'No pairing token. Please pair the device first.' });
         return;
       }
 
-      const tokenEntry = pairTokenManager.consumeToken(pairToken, socket.id);
+      // validateToken does NOT consume the token — it stays valid for 15 min
+      // so the same browser can rejoin after page refresh or window close/reopen
+      const tokenEntry = pairTokenManager.validateToken(pairToken);
       if (!tokenEntry) {
-        console.warn(`[Frontend] join-device rejected: invalid/expired token (socket ${socket.id})`);
-        callback?.({ success: false, message: 'Pairing token invalid or expired. Please pair again.' });
+        console.warn(`[Frontend] join-device rejected: token invalid or expired (socket ${socket.id})`);
+        callback?.({ success: false, message: 'Session expired (15 min). Please pair again.' });
         return;
       }
 
       if (tokenEntry.deviceId !== deviceId) {
-        console.warn(`[Frontend] join-device rejected: token device mismatch`);
         callback?.({ success: false, message: 'Token does not match device.' });
         return;
       }
-      // End token validation 
 
       const device = deviceManager.getDevice(deviceId);
       if (!device) {
@@ -52,7 +53,7 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
       deviceManager.addPairedRoom(deviceId, socket.id);
       socket.join(deviceId);
 
-      console.log(`[Frontend] ${socket.id} joined device room: ${deviceId} (token verified)`);
+      console.log(`[Frontend] ${socket.id} joined device room: ${deviceId}`);
 
       // Notify the desktop agent that a web client connected
       const desktopSocket = io.sockets.sockets.get(device.socketId);
