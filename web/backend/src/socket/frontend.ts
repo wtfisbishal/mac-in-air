@@ -113,6 +113,8 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     relayToDesktop(io, socket, { type: 'MOUSE_SCROLL', payload: data });
   });
 
+
+
   // ── Keyboard Type 
   socket.on('keyboard-type', (data: { text: string }) => {
     relayToDesktop(io, socket, { type: 'KEYBOARD_TYPE', payload: data });

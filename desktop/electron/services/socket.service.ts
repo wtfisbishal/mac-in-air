@@ -9,8 +9,11 @@ export interface WebClient {
   connectedAt: number;
 }
 
-// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:4000';
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:4000';
+// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
+
+// How often (ms) to send a lightweight ping to prevent Render's 30-s idle timeout
+const KEEP_ALIVE_INTERVAL_MS = 30000;
 
 export class SocketService {
   private socket: Socket | null = null;
@@ -19,6 +22,11 @@ export class SocketService {
   private pairingCode: string | null = null;
   private deviceId: string = 'mac-01';
   private connectedClients: WebClient[] = [];
+  private keepAliveTimer: ReturnType<typeof setInterval> | null = null;
+
+
+  private reconnectWatchdog: ReturnType<typeof setInterval> | null = null;
+
 
   public get isConnected(): boolean {
     return this._isConnected;
@@ -28,17 +36,23 @@ export class SocketService {
     if (url) this.backendUrl = url;
 
     this.socket = io(this.backendUrl, {
+      // Start with polling (works everywhere incl. Render), then upgrade to WS
+      transports: ['websocket','polling'],
+      // Reconnection — retry forever so the desktop auto-recovers from Render sleep
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
       reconnectionDelayMax: 10000,
+      randomizationFactor: 0.5,
       autoConnect: true,
+      timeout: 20000,
       query: { role: 'desktop' }, // tells backend to route to setupDesktopHandlers
     });
 
-    this.socket.on('connect', () => {
-      this._isConnected = true;
-      this.pairingCode = null; // reset so reconnects always fetch a fresh code
-      logInfo('SocketService', 'Connected to backend', { id: this.socket?.id });
+    this.startReconnectWatchdog();
 
-      // Announce device, then request pairing code in ack callback
+    // ── helpers ──────────────────────────────────────────────────────────────
+    const announceDevice = () => {
       this.socket?.emit(
         'device-online',
         {
@@ -46,22 +60,78 @@ export class SocketService {
           name: require('os').hostname(),
           platform: process.platform,
           arch: process.arch,
-          user:require('os').userInfo().username
+          user: require('os').userInfo().username,
         },
         () => {
-          // device-online acknowledged — now safe to request pairing code
+          // device-online acknowledged — safe to request pairing code
           // this.requestPairingCode();
         }
       );
+    };
+
+    const startKeepAlive = () => {
+      this.stopKeepAlive();
+      this.keepAliveTimer = setInterval(() => {
+        if (this.socket?.connected) {
+          // Lightweight ping — the server will just ignore unknown events,
+          // but it's enough traffic to reset Render's 30-s idle timer.
+          this.socket.emit('keep-alive');
+        }
+      }, KEEP_ALIVE_INTERVAL_MS);
+    };
+
+    // ── connect ──────────────────────────────────────────────────────────────
+    this.socket.on('connect', () => {
+      this._isConnected = true;
+      this.pairingCode = null; // reset so reconnects always fetch a fresh code
+      logInfo('SocketService', 'Connected to backend', { id: this.socket?.id });
+      announceDevice();
+      startKeepAlive();
+
+      console.log('transport:', this.socket?.io.engine.transport.name);
     });
 
-    this.socket.on('disconnect', () => {
+    this.socket.io.engine.on('upgrade', () => {
+      console.log(
+        'upgraded:',
+        this.socket?.io.engine.transport.name
+      );
+    });
+
+    // this.socket.on('disconnect', (reason) => {
+    //   this._isConnected = false;
+    //   this.stopKeepAlive();
+    //   logWarn('SocketService', 'Disconnected from backend', { reason });
+    //   // Socket.IO will auto-reconnect for all reasons except 'io server disconnect'
+    //   // and 'io client disconnect' (explicit .disconnect() call).
+    // });
+
+    this.socket.on('disconnect', (reason) => {
       this._isConnected = false;
-      logWarn('SocketService', 'Disconnected from backend');
+
+      logWarn('SocketService', 'Disconnected from backend', { reason });
+
+      if (reason === 'transport close') {
+        setTimeout(() => {
+          this.socket?.connect();
+        }, 1000);
+      }
     });
 
     this.socket.on('connect_error', (error) => {
       logError('SocketService', 'Connection error', error.message);
+    });
+
+    this.socket.on('reconnect', (attempt: number) => {
+      logInfo('SocketService', 'Reconnected to backend', { attempt });
+    });
+
+    this.socket.on('reconnect_attempt', (attempt: number) => {
+      logInfo('SocketService', 'Reconnect attempt', { attempt });
+    });
+
+    this.socket.on('reconnect_failed', () => {
+      logError('SocketService', 'All reconnection attempts failed');
     });
 
     //  Listen for commands from backend  
@@ -121,6 +191,17 @@ export class SocketService {
       screenService.stopScreenShare();
     });
   }
+
+  private startReconnectWatchdog() {
+  if (this.reconnectWatchdog) return;
+
+  this.reconnectWatchdog = setInterval(() => {
+    if (this.socket && !this.socket.connected) {
+      console.log('[SocketService] forcing reconnect');
+      this.socket.connect();
+    }
+  }, 30000);
+}
 
   private requestPairingCode(): void {
     if (!this.socket?.connected) return;
@@ -218,8 +299,16 @@ export class SocketService {
     return this.socket;
   }
 
+  private stopKeepAlive(): void {
+    if (this.keepAliveTimer !== null) {
+      clearInterval(this.keepAliveTimer);
+      this.keepAliveTimer = null;
+    }
+  }
+
   public disconnect() {
     if (this.socket) {
+      this.stopKeepAlive();
       this.socket.disconnect();
       this._isConnected = false;
     }

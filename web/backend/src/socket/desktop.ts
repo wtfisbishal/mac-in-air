@@ -1,25 +1,25 @@
 import { Server as SocketServer, Socket } from 'socket.io';
 import { deviceManager } from '../managers/devices';
-import { pairingManager } from '../managers/pairing';
-import { pairTokenManager } from '../managers/pairTokens';
+import { pairingManager } from '../managers/pairing'; 
 import { roomManager } from '../managers/rooms';
 
 export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
   // device-online 
- 
+
   socket.on(
     'device-online',
     (
-      data: { deviceId: string; name: string; platform: string; arch: string ,user:string},
+      data: { deviceId: string; name: string; platform: string; arch: string, user: string },
       ack?: () => void
     ) => {
-      const { deviceId, name, platform, arch ,user} = data;
+      const { deviceId, name, platform, arch, user } = data;
 
       if (!deviceId) {
         console.warn('[Desktop] device-online missing deviceId');
         ack?.();
         return;
       }
+
 
       const device = deviceManager.registerDevice(deviceId, {
         name: name || 'Unknown',
@@ -28,7 +28,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         socketId: socket.id,
         user: user || ''
       });
- 
+
 
       // Join the device's own room so we can target it by deviceId
       socket.join(deviceId);
@@ -45,7 +45,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
   // request-pairing-code
   // Desktop agent requests (or refreshes) its pairing code.
-  socket.on( 'request-pairing-code',
+  socket.on('request-pairing-code',
     (data: { deviceId: string; forceRefresh?: boolean }, callback: (res: { success: boolean; code?: string; error?: string }) => void) => {
 
       const { deviceId, forceRefresh } = data;
@@ -122,19 +122,53 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
   });
 
   //   disconnect 
+  // socket.on('disconnect', (reason) => {
+  //   console.log(`[Desktop] Disconnected: ${socket.id} (reason: ${reason})`);
+
+  //   const device = deviceManager.markOffline(socket.id);
+  //   if (device) {
+  //     // Commented out to prevent pairing code from changing on momentary disconnects
+  //     // pairingManager.revokeDevice(device.id);
+  //     // pairTokenManager.revokeDevice(device.id);
+
+  //     // Notify frontends
+  //     io.emit('device-status-changed', { deviceId: device.id, isOnline: false });
+
+  //     // Notify paired frontends that their session ended
+  //     const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
+  //     for (const fid of frontendSocketIds) {
+  //       const frontendSocket = io.sockets.sockets.get(fid);
+  //       if (frontendSocket) {
+  //         frontendSocket.emit('device-disconnected', { deviceId: device.id });
+  //       }
+  //       roomManager.leave(fid);
+  //     }
+  //   }
+  // });
+
   socket.on('disconnect', (reason) => {
     console.log(`[Desktop] Disconnected: ${socket.id} (reason: ${reason})`);
 
-    const device = deviceManager.markOffline(socket.id);
-    if (device) {
-      // Commented out to prevent pairing code from changing on momentary disconnects
-      // pairingManager.revokeDevice(device.id);
-      // pairTokenManager.revokeDevice(device.id);
+  const device = deviceManager.getDeviceBySocketId(socket.id);
 
-      // Notify frontends
-      io.emit('device-status-changed', { deviceId: device.id, isOnline: false });
+  if (!device) return;
 
-      // Notify paired frontends that their session ended
+  setTimeout(() => {
+    const current = deviceManager.getDevice(device.id);
+
+    if (
+      current &&
+      current.socketId === socket.id &&
+      !io.sockets.sockets.has(socket.id)
+    ) {
+      deviceManager.markOffline(socket.id);
+
+      io.emit('device-status-changed', {
+        deviceId: device.id,
+        isOnline: false,
+      });
+    }
+          // Notify paired frontends that their session ended
       const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
       for (const fid of frontendSocketIds) {
         const frontendSocket = io.sockets.sockets.get(fid);
@@ -143,6 +177,13 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         }
         roomManager.leave(fid);
       }
-    }
+
+  }, 30000);
+});
+
+  // keep-alive — desktop sends this every ~25 s to prevent Render's idle timeout
+  socket.on('keep-alive', () => {
+    // Silently ack — just receiving the event is enough to reset the idle timer
+    socket.emit('keep-alive-ack');
   });
 }

@@ -145,7 +145,7 @@ export default function AppsPage({ params }: PageProps) {
 
   if (deviceLoading) return (
     <AppLayout>
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen w-full flex items-center justify-center">
         <Loader2 className="animate-spin text-indigo-400" size={32} />
       </div>
     </AppLayout>
@@ -153,7 +153,7 @@ export default function AppsPage({ params }: PageProps) {
 
   if (!device) return (
     <AppLayout>
-      <div className="min-h-screen flex items-center justify-center">
+      <div className=" w-full   flex items-center justify-center">
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">Device not found</p>

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -17,9 +18,10 @@ html { height: 100%; }
 body {
   height: 100%;
   font-family: var(--font-sans);
-  background-color: var(--color-bg);
+  background-color: #111119;
   color: #f1f5f9;
   -webkit-font-smoothing: antialiased; 
+   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
 }
 
 /* ── Scrollbar ────────────────────────────────────────────── */
@@ -142,5 +144,72 @@ body {
 
 .buttombar{
   background: #57c786;
-background: linear-gradient(0deg, #57c78500 0%, #132964 100%);
+background: linear-gradient(0deg, #57c78500 0%, #3235f931 100%);
 }
+
+.glass-button-primary {
+    background: #0a84ffd9;
+    backdrop-filter: blur(20px);
+    background: linear-gradient(325deg, #3235f9, #0a84ffd9);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(10,132,255,0.6);
+    box-shadow:
+      0 4px 16px rgba(10,132,255,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: all 0.2s ease;
+    color: white;
+}
+.glass-button-primary:hover {
+  background: rgba(10,132,255,0.95);
+  background: linear-gradient(325deg, #3235f9, #46a1fcd9);
+  box-shadow: 0 6px 24px rgba(10,132,255,0.38),  inset 0 1px 0 rgba(255,255,255,0.3);
+  transform: translateY(-1px);
+}
+
+
+
+.glass-button {
+  background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: all 0.2s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,1);
+  transform: translateY(-1px);
+}
+
+
+.bk{
+  background: linear-gradient(rgba(161, 174, 47, 0.1) 0%, rgba(174, 157, 47, 0) 23.08%), rgb(19, 19, 19);
+  border-  : 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+.glass-panel {
+    background: #ffffff45;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid #ffffff69;
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .glass-panel-dark {
+    background: rgba(28,28,30,0.72);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+ 
+ 

@@ -22,7 +22,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen  mx-auto !w-full">
       
         {children}
     </div>

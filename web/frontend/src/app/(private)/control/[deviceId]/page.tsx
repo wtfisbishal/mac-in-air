@@ -6,13 +6,15 @@ import Link from 'next/link';
 import {
   MonitorOff, Keyboard, MousePointer2, Camera,
   Power, Moon, Lock, Terminal, Globe, ArrowLeft,
-  Loader2, Maximize2, Minimize2, Volume2, LayoutGrid, ShieldAlert,
+  Loader2, Maximize2, Minimize2, Volume2, LayoutGrid,
+  ShieldAlert,  
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
+import MacKeyboards from '@/components/MacKeyBoards';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -27,7 +29,7 @@ interface Action {
 }
 
 const ACTIONS: Action[] = [
-  { label: 'Screenshot', icon: Camera, type: 'SCREENSHOT' },
+  // { label: 'Screenshot', icon: Camera, type: 'SCREENSHOT' },
   { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
   { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
   { label: 'Sleep', icon: Moon, type: 'SLEEP' },
@@ -35,6 +37,27 @@ const ACTIONS: Action[] = [
   { label: 'Restart', icon: Power, type: 'RESTART', variant: 'danger' },
   { label: 'Shutdown', icon: Power, type: 'SHUTDOWN', variant: 'danger' },
 ];
+ export function normalizeKey(key: string) {
+  switch (key.toLowerCase()) {
+    case "meta":
+    case "cmd":
+    case "⌘":
+      return "command";
+
+    case "control":
+    case "ctrl":
+      return "control";
+
+    case "option":
+      return "alt";
+
+    case " ":
+      return "space";
+
+    default:
+      return key.toLowerCase();
+  }
+}
 
 //   Screen canvas component 
 function ScreenCanvas({
@@ -54,14 +77,33 @@ function ScreenCanvas({
 
   // Receive screen frames from socket
   useEffect(() => {
-    const socket = getSocket();
+    // const socket = getSocket();
 
-    // Join the device room; present pairToken for server-side auth
-    socket.emit('join-device', { deviceId, pairToken }, (res?: { success: boolean; message?: string }) => {
-      if (res && !res.success) {
-        console.warn('[ScreenCanvas] join-device rejected:', res.message);
+    // // Join the device room; present pairToken for server-side auth
+    // socket.emit('join-device', { deviceId, pairToken }, (res?: { success: boolean; message?: string }) => {
+    //   if (res && !res.success) {
+    //     console.warn('[ScreenCanvas] join-device rejected:', res.message);
+    //   }
+    // });
+
+    // if (!pairToken) return;
+
+  const socket = getSocket();
+
+ const joinDevice = () => {
+    socket.emit(
+      'join-device',
+      { deviceId, pairToken },
+      (res?: { success: boolean; message?: string }) => {
+        console.log('join-device response', res);
       }
-    });
+    );
+  };
+
+  // Join immediately
+  joinDevice();
+
+  socket.on('connect', joinDevice);
 
     const handleFrame = (data: {
       frame: ArrayBuffer | string;
@@ -145,9 +187,8 @@ function ScreenCanvas({
         {!hasFrame && (
           <div className="text-center">
             <MonitorOff size={48} className="text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm font-medium">Waiting for screen stream…</p>
-            <p className="text-slate-600 text-xs mt-1">Make sure screen sharing is started on the desktop agent</p>
-          </div>
+            <p className="text-slate-500 text-sm font-medium">Start screen streamming</p>
+           </div>
         )}
       </div>
 
@@ -161,14 +202,14 @@ function ScreenCanvas({
   );
 }
 
-// ── Main Control Room ─────────────────────────────────────────────────────────
+//   Main Control Room  
 export default function ControlPage({ params }: PageProps) {
   const { deviceId } = use(params);
   const router = useRouter();
   const { data: device, isLoading } = useDevice(deviceId);
   const { toasts, toast, dismiss } = useToast();
 
-  // ── Authorization: require a pairToken stored during the pairing flow ────────
+  //   Authorization: require a pairToken stored during the pairing flow  
   const [pairToken, setPairToken] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -184,6 +225,28 @@ export default function ControlPage({ params }: PageProps) {
   const [fullscreen, setFullscreen] = useState(false);
   const [sessionId, setSessionId] = useState('');
 
+
+  const KEY_MAP: Record<string, string> = {
+  meta: "command",
+  cmd: "command",
+  command: "command",
+
+  control: "control",
+  ctrl: "control",
+
+  option: "alt",
+  alt: "alt",
+
+  return: "enter",
+  escape: "escape",
+  delete: "backspace",
+
+  space: "space",
+  tab: "tab",
+};
+
+
+
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
 
@@ -195,14 +258,42 @@ export default function ControlPage({ params }: PageProps) {
     });
   }, [toast]);
 
-  // ── Mouse events ────────────────────────────────────────────────────────────
+  //   Mouse events  
   const handleMouseEvent = useCallback((type: string, data: Record<string, unknown>) => {
     if (!mouseCapture) return;
     const socket = getSocket();
     socket.emit(type, data); // fire-and-forget for low latency
   }, [mouseCapture]);
 
-  // ── Keyboard capture ────────────────────────────────────────────────────────
+  
+
+  const handleVirtualKeyPress = useCallback(
+  (keyName: string) => {
+    if (!kbCapture) return;
+
+    
+    const socket = getSocket();
+
+    const mapped =
+      KEY_MAP[keyName.toLowerCase()] ??
+      keyName.toLowerCase(); 
+      
+
+    if (mapped.length === 1) {
+      socket.emit("keyboard-type", {
+        text: mapped,
+      });
+    } else {
+      socket.emit("keyboard-shortcut", {
+        key: mapped,
+        modifier: [],
+      });
+    }
+  },
+  [kbCapture]
+);
+
+  // ── Keyboard capture  
   useEffect(() => {
     if (!kbCapture) return;
     const handler = (e: KeyboardEvent) => {
@@ -220,14 +311,16 @@ export default function ControlPage({ params }: PageProps) {
       } else {
         // Special keys / shortcuts
         const socket = getSocket();
-        socket.emit('keyboard-shortcut', { key: e.key.toLowerCase(), modifier: modifiers });
+        let mappedKey =  (e.key);
+        if (!mappedKey) return;
+        socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [kbCapture]);
 
-  // ── Screen share start/stop ──────────────────────────────────────────────────
+  //   Screen share start/stop  
   const toggleStream = () => {
     const socket = getSocket();
     if (!streaming) {
@@ -243,7 +336,7 @@ export default function ControlPage({ params }: PageProps) {
     }
   };
 
-  // ── Quick actions ────────────────────────────────────────────────────────────
+  //   Quick actions  
   const runAction = (action: Action) => {
     emit(action.type, action.payload);
     toast(`Sent: ${action.label}`, 'info');
@@ -257,10 +350,10 @@ export default function ControlPage({ params }: PageProps) {
     </AppLayout>
   );
 
-  // ── Not authorized: no pairToken in sessionStorage ──────────────────────────
+  //   Not authorized: no pairToken in sessionStorage  
   // if (!pairToken) return (
   //   <AppLayout>
-  //     <div className="min-h-screen flex items-center justify-center">
+  //     <div className="w-full flex items-center justify-center">
   //       <div className="text-center max-w-sm">
   //         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
   //           <ShieldAlert size={32} className="text-red-400" />
@@ -280,7 +373,7 @@ export default function ControlPage({ params }: PageProps) {
 
   if (!device) return (
     <AppLayout>
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen  w-full flex items-center justify-center">
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">Device not found</p>
@@ -294,8 +387,9 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={`flex w-full  flex-col h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
-        {/* ── Top bar ──────────────────────────────────────────────────────── */}
+      <div className={`flex w-full flex-col h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
+        {/* Top bar */}
+
         {!fullscreen && (
           <div className="flex items-center justify-between mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
@@ -320,17 +414,17 @@ export default function ControlPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* ── Main area ────────────────────────────────────────────────────── */}
-        <div className={`flex gap-4 flex-1 min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+        {/*   Main area */}
+        <div className={`flex   max-md:flex-col gap-4 flex-1 min-h-0 ${fullscreen ? 'h-full' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
-            className={`flex-1 flex flex-col gap-3 min-w-0 ${fullscreen ? 'p-3' : ''}`}
+            className={`flex-1 flex flex-col min-h-screen items-center gap-3 min-w-0 ${fullscreen ? 'p-3' : ''}`}
             tabIndex={-1}
             style={{ outline: 'none' }}
           >
             {/* Toolbar */}
-            <div className="glass rounded-xl px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
+            <div className="glass max-md:rounded-2xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
@@ -385,7 +479,7 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {/* Canvas */}
-            <div className="flex-1 glass rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className="flex-1 w-full glass min-h-[500px] rounded-2xl overflow-hidden relative animate-fade-up delay-2">
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} />
 
               {/* Keyboard capture overlay indicator */}
@@ -397,7 +491,7 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {/* Keyboard type bar (always visible shortcut) */}
-            <div className="glass rounded-xl px-3 py-2 flex items-center gap-3 animate-fade-up delay-3">
+            <div className="glass rounded-xl w-full px-3 py-2 flex items-center gap-3 animate-fade-up delay-3">
               <Volume2 size={14} className="text-slate-500 flex-shrink-0" />
               <input
                 type="text"
@@ -412,32 +506,22 @@ export default function ControlPage({ params }: PageProps) {
               />
               <kbd className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-500 font-mono">Enter</kbd>
             </div>
+
+            {kbCapture && (
+              <div className="animate-fade-up delay-4 min-h-[400px] w-fit   overflow-x-auto pb-4 flex justify-center">
+                <MacKeyboards onKeyPress={handleVirtualKeyPress} />
+              </div>
+            )}
           </div>
 
-          {/* ── Side panel (only when not fullscreen) ────────────────────── */}
+          {/*  Side panel (only when not fullscreen)  */}
           {!fullscreen && (
-            <div className="w-[220px] flex-shrink-0 flex flex-col gap-3 animate-fade-up delay-2">
-
-              {/* Device info */}
-              <div className="glass rounded-2xl p-4">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-3">Device</p>
-                {[
-                  ['Name', device.name],
-                  ['Platform', device.platform],
-                  ['Arch', device.arch],
-                  ['Status', device.isOnline ? 'Online' : 'Offline'],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-xs py-1.5 border-b border-white/[0.04] last:border-0">
-                    <span className="text-slate-500">{k}</span>
-                    <span className="text-slate-200 font-medium truncate ml-2">{v}</span>
-                  </div>
-                ))}
-              </div>
-
+            <div className="w-[220px] flex-shrink-0 pb-20 max-md:w-full flex flex-col gap-3 animate-fade-up delay-2">
+ 
               {/* Apps launcher link */}
               <Link
                 href={`/apps/${deviceId}`}
-                className="glass rounded-2xl p-3 flex items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
+                className="glass rounded-2xl p-3 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
                 <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
                   <LayoutGrid size={14} className="text-indigo-400" />

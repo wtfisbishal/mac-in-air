@@ -110,10 +110,10 @@ export default function DashboardPage() {
             <p className="text-slate-400 text-sm mt-1">Monitor and control your remote devices</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => refetch()} className="btn btn-ghost text-xs gap-1.5 px-3 py-2">
+            <button onClick={() => refetch()} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
               <RefreshCw size={13} /> Refresh
             </button>
-            <Link href="/pair" className="btn btn-primary text-xs gap-1.5">
+            <Link href="/pair" className=" flex items-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer">
               <Plus size={14} /> Pair Device
             </Link>
           </div>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
             { label: 'Online Now',    value: online, icon: Circle,  color: 'text-emerald-400' },
             { label: 'Offline',       value: total - online, icon: Circle, color: 'text-slate-500' },
           ].map(s => (
-            <div key={s.label} className="glass rounded-2xl p-4 flex items-center gap-4">
+            <div key={s.label} className="glass-panel-dark !rounded-2xl p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-slate-900/60 flex items-center justify-center">
                 <s.icon size={18} className={s.color} />
               </div>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
           {isLoading && (
             <div className="grid grid-cols-2 gap-4">
               {[1, 2].map(i => (
-                <div key={i} className="glass rounded-2xl p-5 space-y-3">
+                <div key={i} className="glass-panel-dark rounded-2xl p-5 space-y-3">
                   <div className="skeleton h-5 w-2/3" />
                   <div className="skeleton h-4 w-1/3" />
                   <div className="grid grid-cols-2 gap-2">
@@ -159,7 +159,7 @@ export default function DashboardPage() {
           )}
 
           {isError && (
-            <div className="glass rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
+            <div className="glass-panel-dark rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
               <p className="text-sm font-medium">Failed to load devices</p>
               <p className="text-xs text-red-400/60 mt-1">{(error as Error).message}</p>
             </div>

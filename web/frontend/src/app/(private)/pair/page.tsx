@@ -93,13 +93,15 @@ export default function PairPage() {
             <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={36} className="text-emerald-400" />
             </div>
+
+             
             <h2 className="text-2xl font-bold text-white mb-2">Paired!</h2>
             <p className="text-slate-400 text-sm mb-6">
               <span className="text-white font-semibold">{paired.name}</span> is now connected.
             </p>
             <button
               onClick={() => router.push(`/control/${paired.id}`)}
-              className="btn btn-primary"
+              className="  flex items-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer "
             >
               Open Control Room <ArrowRight size={15} />
             </button>
@@ -125,7 +127,7 @@ export default function PairPage() {
           </div>
  
           <form onSubmit={submit}>
-            <div className="glass rounded-2xl p-7 mb-4">
+            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-2xl p-7 mb-4">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest text-center mb-5">
                 Pairing Code
               </p>
@@ -142,7 +144,7 @@ export default function PairPage() {
                     onChange={e => handleInput(i, e.target.value)}
                     onKeyDown={e => handleKeyDown(i, e)}
                     onPaste={handlePaste}
-                    className="code-cell"
+                    className="code-cell !backdrop-blur-2xl !text-5xl"
                     placeholder="-"
                   />
                 ))}
@@ -151,7 +153,7 @@ export default function PairPage() {
               <button
                 type="submit"
                 disabled={code.length !== LEN || mutation.isPending}
-                className="btn btn-primary w-full"
+                className="flex items-center justify-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer w-full"
               >
                 {mutation.isPending
                   ? <><Loader2 size={15} className="animate-spin" /> Connecting…</>
@@ -162,8 +164,13 @@ export default function PairPage() {
           </form>
 
           {/* Instructions */}
-          <div className="glass rounded-2xl p-5 border border-indigo-500/[0.08]">
-            <p className="text-xs font-semibold text-indigo-300 mb-3 uppercase tracking-wide">How to get the code</p>
+
+          <div>
+
+
+
+          <div className="bg-gradient-to- bk from-[#ffb700cc] to-[#9d6901]  rounded-2xl p-5 border border-indigo-500/[0.08]">
+            <p className="text-xs font-semibold text-yellow-300 mb-3 uppercase tracking-wide">How to get the code</p>
             <ol className="space-y-2.5">
               {[
                 'Open the Desktop App app on your Mac',
@@ -172,14 +179,18 @@ export default function PairPage() {
                 'Paste or type it above',
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-500/15 text-indigo-400 text-[10px] font-bold flex items-center justify-center mt-0.5">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/70 text-gray-100 text-[10px] font-bold flex items-center justify-center mt-0.5">
                     {i + 1}
                   </span>
-                  <span className="text-xs text-slate-400">{step}</span>
+                  <span className="text-xs text-yellow-400">{step}</span>
                 </li>
               ))}
             </ol>
           </div>
+
+        </div>
+
+
         </div>
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

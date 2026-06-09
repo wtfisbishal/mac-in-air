@@ -3,8 +3,10 @@ import * as path from 'path';
 import { setupIpc } from './ipc';
 import { createTray } from './tray';
 import { socketService } from '../services/socket.service';
+import { powerSaveBlocker } from 'electron';
 
 const isDev = !app.isPackaged;
+let blockerId: number;
 
 function createWindow() {
    
@@ -36,6 +38,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+
+  blockerId = powerSaveBlocker.start('prevent-app-suspension');
+
+  console.log(
+    'PowerSaveBlocker started:',
+    powerSaveBlocker.isStarted(blockerId)
+  );
+
   setupIpc();
   createTray();
   socketService.connect();
@@ -50,6 +60,9 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+  if (powerSaveBlocker.isStarted(blockerId)) {
+    powerSaveBlocker.stop(blockerId);
+  }
   if (process.platform !== 'darwin') {
     app.quit();
   }
