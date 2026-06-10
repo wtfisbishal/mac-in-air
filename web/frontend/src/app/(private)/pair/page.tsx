@@ -127,8 +127,8 @@ export default function PairPage() {
           </div>
  
           <form onSubmit={submit}>
-            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-2xl p-7 mb-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest text-center mb-5">
+            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl p-7 mb-4">
+              <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest text-center mb-5">
                 Pairing Code
               </p>
 
@@ -163,14 +163,11 @@ export default function PairPage() {
             </div>
           </form>
 
-          {/* Instructions */}
-
+          
           <div>
 
-
-
-          <div className="bg-gradient-to- bk from-[#ffb700cc] to-[#9d6901]  rounded-2xl p-5 border border-indigo-500/[0.08]">
-            <p className="text-xs font-semibold text-yellow-300 mb-3 uppercase tracking-wide">How to get the code</p>
+          <div className="bg-blue-500/10 border  border-blue-500/30 rounded-3xl p-5 ">
+            <p className="text-xs font-semibold text-blue-300 mb-3 uppercase tracking-wide">How to get the code</p>
             <ol className="space-y-2.5">
               {[
                 'Open the Desktop App app on your Mac',
@@ -179,15 +176,16 @@ export default function PairPage() {
                 'Paste or type it above',
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/70 text-gray-100 text-[10px] font-bold flex items-center justify-center mt-0.5">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500/70 text-gray-100 text-[10px] font-bold flex items-center justify-center mt-0.5">
                     {i + 1}
                   </span>
-                  <span className="text-xs text-yellow-400">{step}</span>
+                  <span className="text-xs text-blue-400">{step}</span>
                 </li>
               ))}
             </ol>
           </div>
 
+  
         </div>
 
 

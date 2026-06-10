@@ -31,11 +31,11 @@ export default function Sidebar() {
         <Link href="/home" className="flex flex-col items-center gap-3 group">
         
           <div className='  '>
-          <img src="/mac2.png" height={90} width={90} className=' object-fit' alt="" />
+          <img src="/logo.png" height={90} width={90} className=' object-fit' alt="" />
 
           </div>
           <div className="leading-none">
-            <p className="text-xl font-bold text-white tracking-tight">MAC in WIND</p>
+            <p className="text-xl font-bold text-white tracking-tight"> MAC in AIR</p>
           </div>
         </Link>
       </div>

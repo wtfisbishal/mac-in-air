@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PermissionCard } from '@/components/PermissionCard';
-
+import {motion} from 'framer-motion'
 export default function PermissionsPage() {
   const [permissions, setPermissions] = useState<any>(null);
 
@@ -27,7 +27,7 @@ export default function PermissionsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-2xl">
+    <div className="p-6 space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Permissions</h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -42,7 +42,12 @@ export default function PermissionsPage() {
           status={permissions?.screenRecording || 'unknown'}
         />
 
-        <div
+        <motion.div  initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.6,
+          }}
           className={`p-4  rounded-xl flex items-center justify-between transition-colors ${
             permissions?.accessibility
               ? ' bg-gradient-to-b from-[#0ee000] to-[#076a00]'
@@ -51,7 +56,7 @@ export default function PermissionsPage() {
         >
           <div>
             <h3 className="font-semibold text-lg">Accessibility</h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-200">
               Required for mouse and keyboard remote control
             </p>
           </div>
@@ -69,9 +74,14 @@ export default function PermissionsPage() {
             </span>
             <div className={`w-3 h-3 rounded-full ${permissions?.accessibility ? 'bg-green-500' : 'bg-red-500'}`} />
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div  initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.6,
+          }}
           className={`p-4   rounded-xl flex items-center justify-between transition-colors ${
             permissions?.automation
               ? ' bg-gradient-to-b from-[#0ee000] to-[#076a00] '
@@ -80,7 +90,7 @@ export default function PermissionsPage() {
         >
           <div>
             <h3 className="font-semibold text-lg">Automation</h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-200">
               Required to launch apps and control system settings via AppleScript
             </p>
           </div>
@@ -90,7 +100,7 @@ export default function PermissionsPage() {
             </span>
             <div className={`w-3 h-3 rounded-full ${permissions?.automation ? 'bg-green-500' : 'bg-red-500'}`} />
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">

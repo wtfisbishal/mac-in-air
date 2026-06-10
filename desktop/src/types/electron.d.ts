@@ -40,6 +40,10 @@ export interface ElectronAPI {
   getPairingCode: () => Promise<string | null>;
   refreshPairingCode: () => Promise<string | null>;
   getConnectedClients: () => Promise<any[]>;
+  onWebRTCSignaling: (callback: (data: any) => void) => void;
+  sendWebRTCSignaling: (data: any) => void;
+  onStartWebRTC: (callback: (data: any) => void) => void;
+  onStopWebRTC: (callback: () => void) => void;
 }
 
 declare global {

@@ -40,25 +40,18 @@ export default function PairingPage() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen   p-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex items-center max-w-4xl mx-auto justify-center min-h-screen   p-4">
+      <div className="  space-y-8">
          
         <div className="text-center space-y-2 w-[560px] ">
-          <div className="text-5xl mb-4">🔗</div>
+          <div className="text-5xl mb-4 drop-shadow-xl drop-shadow-[#ffffff4f]  ">🔗</div>
           <h1 className="text-3xl font-bold text-white">Pair Your Device</h1>
           <p className="text-gray-400 text-sm">
             Share this code with your web dashboard to connect your Mac
           </p>
         </div>
  
-        {deviceInfo && (
-          <div className="bg-gradient-to-t w-[560px] h-[160px] from-[#0E161B] to-[#374750]  rounded-lg p-4 ">
-            <p className="text-gray-400 text-xs mb-2 uppercase font-semibold">Device</p>
-            <p className="text-white font-semibold font-mono capitalize"> 💻 {deviceInfo.user}'s {deviceInfo.hostname}</p>
-            <p className="text-gray-500 text-sm">{deviceInfo.platform} • {deviceInfo.arch}</p>
-            <p className="text-gray-600 text-xs mt-2">{deviceInfo.cpus} CPUs • {(deviceInfo.totalMemory / 1024 / 1024 / 1024).toFixed(1)}GB RAM</p>
-          </div>
-        )}
+       
  
         <PairingCodeCard />
 

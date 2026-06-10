@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css"; 
 import  TitleBar  from "@/components/titleBar";
+import WebRTCManager from "@/components/WebRTCManager";
 
 
 const inter = Inter({
@@ -10,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MAC in WIND",
+  title: "MAC in AIR",
   description: "Remote desktop control agent for macOS",
 };
 
@@ -21,11 +22,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} relative   font-sans`}>
+      <body className={`${inter.variable} relative backdrop-blur-3xl bg-[#00000032]  font-sans`}>
 
         <TitleBar />
+        <WebRTCManager />
 
-        <div className="flex mt-16 app-container bg-[#191a1d] text-white">
+        <div className="flex mt-16 app-container  text-white">
            
           <main className="flex-1 overflow-auto">{children}</main>
         </div>

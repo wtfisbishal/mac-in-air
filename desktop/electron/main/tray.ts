@@ -18,7 +18,7 @@ export function createTray() {
       { label: 'Quit', click: () => { app.quit(); } }
     ]);
  
-    tray.setToolTip('MAC in WIND');
+    tray.setToolTip('MAC in AIR');
     tray.setContextMenu(contextMenu);
   } catch (error) {
     console.error('Failed to create tray icon', error);

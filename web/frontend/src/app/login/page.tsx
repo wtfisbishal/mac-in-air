@@ -40,31 +40,27 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-[400px]">
 
-          {/* Logo */}
           <div className="flex flex-col items-center mb-8 animate-fade-up">
-            {/* <div className="w-14 h-14 text-5xl rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-4">
-              
-            </div> */}
 
-            {/* <SwiftAppleLogo/> */}
-            <img src="/mac2.png" height={120} width={120} className=' object-fit' alt="" />
+            <img src="/logo.png" height={120} width={120} className=' object-fit' alt="" />
 
+            <h1 className="text-5xl  font-black tracking-tight leading-none mt-4">MAC in AIR</h1>
 
             <p className="text-slate-400 text-sm mt-1">Control your Mac from anywhere</p>
           </div>
 
           {/* Card */}
-          <div className="glass rounded-2xl p-7 animate-fade-up delay-1">
+          <div className="glass-panel-dark rounded-4xl p-7 animate-fade-up delay-1">
             {/* Tab toggle */}
-            <div className="flex gap-1 bg-slate-900/60 p-1 rounded-xl mb-6">
+            <div className="flex gap-1 glass-panel p-1  !rounded-full mb-6">
               {(['login', 'register'] as const).map(m => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all capitalize
+                  className={`flex-1 py-2 text-sm font-semibold  !rounded-full   transition-all capitalize
                     ${mode === m
-                      ? 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/20'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? '  /15 text-indigo-300 border glass-button-primary border-indigo-500/20'
+                      : 'text-slate-200 hover:text-slate-300'
                     }`}
                 >
                   {m}
@@ -81,7 +77,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="input"
+                  className="w-full glass-panel !rounded-2xl outline-none !pl-5 py-2.5 text-sm border "
                   placeholder="you@example.com"
                   autoComplete="email"
                 />
@@ -96,14 +92,14 @@ export default function LoginPage() {
                     type={showPw ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="input pr-11"
+                    className="w-full glass-panel !rounded-2xl outline-none !pl-5 py-2.5 text-sm border"
                     placeholder="••••••••"
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(p => !p)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-200 hover:text-slate-300 transition-colors"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -113,7 +109,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="btn btn-primary w-full mt-2"
+                className="btn glass-button-primary !rounded-full w-full mt-2"
               >
                 {mutation.isPending
                   ? <><Loader2 size={16} className="animate-spin" /> {mode === 'login' ? 'Signing in…' : 'Creating account…'}</>
@@ -150,7 +146,7 @@ function SwiftAppleLogo() {
 
       {/* Optional Typography */}
       <span className="ml-4 text-2xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-cyan-400">
-        MAC in WIND
+        MAC in AIR
       </span>
     </div>
   );

@@ -3,7 +3,7 @@ import './globals.css';
 import Providers from '@/components/Providers';
  
 export const metadata: Metadata = {
-  title: { default: 'MAC in WIND', template: '%s | MAC in WIND' },
+  title:'MAC in AIR'  ,
   description: 'Control your Mac remotely — screen streaming, mouse & keyboard control.',
 };
 

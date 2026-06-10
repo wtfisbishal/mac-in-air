@@ -131,9 +131,9 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
           onClick={copyToClipboard}
           disabled={isLoading || loading}
           className="
-            flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50
-            text-white font-semibold py-2 px-4 rounded-lg
-            transition-colors text-sm
+            flex-1 glass-button-primary disabled:bg-gray-600 disabled:opacity-50
+            text-white font-semibold py-2 px-4 !rounded-full
+            
           "
         >
           {copySuccess ? '✓ Copied' : 'Copy Code'}
@@ -142,9 +142,9 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
           onClick={handleRefresh}
           disabled={isLoading || loading}
           className="
-            flex-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 disabled:opacity-50
-            text-white font-semibold py-2 px-4 rounded-lg
-            transition-colors text-sm
+            flex-1 glass-button disabled:bg-gray-600 disabled:opacity-50
+            text-white font-semibold py-2 px-4 !rounded-full
+             
           "
         >
           {loading ? '⟳ Refreshing...' : 'Refresh'}

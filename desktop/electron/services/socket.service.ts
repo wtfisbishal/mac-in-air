@@ -98,14 +98,7 @@ export class SocketService {
       );
     });
 
-    // this.socket.on('disconnect', (reason) => {
-    //   this._isConnected = false;
-    //   this.stopKeepAlive();
-    //   logWarn('SocketService', 'Disconnected from backend', { reason });
-    //   // Socket.IO will auto-reconnect for all reasons except 'io server disconnect'
-    //   // and 'io client disconnect' (explicit .disconnect() call).
-    // });
-
+   
     this.socket.on('disconnect', (reason) => {
       this._isConnected = false;
 
@@ -189,6 +182,25 @@ export class SocketService {
     this.socket.on('screen-share-stop', (data) => {
       logInfo('SocketService', 'Screen share stopped', { sessionId: data.sessionId });
       screenService.stopScreenShare();
+      
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
+    });
+
+    // WebRTC Signaling from Backend -> Renderer
+    this.socket.on('webrtc-offer', (data) => {
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'offer', ...data });
+    });
+
+    this.socket.on('webrtc-answer', (data) => {
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'answer', ...data });
+    });
+//After Offer/Answer exchange, peers still need to discover network paths.
+    this.socket.on('webrtc-ice-candidate', (data) => {
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'ice-candidate', ...data });
     });
   }
 
@@ -202,20 +214,7 @@ export class SocketService {
     }
   }, 30000);
 }
-
-  private requestPairingCode(): void {
-    if (!this.socket?.connected) return;
-
-    this.socket.emit('request-pairing-code', { deviceId: this.deviceId }, (response: any) => {
-      if (response?.success) {
-        this.pairingCode = response.code;
-        logInfo('SocketService', 'Received pairing code', { code: response.code });
-      } else {
-        logError('SocketService', 'Failed to get pairing code', response?.error);
-      }
-    });
-  }
-
+ 
   public async getPairingCode(): Promise<string | null> {
     // If we already have a code cached, return it immediately
     if (this.pairingCode) {
@@ -226,7 +225,7 @@ export class SocketService {
       return null;
     }
 
-    // Wait up to 3s for connection if not yet connected
+    // Wait up to 3s  if not  connected
     if (!this.socket.connected) {
       await new Promise<void>((resolve) => {
         this.socket?.once('connect', resolve);

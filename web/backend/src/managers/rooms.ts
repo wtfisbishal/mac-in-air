@@ -1,8 +1,9 @@
 class RoomManager {
-  // deviceId → Set<frontendSocketId>  
+
+  // deviceId -> Set<frontendSocketId>  
   private rooms: Map<string, Set<string>> = new Map();
 
-  // frontendSocketId → deviceId 
+  // frontendSocketId -> deviceId 
   private socketToDevice: Map<string, string> = new Map();
 
    // Join a frontend socket to a device's control room.

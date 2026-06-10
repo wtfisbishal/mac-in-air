@@ -78,4 +78,18 @@ export function setupIpc() {
   ipcMain.handle('get-connected-clients', () => {
     return socketService.getConnectedClients();
   });
+
+  //  WebRTC Signaling (Renderer -> Main -> Backend)
+  ipcMain.on('webrtc-signaling', (event, data) => {
+    const socket = socketService.getSocket();
+    if (!socket?.connected) return;
+
+    if (data.type === 'offer') {
+      socket.emit('webrtc-offer', data);
+    } else if (data.type === 'answer') {
+      socket.emit('webrtc-answer', data);
+    } else if (data.type === 'ice-candidate') {
+      socket.emit('webrtc-ice-candidate', data);
+    }
+  });
 }

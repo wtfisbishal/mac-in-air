@@ -6,6 +6,22 @@ const nextConfig: NextConfig = {
   typescript:{
     ignoreBuildErrors:true
   },
+  images:{
+    remotePatterns:[
+      {
+        protocol:'https',
+        hostname:'s3.macosicons.com',
+        port:'',
+        pathname:'/**'
+      },
+       {
+        protocol:'https',
+        hostname:'cdn.jim-nielsen.com',
+        port:'',
+        pathname:'/**'
+      }
+    ]
+  },
   turbopack:{
     root:path.join(__dirname, '..'),
   },

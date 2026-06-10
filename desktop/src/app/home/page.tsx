@@ -5,6 +5,7 @@ import { DeviceCard } from '@/components/DeviceCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import PairingStatusWidget from '@/components/PairingStatusWidget';
 import { Monitor, Globe } from 'lucide-react';
+import Link from 'next/link';
 
 interface DeviceInfo {
   hostname: string;
@@ -25,7 +26,6 @@ interface WebClient {
 export default function DashboardPage() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [commandLog, setCommandLog] = useState<string[]>([]);
   const [webClients, setWebClients] = useState<WebClient[]>([]);
 
   useEffect(() => {
@@ -36,28 +36,32 @@ export default function DashboardPage() {
         const connected = await window.electronAPI.getConnectionStatus();
         setIsConnected(connected);
         const clients = await window.electronAPI.getConnectedClients?.() ?? [];
+        console.log(clients)
         setWebClients(clients);
       };
       fetchData();
       const interval = setInterval(fetchData, 3000);
       return () => clearInterval(interval);
     }
+
   }, []);
- 
+
+   
+
   return (
-    <div className="p-6 space-y-6 h-fit  ">
-      
+    <div className="p-6 max-w-4xl mx-auto space-y-6 h-fit  ">
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Home</h1>
-          
+
         </div>
-        <StatusBadge status={isConnected ? 'online' : 'offline'} label={isConnected ? 'Backend Connected' : 'Backend Disconnected'} />
+        <StatusBadge status={isConnected ? 'online' : 'offline'} label={isConnected ? 'Connected to Server' : 'Disconnected'} />
       </div>
 
-       
-      <PairingStatusWidget />
- 
+
+      {!isConnected && <PairingStatusWidget />}
+
       <div className="rounded-xl border border-white/[0.06] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
@@ -105,10 +109,10 @@ export default function DashboardPage() {
         )}
       </div>
 
-      
+ {/* <Link className='glass-button' href='/'>home</Link> */}
       {deviceInfo && (
         <DeviceCard {...deviceInfo} isConnected={isConnected} />
-      )} 
+      )}
     </div>
   );
 }

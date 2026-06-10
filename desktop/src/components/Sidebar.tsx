@@ -20,7 +20,7 @@ export function Sidebar() {
       <div className="p-5 border-b  border-white/[0.06]">
         <div className="flex items-center gap-2">
           
-          <span className="font-extrabold text-2xl text-white tracking-tight">MAC in WIND</span>
+          <span className="font-extrabold text-2xl text-white tracking-tight">MAC in AIR</span>
         </div>
       </div>
 

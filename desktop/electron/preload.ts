@@ -28,4 +28,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Active web sessions
   getConnectedClients: () => ipcRenderer.invoke('get-connected-clients'),
+
+  // WebRTC
+  onWebRTCSignaling: (callback: (data: any) => void) => {
+    ipcRenderer.on('webrtc-signaling', (_event, data) => callback(data));
+  },
+  sendWebRTCSignaling: (data: any) => ipcRenderer.send('webrtc-signaling', data),
+  onStartWebRTC: (callback: (data: any) => void) => {
+    ipcRenderer.on('start-webrtc', (_event, data) => callback(data));
+  },
+  onStopWebRTC: (callback: () => void) => {
+    ipcRenderer.on('stop-webrtc', () => callback());
+  },
 });

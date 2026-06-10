@@ -1,5 +1,5 @@
 {
-  "name": "MACinWIND",
+  "name": "MACinAIR",
   "version": "1.0.0",
   "description": "A MAC app ",
   "author": "Bishal Kandi",
@@ -21,13 +21,14 @@
     "package:mac": "npm run build && electron-builder --mac",
     "postinstall": "electron-builder install-app-deps"
   },
-    "keywords": [
-      "mac-in-wind",
-      "remote-desktop-control",
-      "mac screen sharing"
+  "keywords": [
+    "mac-in-wind",
+    "remote-desktop-control",
+    "mac screen sharing"
   ],
   "dependencies": {
     "electron-serve": "^2.1.1",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "robotjs": "^0.7.1",
     "socket.io-client": "^4.8.3"
@@ -49,9 +50,9 @@
     "typescript": "^5.8.3",
     "wait-on": "^8.0.3"
   },
-   "build": {
+  "build": {
     "appId": "com.bisxxal.fuckdsa",
-    "productName": "MAC in WIND",
+    "productName": "MAC in AIR",
     "directories": {
       "output": "release"
     },

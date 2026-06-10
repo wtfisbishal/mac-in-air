@@ -9,6 +9,7 @@ import { useDevice } from '@/hooks/useDevices';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
+import Image from 'next/image';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -167,15 +168,15 @@ export default function AppsPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className="flex flex-col w-full  h-screen p-5">
+      <div className="flex flex-col w-full -mt-16 max-md:mt-0 h-screen p-5">
  
         <div className="flex items-center justify-between mb-5 animate-fade-up">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="btn btn-ghost !p-3">
+            <button onClick={() => router.back()} className="btn btn-ghost glass-panel-dark  !rounded-2xl !p-3">
               <ArrowLeft size={16} />
             </button>
             <div>
-              <h1 className="text-lg font-bold text-white leading-tight">
+              <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight">
                 Apps — <span className="text-indigo-400 capitalize"> {device?.user}'s {device.name}</span>
               </h1>
               <p className="text-xs text-slate-500">
@@ -190,7 +191,7 @@ export default function AppsPage({ params }: PageProps) {
             <button
               onClick={loadApps}
               disabled={loading}
-              className="btn btn-ghost p-2"
+              className="btn btn-ghost glass-panel-dark  !rounded-3xl  p-2"
               title="Refresh app list"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -199,20 +200,20 @@ export default function AppsPage({ params }: PageProps) {
         </div>
 
 
-        <div className="relative !rounded-full mb-4 animate-fade-up delay-1">
-          <Search size={14} className="absolute !left-5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+        <div className="relative glass-panel-dark py-1 px-5 w-1/2 mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
+          <Search size={17} className="  text-slate-200 pointer-events-none" />
           <input
             ref={searchRef}
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search apps… (⌘K)"
-            className="input !pl-10 py-2.5 ml-2 text-sm"
+            className=" w-full border-none outline-none !pl-10 py-2.5 ml-2 text-sm"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+              className="   text-slate-200 hover:text-slate-300 text-sm"
             >
               ✕
             </button>
@@ -231,7 +232,8 @@ export default function AppsPage({ params }: PageProps) {
 
           {!loading && filtered.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <AppWindow size={36} className="text-slate-600" />
+              {/* <AppWindow size={36} className="text-slate-600" /> */}
+              <Image src={'/apps.png'} height={65} width={65} alt='apps' />
               <p className="text-slate-400 text-sm font-medium">
                 {search ? `No apps matching "${search}"` : 'No apps found'}
               </p>

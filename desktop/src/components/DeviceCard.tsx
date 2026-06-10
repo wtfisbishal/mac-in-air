@@ -1,5 +1,5 @@
 import { StatusBadge } from './StatusBadge';
-
+import { motion } from 'framer-motion'
 interface DeviceCardProps {
   hostname: string;
   platform: string;
@@ -9,7 +9,7 @@ interface DeviceCardProps {
   freeMemory: number;
   uptime: number;
   isConnected: boolean;
-  user:string
+  user: string
 }
 
 function formatBytes(bytes: number): string {
@@ -35,7 +35,13 @@ export function DeviceCard({
   isConnected,
 }: DeviceCardProps) {
   return (
-    <div className="p-5 rounded-xl bg-gradient-to-t  from-[#0E161B] to-[#374750]   transition-colors">
+    <motion.div initial={{ y: 30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{
+        delay: 0.1,
+        duration: 0.6,
+      }}
+      className="p-5 rounded-xl bg-gradient-to-t  from-[#0E161B] to-[#374750]   transition-colors">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 rounded-lg shadow-lg shadow-black/50 bg-gradient-to-br from-zinc-500/20 to-zinc-600/20 border border-white/[0.08] flex items-center justify-center text-4xl">
@@ -64,6 +70,6 @@ export function DeviceCard({
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

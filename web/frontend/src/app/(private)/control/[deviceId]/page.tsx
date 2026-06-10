@@ -7,7 +7,7 @@ import {
   MonitorOff, Keyboard, MousePointer2, Camera,
   Power, Moon, Lock, Terminal, Globe, ArrowLeft,
   Loader2, Maximize2, Minimize2, Volume2, LayoutGrid,
-  ShieldAlert,  
+  ShieldAlert,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import MacKeyboards from '@/components/MacKeyBoards';
+import Image from 'next/image';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -28,16 +29,13 @@ interface Action {
   variant?: 'default' | 'danger';
 }
 
-const ACTIONS: Action[] = [
-  // { label: 'Screenshot', icon: Camera, type: 'SCREENSHOT' },
+const ACTIONS: Action[] = [ 
   { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
   { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
   { label: 'Sleep', icon: Moon, type: 'SLEEP' },
-  { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' },
-  { label: 'Restart', icon: Power, type: 'RESTART', variant: 'danger' },
-  { label: 'Shutdown', icon: Power, type: 'SHUTDOWN', variant: 'danger' },
+  { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' }, 
 ];
- export function normalizeKey(key: string) {
+export function normalizeKey(key: string) {
   switch (key.toLowerCase()) {
     case "meta":
     case "cmd":
@@ -69,91 +67,93 @@ function ScreenCanvas({
   pairToken: string;
   onMouseEvent: (type: string, data: Record<string, unknown>) => void;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
   const [hasFrame, setHasFrame] = useState(false);
   const [dimLabel, setDimLabel] = useState('');
   const screenSize = useRef({ w: 1920, h: 1080 }); // actual Mac screen size from frames
 
-  // Receive screen frames from socket
   useEffect(() => {
-    // const socket = getSocket();
+    const socket = getSocket();
 
-    // // Join the device room; present pairToken for server-side auth
-    // socket.emit('join-device', { deviceId, pairToken }, (res?: { success: boolean; message?: string }) => {
-    //   if (res && !res.success) {
-    //     console.warn('[ScreenCanvas] join-device rejected:', res.message);
-    //   }
-    // });
-
-    // if (!pairToken) return;
-
-  const socket = getSocket();
-
- const joinDevice = () => {
-    socket.emit(
-      'join-device',
-      { deviceId, pairToken },
-      (res?: { success: boolean; message?: string }) => {
-        console.log('join-device response', res);
-      }
-    );
-  };
-
-  // Join immediately
-  joinDevice();
-
-  socket.on('connect', joinDevice);
-
-    const handleFrame = (data: {
-      frame: ArrayBuffer | string;
-      width: number;
-      height: number;
-      mimeType?: string;
-    }) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      screenSize.current = { w: data.width, h: data.height };
-      if (canvas.width !== data.width) canvas.width = data.width;
-      if (canvas.height !== data.height) canvas.height = data.height;
-      setDimLabel(`${data.width} × ${data.height}`);
-
-      const mimeType = data.mimeType ?? 'image/jpeg';
-
-      const drawBlob = (blob: Blob) => {
-        // createImageBitmap decodes off the main thread — faster and smoother
-        createImageBitmap(blob).then((bitmap) => {
-          ctx.drawImage(bitmap, 0, 0);
-          bitmap.close(); // free GPU memory
-        }).catch(() => {
-          // Fallback to Image element if createImageBitmap not supported
-          const url = URL.createObjectURL(blob);
-          const img = new Image();
-          img.onload = () => { ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url); };
-          img.src = url;
-        });
-      };
-
-      if (typeof data.frame === 'string') {
-        // Base64-encoded frame
-        fetch(`data:${mimeType};base64,${data.frame}`)
-          .then(r => r.blob())
-          .then(drawBlob);
-      } else {
-        // Binary ArrayBuffer frame
-        drawBlob(new Blob([data.frame], { type: mimeType }));
-      }
-
-      if (!hasFrame) setHasFrame(true);
+    const joinDevice = () => {
+      socket.emit(
+        'join-device',
+        { deviceId, pairToken },
+        (res?: { success: boolean; message?: string }) => {
+          console.log('join-device response', res);
+        }
+      );
     };
 
-    socket.on('screen-frame', handleFrame);
-    return () => { socket.off('screen-frame', handleFrame); };
-  }, [deviceId, hasFrame]);
+    joinDevice();
+    socket.on('connect', joinDevice);
 
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+    });
+    pcRef.current = pc;
+
+    pc.ontrack = (event) => {
+      console.log('[WebRTC] Track received', event.streams[0]);
+      if (videoRef.current) {
+        videoRef.current.srcObject = event.streams[0];
+        setHasFrame(true);
+
+        const track = event.streams[0].getVideoTracks()[0];
+        if (track) {
+          const settings = track.getSettings();
+          if (settings.width && settings.height) {
+            screenSize.current = { w: settings.width, h: settings.height };
+            setDimLabel(`${settings.width} × ${settings.height}`);
+          }
+        }
+      }
+    };
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        socket.emit('webrtc-ice-candidate', {
+          candidate: event.candidate,
+          deviceId,
+        });
+      }
+    };
+
+    const handleOffer = async (data: { sdp: any; deviceId: string }) => {
+      console.log('[WebRTC] Received offer');
+      try {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit('webrtc-answer', {
+          sdp: answer,
+          deviceId,
+        });
+      } catch (err) {
+        console.error('[WebRTC] Error handling offer', err);
+      }
+    };
+
+    const handleIceCandidate = async (data: { candidate: any; deviceId: string }) => {
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+      } catch (err) {
+        console.error('[WebRTC] Error adding ICE candidate', err);
+      }
+    };
+
+    socket.on('webrtc-offer', handleOffer);
+    socket.on('webrtc-ice-candidate', handleIceCandidate);
+
+    return () => {
+      socket.off('connect', joinDevice);
+      socket.off('webrtc-offer', handleOffer);
+      socket.off('webrtc-ice-candidate', handleIceCandidate);
+      pc.close();
+    };
+  }, [deviceId, pairToken]);
 
   // Scale mouse coordinates from canvas display size to actual screen size
   const toScreenCoords = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -171,7 +171,7 @@ function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className="relative w-full bg-black rounded-xl overflow-hidden"
+      className="relative w-full bg-black min-h-[600px] rounded-3xl overflow-hidden"
       style={{ aspectRatio: '16/9', cursor: 'none' }}
       onMouseMove={e => onMouseEvent('mouse-move', toScreenCoords(e))}
       onClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left' })}
@@ -179,16 +179,21 @@ function ScreenCanvas({
       onDoubleClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left', doubleClick: true })}
       onWheel={e => onMouseEvent('mouse-scroll', { x: Math.round(e.deltaX), y: Math.round(e.deltaY) })}
     >
-      <canvas ref={canvasRef} className="w-full h-full object-contain" />
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="w-full h-full object-contain pointer-events-none"
+      />
 
-      {/* Custom cursor dot */}
-      {/* Shown in overlay approach — canvas itself has cursor:none */}
+      
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         {!hasFrame && (
           <div className="text-center">
             <MonitorOff size={48} className="text-slate-600 mx-auto mb-3" />
             <p className="text-slate-500 text-sm font-medium">Start screen streamming</p>
-           </div>
+          </div>
         )}
       </div>
 
@@ -227,30 +232,30 @@ export default function ControlPage({ params }: PageProps) {
 
 
   const KEY_MAP: Record<string, string> = {
-  meta: "command",
-  cmd: "command",
-  command: "command",
+    meta: "command",
+    cmd: "command",
+    command: "command",
 
-  control: "control",
-  ctrl: "control",
+    control: "control",
+    ctrl: "control",
 
-  option: "alt",
-  alt: "alt",
+    option: "alt",
+    alt: "alt",
 
-  return: "enter",
-  escape: "escape",
-  delete: "backspace",
+    return: "enter",
+    escape: "escape",
+    delete: "backspace",
 
-  space: "space",
-  tab: "tab",
-};
+    space: "space",
+    tab: "tab",
+  };
 
 
 
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
 
-  // ── Send any event to desktop agent via socket ──────────────────────────────
+  // ── Send any event to desktop agent via socket  
   const emit = useCallback((type: string, payload?: Record<string, unknown>) => {
     const socket = getSocket();
     socket.emit('command', { type, payload }, (result: { success: boolean; message: string }) => {
@@ -265,33 +270,33 @@ export default function ControlPage({ params }: PageProps) {
     socket.emit(type, data); // fire-and-forget for low latency
   }, [mouseCapture]);
 
-  
+
 
   const handleVirtualKeyPress = useCallback(
-  (keyName: string) => {
-    if (!kbCapture) return;
+    (keyName: string) => {
+      if (!kbCapture) return;
 
-    
-    const socket = getSocket();
 
-    const mapped =
-      KEY_MAP[keyName.toLowerCase()] ??
-      keyName.toLowerCase(); 
-      
+      const socket = getSocket();
 
-    if (mapped.length === 1) {
-      socket.emit("keyboard-type", {
-        text: mapped,
-      });
-    } else {
-      socket.emit("keyboard-shortcut", {
-        key: mapped,
-        modifier: [],
-      });
-    }
-  },
-  [kbCapture]
-);
+      const mapped =
+        KEY_MAP[keyName.toLowerCase()] ??
+        keyName.toLowerCase();
+
+
+      if (mapped.length === 1) {
+        socket.emit("keyboard-type", {
+          text: mapped,
+        });
+      } else {
+        socket.emit("keyboard-shortcut", {
+          key: mapped,
+          modifier: [],
+        });
+      }
+    },
+    [kbCapture]
+  );
 
   // ── Keyboard capture  
   useEffect(() => {
@@ -311,7 +316,7 @@ export default function ControlPage({ params }: PageProps) {
       } else {
         // Special keys / shortcuts
         const socket = getSocket();
-        let mappedKey =  (e.key);
+        let mappedKey = (e.key);
         if (!mappedKey) return;
         socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
       }
@@ -387,17 +392,17 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={`flex w-full flex-col h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
+      <div className={`flex w-full flex-col h-screen   ${fullscreen ? 'p-0' : 'p-5'}`}>
         {/* Top bar */}
 
         {!fullscreen && (
-          <div className="flex items-center justify-between mb-4 animate-fade-up">
+          <div className="flex items-center -mt-16 max-md:-mt-1 justify-between mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
-              <button onClick={() => router.push('/home')} className="btn btn-ghost p-2">
+              <button onClick={() => router.push('/home')} className="btn  !rounded-3xl  glass-panel-dark btn-ghost p-2">
                 <ArrowLeft size={16} />
               </button>
               <div>
-                <h1 className="text-lg font-bold text-white leading-tight capitalize"> {device?.user}'s {device.name}</h1>
+                <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight capitalize"> {device?.user}'s {device.name}</h1>
                 <p className="text-xs text-slate-500">{device.platform} · {device.arch}</p>
               </div>
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full
@@ -408,7 +413,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => setFullscreen(true)} className="btn btn-ghost p-2">
+            <button onClick={() => setFullscreen(true)} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -424,11 +429,11 @@ export default function ControlPage({ params }: PageProps) {
             style={{ outline: 'none' }}
           >
             {/* Toolbar */}
-            <div className="glass max-md:rounded-2xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
+            <div className="glas glass-panel-dark max-md:rounded-2xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
-                className={`ctrl-btn ${streaming ? 'active' : ''}`}
+                className={`ctrl-btn !rounded-full ${streaming ? 'active' : ''}`}
               >
                 <span className={`w-2 h-2 rounded-full ${streaming ? 'bg-emerald-400' : 'bg-slate-600'}`} />
                 {streaming ? 'Streaming' : 'Start Stream'}
@@ -436,17 +441,17 @@ export default function ControlPage({ params }: PageProps) {
 
               <div className="w-px h-4 bg-white/[0.06]" />
 
-              {/* Mouse capture toggle */}
+              {/* Mouse   toggle */}
               <button
                 onClick={() => setMouseCapture(p => !p)}
-                className={`ctrl-btn ${mouseCapture ? 'active' : ''}`}
-                title="Toggle mouse control"
+                className={` !rounded-full  ctrl-btn ${mouseCapture ? 'active' : ''}`}
+
               >
                 <MousePointer2 size={12} />
                 Mouse {mouseCapture ? 'ON' : 'OFF'}
               </button>
 
-              {/* Keyboard capture toggle */}
+              {/* Keyboard toggle */}
               <button
                 onClick={() => setKbCapture(p => !p)}
                 className={`ctrl-btn ${kbCapture ? 'active' : ''}`}
@@ -456,14 +461,13 @@ export default function ControlPage({ params }: PageProps) {
                 Keyboard {kbCapture ? 'ON' : 'OFF'}
               </button>
 
-              <div className="w-px h-4 bg-white/[0.06]" />
+              <div className="w-px h-4   bg-white/[0.06]" />
 
-              {/* Quick actions */}
               {ACTIONS.map(a => (
                 <button
                   key={a.type + (a.payload?.app ?? '')}
                   onClick={() => runAction(a)}
-                  className={`ctrl-btn ${a.variant === 'danger' ? 'danger' : ''}`}
+                  className={`ctrl-btn  ${a.variant === 'danger' ? 'danger' : ''}`}
                 >
                   <a.icon size={12} />
                   {a.label}
@@ -479,24 +483,16 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {/* Canvas */}
-            <div className="flex-1 w-full glass min-h-[500px] rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className="flex-1 w-full min-h-[450px] rounded-3xl overflow-hidden relative animate-fade-up delay-2">
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} />
-
-              {/* Keyboard capture overlay indicator */}
-              {kbCapture && (
-                <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-xs text-indigo-300 font-semibold flex items-center gap-2 backdrop-blur-sm">
-                  <Keyboard size={11} /> Keyboard captured — press Esc to release
-                </div>
-              )}
             </div>
 
-            {/* Keyboard type bar (always visible shortcut) */}
-            <div className="glass rounded-xl w-full px-3 py-2 flex items-center gap-3 animate-fade-up delay-3">
-              <Volume2 size={14} className="text-slate-500 flex-shrink-0" />
+            {/* Keyboard type bar  */}
+            <div className="glass-panel-dark rounded-full w-full px-3 py-2 flex items-center gap-3 animate-fade-up delay-3">
               <input
                 type="text"
                 placeholder="Type text and press Enter to send directly to Mac…"
-                className="flex-1 bg-transparent outline-none text-sm text-slate-300 placeholder:text-slate-600"
+                className="flex-1 bg-transparent outline-none text-sm text-slate-200 placeholder:text-slate-600"
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     const val = e.currentTarget.value.trim();
@@ -504,37 +500,36 @@ export default function ControlPage({ params }: PageProps) {
                   }
                 }}
               />
-              <kbd className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-500 font-mono">Enter</kbd>
+              <kbd className="px-3 py-2 rounded-3xl text-[10px] bg-zinc-500 text-slate-200 font-mono">Enter</kbd>
             </div>
 
             {kbCapture && (
-              <div className="animate-fade-up delay-4 min-h-[400px] w-fit   overflow-x-auto pb-4 flex justify-center">
+              <div className="animate-fade-up delay-4 min-h-[400px] w-fit overflow-x-auto pb-4 flex justify-center">
                 <MacKeyboards onKeyPress={handleVirtualKeyPress} />
               </div>
             )}
           </div>
 
-          {/*  Side panel (only when not fullscreen)  */}
+          {/*  Side panel */}
           {!fullscreen && (
             <div className="w-[220px] flex-shrink-0 pb-20 max-md:w-full flex flex-col gap-3 animate-fade-up delay-2">
- 
-              {/* Apps launcher link */}
+
+              {/* Apps launcher */}
               <Link
                 href={`/apps/${deviceId}`}
-                className="glass rounded-2xl p-3 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
+                className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
-                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
-                  <LayoutGrid size={14} className="text-indigo-400" />
-                </div>
+                <Image src={'/apps.png'} height={35} width={35} alt='apps' />
                 <div>
-                  <p className="text-xs font-semibold text-slate-200 group-hover:text-white">App Launcher</p>
-                  <p className="text-[10px] text-slate-500">Browse & open apps</p>
+                  <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher</p>
                 </div>
               </Link>
 
-              {/* Quick shortcuts panel */}
-              <div className="glass rounded-2xl p-4">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
+
+
+              {/*  shortcuts   */}
+              <div className="glass-panel-dark rounded-3xl p-4">
+                <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
                 <div className="space-y-1.5">
                   {[
                     { label: 'Copy', key: 'c', mod: 'command' },
@@ -551,18 +546,20 @@ export default function ControlPage({ params }: PageProps) {
                         socket.emit('keyboard-shortcut', { key: s.key, modifier: s.mod });
                         toast(`Sent: ${s.label}`, 'info');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-white/[0.04] transition-colors group"
+                      className="w-full flex items-center justify-between px-3 py-1.5  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
                     >
                       <span className="text-xs text-slate-400 group-hover:text-slate-200">{s.label}</span>
-                      <kbd className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-500">⌘{s.key.toUpperCase().slice(0, 1)}</kbd>
+                      <kbd className="text-[9.5px] glass-panel-dark px-2 flex items-center justify-center gap-1 rounded-xl font-bold text-slate-100 mr-1"> <span className=' text-base'>⌘</span> {s.key.toUpperCase().slice(0, 1)}</kbd>
                     </button>
                   ))}
                 </div>
               </div>
 
+
+
               {/* System actions */}
-              <div className="glass rounded-2xl p-4">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-3">System</p>
+              <div className="glass-panel-dark rounded-3xl p-4">
+                <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">System</p>
                 <div className="space-y-1.5">
                   {[
                     { label: 'Lock Screen', type: 'LOCK_SCREEN', icon: Lock },
@@ -573,7 +570,7 @@ export default function ControlPage({ params }: PageProps) {
                     <button
                       key={a.type}
                       onClick={() => { emit(a.type); toast(`Sent: ${a.label}`, 'info'); }}
-                      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors
+                      className={`w-full  flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
                         ${['RESTART', 'SHUTDOWN'].includes(a.type)
                           ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
@@ -585,6 +582,9 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
+
+
+
             </div>
           )}
         </div>

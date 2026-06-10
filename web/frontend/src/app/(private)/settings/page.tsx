@@ -13,24 +13,23 @@ export default function SettingsPage() {
   const { toasts, dismiss } = useToast();
   const router = useRouter();
 
-  const handleLogout = () => { LogOut(); router.push('/login'); };
+  const handleLogout = () => { logout(); router.push('/login'); };
 
   return (
     <AppLayout>
-      <div className="p-7  max- w-1/2 mx-auto">
+      <div className="p-7   w-[70%]  mx-auto">
         <div className="mb-7 animate-fade-up">
           <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
-          <p className="text-slate-400 text-sm mt-1">Configure your Remote Mac dashboard</p>
         </div>
 
         <div className="space-y-5 animate-fade-up delay-1">
 
-          <div className="glass rounded-2xl p-5">
+          <div className="glass-panel-dark rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <User size={15} className="text-indigo-400" />
               <p className="text-sm font-semibold text-white">Account</p>
             </div>
-            <div className="bg-slate-900/50 rounded-xl p-3 flex items-center gap-3">
+            <div className="bg-black/20 rounded-xl p-3 flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-sm font-bold text-indigo-300 border border-indigo-500/10">
                 {user?.email?.charAt(0).toUpperCase() ?? 'U'}
               </div>
@@ -55,11 +54,11 @@ export default function SettingsPage() {
             <Link href="/home" className="flex flex-col items-center gap-3 group">
 
               <div className='  '>
-                <img src="/mac2.png" height={90} width={90} className=' object-fit' alt="" />
+                <img src="/logo.png" height={90} width={90} className=' object-fit' alt="" />
 
               </div>
               <div className="leading-none">
-                <p className="text-xl font-bold text-white tracking-tight">MAC in WIND</p>
+                <p className="text-xl font-bold text-white tracking-tight">MAC in AIR</p>
               </div>
             </Link>
           </div>

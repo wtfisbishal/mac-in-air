@@ -24,13 +24,11 @@ body {
    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
 }
 
-/* ── Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(100,116,139,.25); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,.4); }
 
-/* ── Glass card ───────────────────────────────────────────── */
 .glass {
   background: #2306c90a;
   backdrop-filter: blur(18px);
@@ -38,7 +36,6 @@ body {
   border: 1px solid rgba(255,255,255,.06);
 }
 
-/* ── Animations ───────────────────────────────────────────── */
 @keyframes fade-up   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
 @keyframes fade-in   { from { opacity:0 } to { opacity:1 } }
 @keyframes slide-in  { from { opacity:0; transform:translateX(20px) } to { opacity:1; transform:none } }
@@ -58,11 +55,11 @@ body {
 .delay-4 { animation-delay: 240ms; }
 .delay-5 { animation-delay: 300ms; }
 
-/* ── Status dots ──────────────────────────────────────────── */
+
 .dot-online  { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--color-success); animation:pulse-dot 2s ease infinite; }
 .dot-offline { display:inline-block; width:8px; height:8px; border-radius:50%; background:#374151; }
 
-/* ── Skeleton ─────────────────────────────────────────────── */
+
 .skeleton {
   background: linear-gradient(90deg, rgba(30,41,59,.5) 25%, rgba(51,65,85,.35) 50%, rgba(30,41,59,.5) 75%);
   background-size: 200% 100%;
@@ -70,25 +67,13 @@ body {
   border-radius: 6px;
 }
 
-/* ── Input ────────────────────────────────────────────────── */
-.input {
-  width: 100%;
-  background: rgba(15,23,42,.7);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 10px;
-  padding: 11px 14px;
-  font-size: 14px;
-  color: #f1f5f9;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
+ 
 .input::placeholder { color: #475569; }
 .input:focus {
   border-color: rgba(99,102,241,.45);
   box-shadow: 0 0 0 3px rgba(99,102,241,.1);
 }
 
-/* ── Button ───────────────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;
@@ -115,7 +100,8 @@ body {
 
 .code-cell {
   width: 52px; height: 64px;
-  background: rgba(15,23,42,.8);
+  background: #0f172a96;
+  backdrop-filter: blur(12px);
   border: 1.5px solid rgba(255,255,255,.1);
   border-radius: 12px;
   font-size: 28px; font-weight: 700; font-family: var(--font-mono);
@@ -130,7 +116,10 @@ body {
 
 .ctrl-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  padding: 7px 14px; 
+  border-radius: 18px; 
+  font-size: 12px; 
+  font-weight: 600;
   background: rgba(255,255,255,.05); color: #94a3b8;
   border: 1px solid rgba(255,255,255,.07);
   cursor: pointer; transition: all .15s;
@@ -143,8 +132,8 @@ body {
 
 
 .buttombar{
-  background: #57c786;
-background: linear-gradient(0deg, #57c78500 0%, #3235f931 100%);
+  background: #ffffff;
+background: linear-gradient(0deg, #57c78500 0%, #ffffff09 100%);
 }
 
 .glass-button-primary {
@@ -205,11 +194,54 @@ background: linear-gradient(0deg, #57c78500 0%, #3235f931 100%);
   }
 
   .glass-panel-dark {
-    background: rgba(28,28,30,0.72);
+    background: #37363653;
     backdrop-filter: blur(32px) saturate(200%);
     -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.262);
+box-shadow:
+      0 8px 32px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.396);
+      }
+ 
+
+.last-text{
+   background-image: linear-gradient(1deg, #111119, #ffffff73);
+}
+.traffic-light {
+    width: 12px; height: 12px; border-radius: 50%;
+    display: inline-block;
   }
- 
- 
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.w-mac-keyboard li:active, .w-mac-keyboard li.pressed {
+    color: #919191  !important;
+    background: #F3F4F6 !important; 
+    border: 1px solid #ffffff !important ;
+    transition: all 1ms linear !important;
+    scale: 0.95 !important ;
+}
+
+.w-mac-keyboard li {
+
+    color: #919191  !important;
+    border: 1px solid #ffffff !important ;
+    background: #F3F4F6 !important; 
+    box-shadow: 0 1px 5px #00000029, 0 1px 10px #00000026, -1px 0 10px #0000002b !important;
+}
+
+.w-mac-keyboard {
+    border-radius: 19px !important;
+}
+.w-mac-keyboard li:nth-child(78) {
+     
+    right: 76px !important;
+}

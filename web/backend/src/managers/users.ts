@@ -3,8 +3,8 @@ import bcrypt from 'bcryptjs';
 import { User } from '../types';
 
 class UserManager {
-  private users: Map<string, User> = new Map(); // id → User
-  private emailIndex: Map<string, string> = new Map(); // email → id
+  private users: Map<string, User> = new Map(); // id -> User
+  private emailIndex: Map<string, string> = new Map(); // email -> id
 
   async register(email: string, password: string): Promise<User> {
     if (this.emailIndex.has(email.toLowerCase())) {
