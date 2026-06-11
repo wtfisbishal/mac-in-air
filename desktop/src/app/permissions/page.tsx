@@ -108,6 +108,10 @@ export default function PermissionsPage() {
           💡 If a permission is denied, go to <strong>System Settings → Privacy & Security</strong> and enable the relevant permission for this app, then restart the agent.
         </p>
       </div>
+
+          <div className=" pb-7 ">
+      <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.png" alt="" />
+          </div>
     </div>
   );
 }

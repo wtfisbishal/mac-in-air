@@ -2,7 +2,7 @@
 
 import { useState, useRef, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Link2, Loader2, CheckCircle, ArrowRight } from 'lucide-react';
+import {  Loader2, CheckCircle, ArrowRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { pairDevice } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
@@ -88,9 +88,10 @@ export default function PairPage() {
   if (paired) {
     return (
       <AppLayout>
-        <div className=" h-fit mt-20 w-full flex items-center justify-center p-6">
+        <div className=" h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
           <div className="text-center animate-fade-up max-w-sm">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+
+            <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={36} className="text-emerald-400" />
             </div>
 

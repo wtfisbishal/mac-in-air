@@ -93,14 +93,16 @@ export default function DashboardPage() {
  
   return (
     <AppLayout>
-      <div className=" !p-7  w-[70%] mx-auto">
+      <div className=" !p-7 max-md:w-full  w-[70%] mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-7 animate-fade-up">
+        <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
+          
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Home</h1>
-            <p className="text-slate-400 text-sm mt-1">Monitor and control your remote devices</p>
+            <p className="text-slate-400 w-full text-xs mt-1">Monitor and control your remote devices</p>
           </div>
-          <div className="flex gap-3">
+
+          <div className="flex items-center max-md:gap-6 max-md:w-full   gap-3">
             <button onClick={() => refetch()} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
               <RefreshCw size={13} /> Refresh
             </button>
@@ -108,10 +110,11 @@ export default function DashboardPage() {
               <Link3 size={14} /> Pair Device
             </Link>
           </div>
+
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-7 animate-fade-up delay-1">
+        <div className="grid grid-cols-3 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
           {[
             { label: 'Total Devices', value: total, icon: Monitor, color: 'text-indigo-400' },
             { label: 'Online Now',    value: online, icon: Circle,  color: 'text-emerald-400' },
@@ -168,7 +171,7 @@ export default function DashboardPage() {
           )}
 
           {!isLoading && !isError && devices && devices.length > 0 && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 w-full max-md:grid-cols-1 gap-4">
               {devices.map(d => <DeviceCard key={d.id} device={d} />)}
             </div>
           )}

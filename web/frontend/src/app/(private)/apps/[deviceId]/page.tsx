@@ -200,15 +200,15 @@ export default function AppsPage({ params }: PageProps) {
         </div>
 
 
-        <div className="relative glass-panel-dark py-1 px-5 w-1/2 mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
-          <Search size={17} className="  text-slate-200 pointer-events-none" />
+        <div className="relative glass-panel-dark py-1 px-5 w-1/2 max-md:w-full  mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
+          <Search size={17} className=" text-slate-200 pointer-events-none" />
           <input
             ref={searchRef}
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search apps… (⌘K)"
-            className=" w-full border-none outline-none !pl-10 py-2.5 ml-2 text-sm"
+            className=" !w-full border-none outline-none !pl-2 py-2.5 ml-2 text-sm"
           />
           {search && (
             <button

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 
 const Navigation = () => {
     const path = usePathname()
-    const control = path.startsWith('/control')
+    const control = path.startsWith('/control') || path.startsWith('/apps')
     const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 })
 
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
@@ -74,14 +74,14 @@ const Navigation = () => {
             </div>
 
             {/* Profile Button */}
-         { control &&  <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] w-32 h-12 rounded-full'>
+         { control &&  <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-24 w-32 h-12 rounded-full'>
                 <Link
                     ref={profileRef}
                     href={path}
                     className={`relative center w-full h-full rounded-full gap-2 flex items-center justify-center  bg-[#ffffff1b] border-none text-white `}>
 
-                    <Laptop  size={20} /> 
-                    <p className=' text-sm'> Control</p>
+                    <Laptop  size={18} /> 
+                    <p className=' max-md:text-xs text-sm'> Control</p>
 
                 </Link>
             </div>}

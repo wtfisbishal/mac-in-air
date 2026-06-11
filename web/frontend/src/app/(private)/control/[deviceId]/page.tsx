@@ -41,7 +41,6 @@ export function normalizeKey(key: string) {
     case "cmd":
     case "⌘":
       return "command";
-
     case "control":
     case "ctrl":
       return "control";
@@ -171,7 +170,7 @@ function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className="relative w-full bg-black min-h-[600px] rounded-3xl overflow-hidden"
+      className="relative w-full bg-black min-h-[600px]   flex items-center justify-center   pb-5 rounded-3xl overflow-hidden"
       style={{ aspectRatio: '16/9', cursor: 'none' }}
       onMouseMove={e => onMouseEvent('mouse-move', toScreenCoords(e))}
       onClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left' })}
@@ -184,7 +183,7 @@ function ScreenCanvas({
         autoPlay
         playsInline
         muted
-        className="w-full h-full object-contain pointer-events-none"
+        className="w-full h-full object-contain   pointer-events-none"
       />
 
       
@@ -392,7 +391,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={`flex w-full flex-col h-screen   ${fullscreen ? 'p-0' : 'p-5'}`}>
+      <div className={`flex w-full flex-col h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
         {/* Top bar */}
 
         {!fullscreen && (
@@ -420,7 +419,7 @@ export default function ControlPage({ params }: PageProps) {
         )}
 
         {/*   Main area */}
-        <div className={`flex   max-md:flex-col gap-4 flex-1 min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+        <div className={`flex max-md:flex-col gap-4 flex-1 min-h-0 ${fullscreen ? 'h-full' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
@@ -429,7 +428,7 @@ export default function ControlPage({ params }: PageProps) {
             style={{ outline: 'none' }}
           >
             {/* Toolbar */}
-            <div className="glas glass-panel-dark max-md:rounded-2xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
+            <div className="glas glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}

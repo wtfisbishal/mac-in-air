@@ -17,7 +17,7 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="p-7   w-[70%]  mx-auto">
+      <div className="p-7  max-md:w-full  w-[70%]  mx-auto">
         <div className="mb-7 animate-fade-up">
           <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
         </div>
@@ -54,7 +54,7 @@ export default function SettingsPage() {
             <Link href="/home" className="flex flex-col items-center gap-3 group">
 
               <div className='  '>
-                <img src="/logo.png" height={90} width={90} className=' object-fit' alt="" />
+                <img src="/logo.png" height={90} width={90} className='drop-shadow-[#f6f6f63b] drop-shadow-2xl  object-fit' alt="" />
 
               </div>
               <div className="leading-none">

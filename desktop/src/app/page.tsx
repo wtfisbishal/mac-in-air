@@ -23,7 +23,7 @@ export default function Home() {
         <motion.img
           src="/logo.png"
           alt="Mac In Wind"
-          className="w-28 h-28 object-contain drop-shadow-2xl"
+          className="w-28 h-28 drop-shadow-[#0000007a] drop-shadow-2xl  object-contain drop-shadow-2xl"
           initial={{ scale: 0.4, opacity: 0, rotate: -20 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
           transition={{

@@ -109,6 +109,9 @@ export class SocketService {
           this.socket?.connect();
         }, 1000);
       }
+
+       logInfo('SocketService', 'Screen share stopped by disconnecting ',  );
+      screenService.stopScreenShare();
     });
 
     this.socket.on('connect_error', (error) => {
@@ -310,6 +313,9 @@ export class SocketService {
       this.stopKeepAlive();
       this.socket.disconnect();
       this._isConnected = false;
+      
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
     }
   }
 }

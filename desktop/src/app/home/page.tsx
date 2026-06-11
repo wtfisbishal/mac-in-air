@@ -60,9 +60,9 @@ export default function DashboardPage() {
       </div>
 
 
-      {!isConnected && <PairingStatusWidget />}
+        <PairingStatusWidget /> 
 
-      <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+      {/* <div className="rounded-xl border border-white/[0.06] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
             <Globe size={14} className="text-indigo-400" />
@@ -107,9 +107,9 @@ export default function DashboardPage() {
             })}
           </ul>
         )}
-      </div>
+      </div> */}
 
- {/* <Link className='glass-button' href='/'>home</Link> */}
+ <Link className='glass-button' href='/'>home</Link>
       {deviceInfo && (
         <DeviceCard {...deviceInfo} isConnected={isConnected} />
       )}

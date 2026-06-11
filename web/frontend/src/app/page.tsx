@@ -217,10 +217,10 @@ useEffect(() => {
           </div>
 
 
-          <div className=" mt-10   py-10  w-full">
+          <div className=" mt-10   py-20  w-full">
 
         <MacKeyBoard
-      className="w-fit !shadow-xl shadow-black/60"
+      className="w-fit drop-shadow-[#9b9b9b75] drop-shadow-2xl "
       pressedKeys={pressedKeys}
       onMouseDown={(e, item) => {
         console.log("Virtual key pressed:", item);
@@ -247,7 +247,7 @@ useEffect(() => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <div key={f.title}
-                className=" backdrop-blur-2xl glass-panel cursor-pointer hover:scale-[1.01] shadow-[#00000046] !shadow-xl transition-all duration-500 rounded-4xl p-6 scroll-fade-in"
+                className=" backdrop-blur-2xl glass-panel-dark cursor-pointer hover:scale-[1.01] shadow-[#00000046] !shadow-xl transition-all duration-500 rounded-4xl p-6 scroll-fade-in"
                 style={{ transitionDelay: `${i * 80}ms` }}>
                 <div className="text-3xl mb-4">{f.icon}</div>
                 <h3 className="text-[15px] font-semibold text-gray-200 mb-2">{f.title}</h3>
@@ -296,7 +296,7 @@ useEffect(() => {
         </section>
 
         {/* App Library */}
-        <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto">
+        <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto drop-shadow-[#9b9b9b75] drop-shadow-2xl ">
           <div className="text-center mb-12 scroll-fade-in">
             <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-3">App Library</p>
             <h2 className="text-4xl font-bold text-gray-50 tracking-tight" style={{ letterSpacing: "-0.025em" }}>
@@ -308,8 +308,7 @@ useEffect(() => {
             </p>
           </div>
 
-
-
+ 
           <div className="glass-panel-dark rounded-4xl p-6 scroll-fade-in">
             {/* Window chrome */}
             <div className="flex items-center gap-2 mb-5">
