@@ -1,9 +1,16 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, protocol, net } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+import { pathToFileURL } from 'url';
 import { setupIpc } from './ipc';
 import { createTray } from './tray';
 import { socketService } from '../services/socket.service';
 import { powerSaveBlocker } from 'electron';
+
+// Register the custom protocol before app is ready
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, bypassCSP: true } }
+]);
 
 const isDev = !app.isPackaged;
 let blockerId: number;
@@ -33,11 +40,28 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000');
     // mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../../renderer/index.html'));
+    mainWindow.loadURL('app://-/');
   }
 }
 
 app.whenReady().then(() => {
+  protocol.handle('app', (request) => {
+    const urlObj = new URL(request.url);
+    let pathname = decodeURIComponent(urlObj.pathname);
+    
+    if (pathname === '/') {
+      pathname = '/index.html';
+    }
+    
+    let filePath = path.join(__dirname, '../../renderer', pathname);
+    
+    // If it doesn't exist and has no extension, try appending .html for Next.js App Router exports
+    if (!fs.existsSync(filePath) && !path.extname(pathname)) {
+      filePath = filePath + '.html';
+    }
+    
+    return net.fetch(pathToFileURL(filePath).toString());
+  });
 
   blockerId = powerSaveBlocker.start('prevent-app-suspension');
 

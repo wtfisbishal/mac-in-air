@@ -49,18 +49,14 @@ export class AppService {
       const searchDirs = [
         '/Applications',
         '~/Applications',
-        '/System/Applications',
-        // '/System/Applications/Utilities',
-        // '/System/Library/CoreServices',
+        '/System/Applications', 
       ].join(' -onlyin ');
 
       const mdfindCmd = `mdfind "kMDItemContentType == 'com.apple.application-bundle'" -onlyin ${searchDirs} 2>/dev/null`;
 
       const lsCmd = [
         '/Applications',
-        '/System/Applications',
-        // '/System/Applications/Utilities',
-        // '/System/Library/CoreServices',
+        '/System/Applications', 
       ]
         .map(d => `ls -d "${d}"/*.app 2>/dev/null`)
         .join('; ');
@@ -91,7 +87,7 @@ export class AppService {
           limit(async () => ({
             name,
             path: appPath,
-            icon: await this.extractIcon(appPath),
+            // icon: await this.extractIcon(appPath),
           }))
         )
       );
@@ -102,7 +98,7 @@ export class AppService {
     }
   }
 
-    private async extractIcon(appPath: string): Promise<string | null> {
+  private async extractIcon(appPath: string): Promise<string | null> {
     const tmpFile = path.join(
       os.tmpdir(),
       `rmac_icon_${Buffer.from(appPath).toString('base64').slice(0, 16)}.png`

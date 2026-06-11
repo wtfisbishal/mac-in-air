@@ -6,7 +6,7 @@ import { setupFrontendHandlers } from './frontend';
 import { verifyToken } from '../middleware/auth';
 
 let io: SocketServer;
- 
+
 export function initSocket(httpServer: HttpServer): SocketServer {
   io = new SocketServer(httpServer, {
     cors: {
@@ -15,14 +15,11 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     },
     // polling is required for the initial HTTP handshake before upgrading to ws
     transports: ['polling', 'websocket'],
-    // Keep-alive settings — critical for Render free tier (30s idle timeout)
-    // pingInterval: 10000,   // send a ping every 10 s
-    // pingTimeout: 20000,    // wait 20 s for pong before considering the socket dead
+    // Keep-alive settings — critical for Render free tier (30s idle timeout) 
     upgradeTimeout: 15000, // give 15 s for the polling→websocket upgrade
     connectTimeout: 30000, // 30 s to complete the initial handshake
-
-    pingInterval: 25000,
-pingTimeout: 60000,
+    pingInterval: 30000, // send a ping every 30 s
+    pingTimeout: 60000, // wait 60 s for pong before considering the socket dead
   });
 
   // Connection handler 
@@ -43,9 +40,9 @@ pingTimeout: 60000,
       }
     }
 
-     socket.on('keep-alive', () => {
-    // noop
-  });
+    socket.on('keep-alive', () => {
+      // noop
+    });
 
     console.log(`[Socket] ${isDesktop ? 'Desktop' : 'Frontend'} connected: ${socket.id}`);
 
@@ -55,7 +52,7 @@ pingTimeout: 60000,
       setupFrontendHandlers(io, socket);
     }
   });
- 
+
   return io;
 }
 

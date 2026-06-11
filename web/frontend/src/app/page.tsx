@@ -184,7 +184,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Features ── */}
+        {/*   Features   */}
         <section className="py-28 px-4 sm:px-8 max-w-6xl mx-auto">
           <div className="text-center mb-16 scroll-fade-in">
             <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-3">Capabilities</p>
@@ -247,7 +247,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* App Library */}
+        {/* Apps */}
         <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto drop-shadow-[#9b9b9b75] drop-shadow-2xl ">
           <div className="text-center mb-12 scroll-fade-in">
             <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-3">App Library</p>
@@ -262,7 +262,7 @@ export default function Home() {
 
 
           <div className="glass-panel-dark rounded-4xl p-6 scroll-fade-in">
-            {/* Window chrome */}
+            {/* Windows */}
             <div className="flex items-center gap-2 mb-5">
               <span className="traffic-light" style={{ background: "#FF5F57" }} />
               <span className="traffic-light" style={{ background: "#FFBD2E" }} />
@@ -348,8 +348,8 @@ export default function Home() {
 
         <div className="w-full h-[30vh] max-md:h-[10vh] relative overflow-hidden">
 
-          <h1 className=" last-text bg-clip-text text-transparent text-[160px] max-md:text-6xl max-md:-bottom-[20%] absolute -bottom-[40%] w-full text-center  font-extrabold  tracking-wide">
-            MAC in AIR
+          <h1 className=" last-text bg-clip-text text-transparent text-[170px] max-md:text-6xl max-md:-bottom-[20%] absolute -bottom-[30%] w-full text-center  font-extrabold  tracking-wide">
+            MAC in AIR 💨 
           </h1>
         </div>
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   MonitorOff, Keyboard, MousePointer2, Camera,
   Power, Moon, Lock, Terminal, Globe, ArrowLeft,
-  Loader2, Maximize2, Minimize2, Volume2, LayoutGrid,
+  Loader2, Maximize2, Minimize2, Link as Link2,
   ShieldAlert,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
@@ -44,8 +44,7 @@ export function normalizeKey(key: string) {
     case "control":
     case "ctrl":
       return "control";
-    
-
+     
     case "option":
       return "alt";
 
@@ -222,6 +221,7 @@ export default function ControlPage({ params }: PageProps) {
     const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
     setPairToken(token);
     setAuthChecked(true);
+ 
   }, [deviceId]);
 
   const [streaming, setStreaming] = useState(false);
@@ -339,32 +339,33 @@ export default function ControlPage({ params }: PageProps) {
 
   if (isLoading || !authChecked) return (
     <AppLayout>
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen  w-full flex items-center justify-center">
         <Loader2 className="animate-spin text-indigo-400" size={32} />
       </div>
     </AppLayout>
   );
 
   //   Not authorized: no pairToken in sessionStorage  
-  // if (!pairToken) return (
-  //   <AppLayout>
-  //     <div className="w-full flex items-center justify-center">
-  //       <div className="text-center max-w-sm">
-  //         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
-  //           <ShieldAlert size={32} className="text-red-400" />
-  //         </div>
-  //         <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
-  //         <p className="text-slate-400 text-sm mb-6">
-  //           You must pair this device before you can control it.
-  //           Pairing tokens expire after 15 min  or when you close the tab.
-  //         </p>
-  //         <Link href="/pair" className="btn btn-primary">
-  //           Pair Device
-  //         </Link>
-  //       </div>
-  //     </div>
-  //   </AppLayout>
-  // );
+  if (!pairToken) return (
+    <AppLayout>
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
+            <ShieldAlert size={32} className="text-red-400" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
+          <p className="text-slate-400 text-sm mb-6">
+            You must pair this device before you can control it.
+            Pairing tokens expire after 15 min  or when you close the tab.
+          </p>
+          <Link href="/pair" className="btn !rounded-full glass-button-primary">
+          <Link2 size={20}/>
+            Pair Device
+          </Link>
+        </div>
+      </div>
+    </AppLayout>
+  );
 
   if (!device) return (
     <AppLayout>

@@ -9,10 +9,7 @@ export interface WebClient {
   connectedAt: number;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:4000';
-// const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
-
-// How often (ms) to send a lightweight ping to prevent Render's 30-s idle timeout
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
 const KEEP_ALIVE_INTERVAL_MS = 30000;
 
 export class SocketService {
@@ -51,7 +48,7 @@ export class SocketService {
 
     this.startReconnectWatchdog();
 
-    // ── helpers ──────────────────────────────────────────────────────────────
+    // helpers
     const announceDevice = () => {
       this.socket?.emit(
         'device-online',
@@ -80,7 +77,6 @@ export class SocketService {
       }, KEEP_ALIVE_INTERVAL_MS);
     };
 
-    // ── connect ──────────────────────────────────────────────────────────────
     this.socket.on('connect', () => {
       this._isConnected = true;
       this.pairingCode = null; // reset so reconnects always fetch a fresh code

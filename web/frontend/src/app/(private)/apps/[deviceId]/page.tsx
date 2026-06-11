@@ -3,13 +3,17 @@
 import { use, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-ArrowLeft, Search, RefreshCw, Loader2,AppWindow, Play, MonitorOff, Grid2x2, List} from 'lucide-react';
+  ArrowLeft, Search, RefreshCw, Loader2, AppWindow, Play, MonitorOff, Grid2x2, List,
+  Link as Link2,
+  ShieldAlert
+} from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -18,15 +22,15 @@ interface PageProps {
 interface AppInfo {
   name: string;
   path: string;
-  icon?: string | null;  
-} 
+  icon?: string | null;
+}
 function getAppStyle(name: string): { color: string; bg: string } {
   const lower = name.toLowerCase();
-   
+
   return { color: '#818cf8', bg: 'rgba(129,140,248,.15)' };
 }
 
- function AppIcon({
+function AppIcon({
   name,
   icon,
   size = 'md',
@@ -43,11 +47,10 @@ function getAppStyle(name: string): { color: string; bg: string } {
     .join('');
 
   const rounded = size === 'sm' ? 'rounded-xl' : 'rounded-2xl';
-  const textSize = size === 'sm' ? 'text-sm' : 'text-lg';
+
 
   if (icon) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={icon}
         alt={name}
@@ -60,13 +63,14 @@ function getAppStyle(name: string): { color: string; bg: string } {
 
   return (
     <div
-      className={`flex items-center justify-center ${rounded} ${textSize} font-bold select-none w-full h-full`}
+      className={`flex items-center justify-center rounded-3xl text-4xl font-bold select-none w-full h-full`}
       style={{
         background: style.bg,
         color: style.color,
         border: `1px solid ${style.color}25`,
       }}
     >
+
       {initials}
     </div>
   );
@@ -82,7 +86,7 @@ export default function AppsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-   
+
   const searchRef = useRef<HTMLInputElement>(null);
 
   const sendCommand = useCallback(
@@ -95,6 +99,13 @@ export default function AppsPage({ params }: PageProps) {
       }),
     []
   );
+
+  const [pairToken, setPairToken] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
+    setPairToken(token);
+  }, [deviceId]);
 
   const loadApps = useCallback(async () => {
     setLoading(true);
@@ -165,11 +176,30 @@ export default function AppsPage({ params }: PageProps) {
       </div>
     </AppLayout>
   );
-
+if (!pairToken) return (
+    <AppLayout>
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
+            <ShieldAlert size={32} className="text-red-400" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
+          <p className="text-slate-400 text-sm mb-6">
+            You must pair this device before you can control it.
+            Pairing tokens expire after 15 min  or when you close the tab.
+          </p>
+          <Link href="/pair" className="btn !rounded-full glass-button-primary">
+          <Link2 size={20}/>
+            Pair Device
+          </Link>
+        </div>
+      </div>
+    </AppLayout>
+  );
   return (
     <AppLayout>
       <div className="flex flex-col w-full -mt-16 max-md:mt-0 h-screen p-5">
- 
+
         <div className="flex items-center justify-between mb-5 animate-fade-up">
           <div className="flex items-center gap-3">
             <button onClick={() => router.back()} className="btn btn-ghost glass-panel-dark  !rounded-2xl !p-3">
@@ -186,7 +216,7 @@ export default function AppsPage({ params }: PageProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            
+
 
             <button
               onClick={loadApps}
@@ -241,7 +271,7 @@ export default function AppsPage({ params }: PageProps) {
           )}
 
           {!loading && filtered.length > 0 && (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-3 animate-fade-in pb-4">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))] w-[90% mx-auto gap-3 animate-fade-in pb-4">
               {filtered.map((app) => {
                 const isOpening = opening === app.name;
                 return (
@@ -249,8 +279,7 @@ export default function AppsPage({ params }: PageProps) {
                     key={app.path}
                     onClick={() => openApp(app)}
                     disabled={isOpening}
-                    className="group flex flex-col items-center gap-2.5 p-3 rounded-2xl
-                      hover:bg-white/[0.01] hover:border-white/[0.09]
+                    className="group flex  flex-col items-center gap-2.5 p-3 cursor-pointer rounded-2xl
                       active:scale-95 transition-all duration-150
                       disabled:opacity-60 disabled:cursor-wait"
                   >
@@ -277,7 +306,7 @@ export default function AppsPage({ params }: PageProps) {
             </div>
           )}
 
-           
+
         </div>
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

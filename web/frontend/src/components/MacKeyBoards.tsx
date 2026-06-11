@@ -1,45 +1,4 @@
-// 'use client'
-// import { useState } from "react";
-
-// import MacKeyboard from "@uiw/react-mac-keyboard";
-
-// interface MacKeyboardsProps {
-//   onKeyPress?: (keyName: string, keyCode: number) => void;
-// }
-
-// export default function MacKeyboards({ onKeyPress }: MacKeyboardsProps) {
-//   const [keyCode, setKeyCode] = useState<number[]>([]);
-//   return (
-//     <div className="w-full flex justify-center  ">
-//       <MacKeyboard
-//       keyCode={keyCode}
-//       className="w-fit shadow shadow-white/40"  
-//       onMouseDown={(e, item) => {
-
-
-//   console.log("KEY ITEM:", item);
-
-//         // console.log("MacKeyboard onMouseDown item:", item);
-//         if (item.keycode > -1) {
-//           setKeyCode([item.keycode]);
-//           if (onKeyPress && item.name && item.name.length > 0) {
-             
-//             console.log("MacKeyboard passing to onKeyPress:", item.name[0]);
-//             onKeyPress(item.name[0], item.keycode);
-//           } else {
-//             console.warn("MacKeyboard item missing name:", item);
-//           }
-//         }
-//       }}
-      
-//       onMouseUp={() =>{
-//         setKeyCode([]);
-//       }}
-//     />
-//     </div>
-//   );
-// }
-
+ 
 'use client';
 
 import { useEffect, useState, useRef } from 'react';

@@ -22,14 +22,7 @@ export class KeyboardService {
       return key.toLowerCase();
   }
 }
-
-  // public async keyTap(key: string, modifier?: string | string[]) {
-  //   if (modifier) {
-  //     robot.keyTap(key, modifier);
-  //   } else {
-  //     robot.keyTap(key);
-  //   }
-  // }
+ 
   public async keyTap(key: string, modifiers: string[] = []) {
   const normalizedKey = this.normalizeKey(key);
 

@@ -1,10 +1,10 @@
 import type { Device, CommandResult } from '@/types';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+export const URL = process.env.NEXT_PUBLIC_API_URL ;
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('rmac_token'); // must match TOKEN_KEY in useAuth.ts
+  return localStorage.getItem('rmac_token');
 }
 
 function authHeaders(): HeadersInit {
@@ -16,7 +16,7 @@ function authHeaders(): HeadersInit {
 }
 
 async function req<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${url}`, init);
+  const res = await fetch(`${URL}${url}`, init);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as { message?: string }).message ?? `Request failed (${res.status})`);
@@ -24,7 +24,6 @@ async function req<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
 export async function apiLogin(email: string, password: string) {
   return req<{ token: string; user: { id: string; email: string } }>('/auth/login', {
     method: 'POST',
@@ -41,7 +40,6 @@ export async function apiRegister(email: string, password: string) {
   });
 }
 
-// ── Devices ───────────────────────────────────────────────────────────────────
 export async function fetchDevices(): Promise<Device[]> {
   return req<Device[]>('/devices', { headers: authHeaders() });
 }
@@ -50,7 +48,6 @@ export async function fetchDevice(id: string): Promise<Device> {
   return req<Device>(`/devices/${id}`, { headers: authHeaders() });
 }
 
-// ── Commands ─────────────────────────────────────────────────────────────────
 export async function sendCommand(
   deviceId: string,
   type: string,
@@ -63,7 +60,6 @@ export async function sendCommand(
   });
 }
 
-// ── Pairing ───────────────────────────────────────────────────────────────────
 export async function pairDevice(code: string, frontendSocketId: string) {
   return req<{
     success: boolean;

@@ -13,7 +13,7 @@ export function useSocket() {
     ref.current = s;
     if (s.connected) setIsConnected(true);
 
-    const onConnect    = () => setIsConnected(true);
+    const onConnect = () => setIsConnected(true);
     const onDisconnect = () => setIsConnected(false);
 
     s.on('connect',    onConnect);

@@ -18,7 +18,7 @@ export function useDevice(id: string) {
     queryKey: ['device', id],
     queryFn: () => fetchDevice(id),
     enabled: !!id,
-    refetchInterval: 8_000,
+    refetchInterval: 30_000,
   });
 }
 
