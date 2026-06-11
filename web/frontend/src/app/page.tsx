@@ -5,7 +5,7 @@ import Link from "next/link";
 import MacKeyBoard from "@uiw/react-mac-keyboard";
 import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
-  
+
 const features = [
   {
     icon: "🖱️",
@@ -28,15 +28,15 @@ const features = [
     desc: "Every session is secured with AES-256 encryption. Your screen and inputs never leave your private tunnel.",
   },
   {
-     icon: "⌨️",
-      title: "Full Keyboard Input",
-      desc: "Type naturally with full modifier key support — ⌘, ⌥, ⌃, and Fn combos all work as expected.",
+    icon: "⌨️",
+    title: "Full Keyboard Input",
+    desc: "Type naturally with full modifier key support — ⌘, ⌥, ⌃, and Fn combos all work as expected.",
   },
   {
-      icon: "⚡️",
-      title: "Ultra-low Latency",
-      desc: "WebRTC-powered streaming keeps latency under 30ms on a good connection — indistinguishable from local.",
-    },
+    icon: "⚡️",
+    title: "Ultra-low Latency",
+    desc: "WebRTC-powered streaming keeps latency under 30ms on a good connection — indistinguishable from local.",
+  },
 ];
 
 const macApps = [
@@ -98,54 +98,12 @@ export default function Home() {
 
     return () => clearInterval(id);
   }, []);
+
+
  
- 
-  const [pressedKeys, setPressedKeys] = useState(new Set());
-
-  const handleKeyDown = (e) => {
-  const keyMap = {
-    a: "A",
-    b: "B",
-    Enter: "Enter",
-    " ": "Space",
-  };
-
-  const key = keyMap[e.key] || e.key;
-
-  setPressedKeys((prev) => new Set(prev).add(key));
-};
-
-const handleKeyUp = (e) => {
-  const key = keyMap[e.key] || e.key;
-
-  setPressedKeys((prev) => {
-    const next = new Set(prev);
-    next.delete(key);
-    return next;
-  });
-};
-
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    console.log("down", e.key, e.code);
-  };
-
-  const handleKeyUp = (e) => {
-    console.log("up", e.key, e.code);
-  };
-
-  window.addEventListener("keydown", handleKeyDown);
-  window.addEventListener("keyup", handleKeyUp);
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-    window.removeEventListener("keyup", handleKeyUp);
-  };
-}, []);
-
   return (
     <>
-      
+
 
       <div className=" relative min-h-screen overflow-x-hidden">
 
@@ -185,11 +143,11 @@ useEffect(() => {
             <p className="text-xs font-semibold tracking-[0.2em] text-gray-100 uppercase mb-4">
               Your Mac · Anywhere
             </p>
-            <h1 className="text-6xl   sm:text-8xl font-black tracking-tight leading-none mb-4"
+            <h1 className="text-6xl   sm:text-8xl font-black logo-text text-clip text-transparent  bg-clip-text tracking-tight leading-none mb-4"
               style={{ letterSpacing: "-0.03em" }}>
-              <span className=" text-white pb-3 !mb-5">   </span> MAC in AIR 
+              <span className=" text-white pb-3 !mb-5">   </span> MAC in AIR
             </h1>
-            <p className=" text-sm text-gray-100 font-light max-w-md mx-auto mt-4 leading-relaxed">
+            <p className=" text- text-gray-100 font-light max-w-xl max-md:text-sm mx-auto mt-4 leading-relaxed">
               Full Mac control from any browser. Stream your screen, move the mouse,
               type, open apps — everything, from anywhere.
             </p>
@@ -219,16 +177,10 @@ useEffect(() => {
 
           <div className=" mt-10   py-20  w-full">
 
-        <MacKeyBoard
-      className="w-fit drop-shadow-[#9b9b9b75] drop-shadow-2xl "
-      pressedKeys={pressedKeys}
-      onMouseDown={(e, item) => {
-        console.log("Virtual key pressed:", item);
-      }}
-      onMouseUp={() => {
-        console.log("Virtual key released");
-      }}
-    />
+            <MacKeyBoard
+              className="w-fit drop-shadow-[#9b9b9b75] drop-shadow-2xl "
+              
+            />
           </div>
         </section>
 
@@ -247,7 +199,7 @@ useEffect(() => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <div key={f.title}
-                className=" backdrop-blur-2xl glass-panel-dark cursor-pointer hover:scale-[1.01] shadow-[#00000046] !shadow-xl transition-all duration-500 rounded-4xl p-6 scroll-fade-in"
+                className=" backdrop-blur-2xl drop-shadow-[#9b9b9b57] drop-shadow-2xl  glass-panel-dark cursor-pointer hover:scale-[1.01]  transition-all duration-500 rounded-4xl p-6 scroll-fade-in"
                 style={{ transitionDelay: `${i * 80}ms` }}>
                 <div className="text-3xl mb-4">{f.icon}</div>
                 <h3 className="text-[15px] font-semibold text-gray-200 mb-2">{f.title}</h3>
@@ -271,14 +223,14 @@ useEffect(() => {
               </h2>
 
             </div>
-            <div className="glass-panel-dark rounded-4xl p-8 sm:p-12 relative overflow-hidden scroll-fade-in">
+            <div className="glass-panel-dark drop-shadow-[#9b9b9b57] drop-shadow-2xl rounded-4xl p-8 sm:p-12 relative overflow-hidden scroll-fade-in">
               <div className="flex absolute top-6 left-8 items-center gap-2 mb-5">
                 <span className="traffic-light" style={{ background: "#FF5F57" }} />
                 <span className="traffic-light" style={{ background: "#FFBD2E" }} />
                 <span className="traffic-light" style={{ background: "#28C840" }} />
 
               </div>
-              <div className="grid sm:grid-cols-3 mt-5 !text-white gap-8 relative z-10">
+              <div className="grid sm:grid-cols-3  mt-5 !text-white gap-8 relative z-10">
                 {[
                   { step: "01", title: "Install the Mac app", desc: "Download the lightweight helper app and install it on your Mac in seconds." },
                   { step: "02", title: "Sign in on the web", desc: "Open MAC in AIR in any browser and log in with the same account." },
@@ -308,7 +260,7 @@ useEffect(() => {
             </p>
           </div>
 
- 
+
           <div className="glass-panel-dark rounded-4xl p-6 scroll-fade-in">
             {/* Window chrome */}
             <div className="flex items-center gap-2 mb-5">
@@ -339,55 +291,57 @@ useEffect(() => {
           </div>
         </section>
 
-        {/* ── Download CTA ── */}
-        <section id="download" className="py-24 px-4">
-          <div className="max-w-3xl mx-auto text-center scroll-fade-in">
-            <div className="glass-pane  bg-gradient-to-t  from-[#0E161B] to-[#374750]   rounded-4xl p-10 sm:p-16 relative overflow-hidden">
+      
+        <section className=" w-[70%] max-md:w-[95%]  shadow-[#f7f7f7]  shadow-xl my-20 mt-32 glass-panel-dark overflow-hidden relative mx-auto rounded-4xl flex justify-between flex-col h-[600px] bg-gradient-to-t  from-[#0E161B] to-[#252f35]  ">
 
-              <div className="relative z-10">
-                <div className="relative w-full max-w-4xl mx-auto">
+          <div className="w-[70%] max-md:w-full max-md:px-8 max-md:ml-0  ml-[10%] flex flex-col  items-start justify-center  mt-20">
+            <h2 className="text-3xl sm:text-5xl font-bold text-gray-200 mb-3 tracking-tight"
+              style={{ letterSpacing: "-0.025em" }}>
+              Download the Mac App
+            </h2>
+            <p className="text-gray-300 text-[13px] max-md:text-xs  mb-8 leading-relaxed">
+              Install the helper app on your Mac and you're ready to connect
+              from any web browser in seconds. No configuration needed.
+            </p>
 
-                  <Image
-                    src="/laptop2.png"
-                    alt="MacBook"
-                    width={1200}
-                    height={700}
-                    className="w-full h-auto"
-                    priority
-                  />
+            <div className=" hidden max-md:flex max-md:w-full  flex-col w-[40%]  items-start  justify-center  mb-20 gap-3">
+              <button
+                className="glass-button-primary rounded-full px-8 py-3  text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
+                 Download for Mac
+              </button>
 
-                  <div
-                    className="  absolute  overflow-hidden  rounded-lg  left-[10.5%]  top-[4%]  w-[79%]  h-[86%] "
-                  >
-                    <Image
-                      src="/desk.png"
-                      alt="Desktop"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
-
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-200 mb-3 tracking-tight"
-                  style={{ letterSpacing: "-0.025em" }}>
-                  Download the Mac App
-                </h2>
-                <p className="text-gray-500 text-[13px] mb-8 leading-relaxed">
-                  Install the helper app on your Mac and you're ready to connect
-                  from any web browser in seconds. No configuration needed.
-                </p>
-                <div className="flex flex-col   items-center justify-center gap-3">
-                  <button
-                    className="glass-button-primary rounded-full px-8 py-3 text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
-                     Download for Mac
-                  </button>
-
-                  <p className="text-[10px] text-gray-400">macOS 13 Ventura or later</p>
-                </div>
-
-              </div>
+              <p className="text-[10px] text-gray-400 ml-6">macOS 13 Ventura or later</p>
             </div>
+ 
           </div>
+
+          <div className=" w-full flex mb-32  justify-start  ">
+
+            <div className="flex max-md:hidden flex-col w-[40%]  items-center justify-center  mb-20 gap-3">
+              <button
+                className="glass-button-primary rounded-full px-8 py-3 text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
+                 Download for Mac
+              </button>
+
+              <p className="text-[10px] text-gray-400">macOS 13 Ventura or later</p>
+            </div>
+
+            <div className=" w-[60%] max-md:w-[95%] border-black shadow-[black] shadow-2xl outline-2 outline-[#ffffff7b] rounded-[22px] border-[12px] overflow-hidden 
+             transition-all duration-500 hover:-rotate-1 hover:scale-105 border h-[400px] max-md:h-[300px] hover:-right-8   -right-12 -bottom-8 absolute ">
+
+              <div className=" h-[23px] w-[100px] flex items-center justify-center bg-black absolute -top-1 left-[45%] z-10 rounded-lg -2xl">
+                <div className=" h-1 w-1 bg-green-500 ml-10 rounded-full"></div>
+              </div>
+              <Image
+                src="/desk.png"
+                alt="Desktop"
+                fill
+                className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "
+              />
+            </div>
+
+          </div>
+
         </section>
 
 
@@ -404,4 +358,3 @@ useEffect(() => {
     </>
   );
 }
- 

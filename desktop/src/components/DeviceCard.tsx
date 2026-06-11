@@ -41,7 +41,7 @@ export function DeviceCard({
         delay: 0.1,
         duration: 0.6,
       }}
-      className="p-5 rounded-xl bg-gradient-to-t  from-[#0E161B] to-[#374750]   transition-colors">
+      className="p-5 rounded-xl bg-gradient-to- t glass-panel  from-[#0E161B] to-[#374750]  drop-shadow-2xl drop-shadow-[#0000006d] transition-colors">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 rounded-lg shadow-lg shadow-black/50 bg-gradient-to-br from-zinc-500/20 to-zinc-600/20 border border-white/[0.08] flex items-center justify-center text-4xl">
@@ -49,24 +49,26 @@ export function DeviceCard({
           </div>
           <div>
             <h3 className="font-semibold text-sm">{user}'s {hostname} </h3>
-            <p className="text-xs text-gray-500">{platform} · {arch}</p>
+            <p className="text-xs text-gray-300">{platform} · {arch}</p>
           </div>
         </div>
-        <StatusBadge status={isConnected ? 'online' : 'offline'} />
+
+        <StatusBadge status={isConnected ? 'online' : 'offline'} label={isConnected ? 'Connected to Server' : 'Disconnected'} />
+
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 rounded-lg bg-white/[0.02]">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">CPUs</p>
+        <div className="p-3 rounded-2xl !shadow-2xl glass-panel-dark shadow-white/[0.02]">
+          <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">CPUs</p>
           <p className="text-sm font-medium">{cpus} cores</p>
         </div>
-        <div className="p-3 rounded-lg bg-white/[0.02]">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Memory</p>
+        <div className="p-3 rounded-2xl !shadow-2xl glass-panel-dark shadow-white/[0.02]">
+          <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Memory</p>
           <p className="text-sm font-medium">{formatBytes(freeMemory)} free</p>
-          <p className="text-[10px] text-gray-500">of {formatBytes(totalMemory)}</p>
+          <p className="text-[10px] text-gray-200">of {formatBytes(totalMemory)}</p>
         </div>
-        <div className="p-3 rounded-lg bg-white/[0.02]">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Uptime</p>
+        <div className="p-3 rounded-2xl !shadow-2xl glass-panel-dark shadow-white/[0.02]">
+          <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Uptime</p>
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
         </div>
       </div>

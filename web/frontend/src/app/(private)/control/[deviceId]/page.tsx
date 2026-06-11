@@ -44,6 +44,7 @@ export function normalizeKey(key: string) {
     case "control":
     case "ctrl":
       return "control";
+    
 
     case "option":
       return "alt";
@@ -245,6 +246,7 @@ export default function ControlPage({ params }: PageProps) {
     escape: "escape",
     delete: "backspace",
 
+    " ": "space",
     space: "space",
     tab: "tab",
   };
@@ -271,58 +273,47 @@ export default function ControlPage({ params }: PageProps) {
 
 
 
-  const handleVirtualKeyPress = useCallback(
-    (keyName: string) => {
+  const handleVirtualShortcut = useCallback(
+    (keyName: string, modifiers: string[]) => {
       if (!kbCapture) return;
 
-
       const socket = getSocket();
+      const mapped = KEY_MAP[keyName.toLowerCase()] ?? keyName.toLowerCase();
 
-      const mapped =
-        KEY_MAP[keyName.toLowerCase()] ??
-        keyName.toLowerCase();
-
-
-      if (mapped.length === 1) {
-        socket.emit("keyboard-type", {
-          text: mapped,
-        });
+      if (modifiers.length === 0 && mapped.length === 1) {
+        socket.emit("keyboard-type", { text: mapped });
       } else {
         socket.emit("keyboard-shortcut", {
           key: mapped,
-          modifier: [],
+          modifier: modifiers,
         });
       }
     },
     [kbCapture]
   );
 
-  // ── Keyboard capture  
-  useEffect(() => {
-    if (!kbCapture) return;
-    const handler = (e: KeyboardEvent) => {
-      // Prevent browser shortcuts when capturing
+  const handlePhysicalKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!kbCapture) return;
       e.preventDefault();
+
       const modifiers: string[] = [];
-      if (e.ctrlKey || e.metaKey) modifiers.push('command');
+      if (e.metaKey) modifiers.push('command');
+      if (e.ctrlKey) modifiers.push('control');
       if (e.altKey) modifiers.push('alt');
       if (e.shiftKey) modifiers.push('shift');
 
-      // Printable single chars → typeString
+      const socket = getSocket();
+
       if (e.key.length === 1 && modifiers.length === 0) {
-        const socket = getSocket();
         socket.emit('keyboard-type', { text: e.key });
       } else {
-        // Special keys / shortcuts
-        const socket = getSocket();
-        let mappedKey = (e.key);
-        if (!mappedKey) return;
+        const mappedKey = KEY_MAP[e.key.toLowerCase()] ?? e.key;
         socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
       }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [kbCapture]);
+    },
+    [kbCapture]
+  );
 
   //   Screen share start/stop  
   const toggleStream = () => {
@@ -504,7 +495,7 @@ export default function ControlPage({ params }: PageProps) {
 
             {kbCapture && (
               <div className="animate-fade-up delay-4 min-h-[400px] w-fit overflow-x-auto pb-4 flex justify-center">
-                <MacKeyboards onKeyPress={handleVirtualKeyPress} />
+                <MacKeyboards onVirtualShortcut={handleVirtualShortcut} onPhysicalKeyDown={handlePhysicalKeyDown} />
               </div>
             )}
           </div>
