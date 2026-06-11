@@ -27,12 +27,15 @@ jobs:
           node-version: '20'
 
       - name: Create placeholder .env file
+        working-directory: ./desktop
         run: touch .env
 
       - name: Install dependencies
+        working-directory: ./desktop
         run: npm install
 
       - name: Build and release
+        working-directory: ./desktop
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release
