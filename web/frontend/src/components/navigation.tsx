@@ -11,7 +11,7 @@ const Navigation = () => {
 
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
     const profileRef = useRef<HTMLAnchorElement | null>(null)
-
+    const [fullscreen, setFullscreen] = useState(false);
 
     const navItems = [
         { href: '/home', title: 'Home' },
@@ -21,6 +21,12 @@ const Navigation = () => {
 
     useEffect(() => {
         const activeIndex = navItems.findIndex((item) => item.href === path)
+
+         const f = sessionStorage.getItem('full-screen')
+            if(f === 'true'){
+                setFullscreen(true)
+            }
+
 
         if (activeIndex !== -1) {
             const el = itemRefs.current[activeIndex]
@@ -34,9 +40,21 @@ const Navigation = () => {
         } else {
             setPillStyle({ left: 0, width: 0, opacity: 0 })
         }
-    }, [path])
+    }, [path,fullscreen])
+
+    useEffect(() => {
+        
+         const f = sessionStorage.getItem('full-screen')
+            if(f === 'true'){
+                setFullscreen(true)
+            }
+
+            
+            console.log(fullscreen)
+        }, [ fullscreen , ])
+
     return (
-        <div className='fixed top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none'>
+        <div className={ `   top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none `}>
 
 
              <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-dark relative flex items-center p-2 rounded-full'>

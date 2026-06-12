@@ -130,7 +130,7 @@ export class SocketService {
     this.socket.on('command', async (payload: CommandPayload, callback?: (result: any) => void) => {
       logInfo('SocketService', 'Received command', payload);
       const result = await commandService.handleCommand(payload);
-      logInfo('SocketService', 'Command result', result);
+      // logInfo('SocketService', 'Command result', result);
 
       // Send result back to backend
       if (callback) {
@@ -260,8 +260,7 @@ export class SocketService {
   }
 
   public async refreshPairingCode(): Promise<string | null> {
-
-    console.log("calling refresh ")
+ 
     if (!this.socket) return null;
 
     if (!this.socket.connected) {

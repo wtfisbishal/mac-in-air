@@ -4,10 +4,9 @@ import { use, useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  MonitorOff, Keyboard, MousePointer2, Camera,
-  Power, Moon, Lock, Terminal, Globe, ArrowLeft,
-  Loader2, Maximize2, Minimize2, Link as Link2,
-  ShieldAlert,
+  MonitorOff, Keyboard, MousePointer2, Power, 
+  Moon, Lock, Terminal, Globe, ArrowLeft,Loader,
+  Maximize2, Minimize2, Link as Link2,  ShieldAlert,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -340,7 +339,7 @@ export default function ControlPage({ params }: PageProps) {
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
-        <Loader2 className="animate-spin text-indigo-400" size={32} />
+        <Loader className="animate-spin text-indigo-400" size={32} />
       </div>
     </AppLayout>
   );
@@ -387,7 +386,7 @@ export default function ControlPage({ params }: PageProps) {
         {/* Top bar */}
 
         {!fullscreen && (
-          <div className="flex items-center -mt-16 max-md:-mt-1 justify-between mb-4 animate-fade-up">
+          <div className="flex items-center   max-md:-mt-1 justify-between mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
               <button onClick={() => router.push('/home')} className="btn  !rounded-3xl  glass-panel-dark btn-ghost p-2">
                 <ArrowLeft size={16} />
@@ -404,7 +403,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => setFullscreen(true)} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
+            <button onClick={() =>{ setFullscreen(true) ; sessionStorage.setItem('full-screen','true') }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -467,7 +466,7 @@ export default function ControlPage({ params }: PageProps) {
 
               {/* Fullscreen exit */}
               {fullscreen && (
-                <button onClick={() => setFullscreen(false)} className="ctrl-btn ml-auto">
+                <button onClick={() => {setFullscreen(false) ; ; sessionStorage.setItem('full-screen','true') }} className="ctrl-btn ml-auto">
                   <Minimize2 size={12} /> Exit
                 </button>
               )}

@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect  } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap,  Link as Link3,   } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap, Link as Link3, } from 'lucide-react';
 import { useDevices, DEVICES_KEY } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Device } from '@/types'; 
- 
+import type { Device } from '@/types';
+
 function DeviceCard({ device }: { device: Device }) {
   const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
- 
+
   return (
     <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel -dark rounded-3xl p-5 transition-all   group
       ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
@@ -63,7 +63,7 @@ function DeviceCard({ device }: { device: Device }) {
         >
           <Zap size={13} /> Control
         </Link>
-        
+
       </div>
     </div>
   );
@@ -88,15 +88,15 @@ export default function DashboardPage() {
     return () => { socket.off('device-status-changed', handler); };
   }, [socket, qc, toast]);
 
-  const online  = devices?.filter(d => d.isOnline).length ?? 0;
-  const total   = devices?.length ?? 0;
- 
+  const online = devices?.filter(d => d.isOnline).length ?? 0;
+  const total = devices?.length ?? 0;
+
   return (
     <AppLayout>
       <div className=" !p-7 max-md:w-full  w-[70%] mx-auto">
         {/* Header */}
         <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
-          
+
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Home</h1>
             <p className="text-slate-400 w-full text-xs mt-1">Monitor and control your remote devices</p>
@@ -117,8 +117,8 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
           {[
             { label: 'Total Devices', value: total, icon: Monitor, color: 'text-indigo-400' },
-            { label: 'Online Now',    value: online, icon: Circle,  color: 'text-emerald-400' },
-            { label: 'Offline',       value: total - online, icon: Circle, color: 'text-red-500' },
+            { label: 'Online Now', value: online, icon: Circle, color: 'text-emerald-400' },
+            { label: 'Offline', value: total - online, icon: Circle, color: 'text-red-500' },
           ].map(s => (
             <div key={s.label} className="glass-panel-dark !rounded-3xl p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-[#ffffff45] flex items-center justify-center">
@@ -153,18 +153,18 @@ export default function DashboardPage() {
           )}
 
           {isError && (
-            <div className="glass-panel-dark rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
+            <div className="glass-panel rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
               <p className="text-sm font-medium">Failed to load devices</p>
               <p className="text-xs text-red-400/60 mt-1">{(error as Error).message}</p>
             </div>
           )}
 
           {!isLoading && !isError && devices?.length === 0 && (
-            <div className="glass rounded-2xl p-12 text-center border border-dashed border-white/[0.06]">
+            <div className=" glass-panel-dark rounded-3xl p-12 text-center  ">
               <Monitor size={36} className="text-slate-600 mx-auto mb-3" />
               <p className="text-slate-400 font-medium">No devices yet</p>
               <p className="text-slate-600 text-sm mt-1">Pair your Mac to get started</p>
-              <Link href="/pair" className="btn btn-primary mx-auto mt-4 text-sm">
+              <Link href="/pair" className="btn glass-button-primary !rounded-full mx-auto mt-4 text-sm">
                 <Plus size={14} /> Pair Device
               </Link>
             </div>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-      
+
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
   );

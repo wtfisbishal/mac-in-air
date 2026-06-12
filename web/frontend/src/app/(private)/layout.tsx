@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <main>
       <div className="relative w-full">
         <Navigation />
-        <div className="mt-[80px]  ">
+        <div  >
           {children}
         </div>
       </div>

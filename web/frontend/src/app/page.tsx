@@ -5,73 +5,10 @@ import Link from "next/link";
 import MacKeyBoard from "@uiw/react-mac-keyboard";
 import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
-
-const features = [
-  {
-    icon: "🖱️",
-    title: "Remote Mouse & Keyboard",
-    desc: "Full pointer control and keyboard input. Type, click, scroll — every interaction your Mac supports, delivered through the browser.",
-  },
-  {
-    icon: "📺",
-    title: "Live Screen Streaming",
-    desc: "Real-time screen mirroring with ultra-low latency. Watch your Mac desktop update live as you work from anywhere in the world.",
-  },
-  {
-    icon: "🚀",
-    title: "Launch Any App",
-    desc: "Browse your full application library and open any app with one tap. No switching back — just click and it launches on your Mac.",
-  },
-  {
-    icon: "🔐",
-    title: "End-to-End Encrypted",
-    desc: "Every session is secured with AES-256 encryption. Your screen and inputs never leave your private tunnel.",
-  },
-  {
-    icon: "⌨️",
-    title: "Full Keyboard Input",
-    desc: "Type naturally with full modifier key support — ⌘, ⌥, ⌃, and Fn combos all work as expected.",
-  },
-  {
-    icon: "⚡️",
-    title: "Ultra-low Latency",
-    desc: "WebRTC-powered streaming keeps latency under 30ms on a good connection — indistinguishable from local.",
-  },
-];
-
-const macApps = [
-  { name: "Finder", icon: "https://s3.macosicons.com/macosicons/icons/k9tFW4a3UM/lowResPngFile_9e80c50a5802d3b0a7ec66f3fe4ce348_low_res_Finder.png", },
-  { name: "Safari", icon: "https://s3.macosicons.com/macosicons/icons/utug9Rt8g6/lowResPngFile_a0b8d534889b5695781a9a03f388e2d4_low_res_Safari__MacOS_Tahoe_.png", },
-  { name: "Terminal", icon: "https://s3.macosicons.com/macosicons/icons/yqUGh6O6LH/lowResPngFile_1ae9bc6811dcc2d2d0e82816c3ee1727_low_res_Terminal__MacOS_Tahoe_.png", },
-  { name: "Xcode", icon: "https://s3.macosicons.com/macosicons/icons/B7GcnoIhKy/lowResPngFile_53ef82cc954d2fed837f43ec890f93a6_low_res_Xcode__Liquid_Glass_.png", },
-  { name: "Maps", icon: "https://s3.macosicons.com/macosicons/icons/5aA6m3BXxr/lowResPngFile_a3b2511cb67879107a0b6da86c3d1dc5_low_res_Maps__MacOS_Tahoe_.png", },
-  { name: "Stocks", icon: "https://s3.macosicons.com/macosicons/icons/rI6kmZBrnK/lowResPngFile_da63fad3e36519f6e472618b55b62532_rI6kmZBrnK.png", },
-  { name: "Activity Moniter", icon: "https://s3.macosicons.com/macosicons/icons/413ZGJDwjU/lowResPngFile_26997c9db4faff8c1098c0de56993a6b_low_res_Activite_monitor__MacOS_Tahoe_.png", },
-  { name: "Figma", icon: "https://s3-new.macosicons.com/macosicons/parse/Figma_NgviovhviJ_lowResPng-f7b09e724a.png", },
-  { name: "VS Code", icon: "https://s3-new.macosicons.com/macosicons/parse/VScode_tpG0bknPQ1_lowResPng-b77f4d22f5.png", },
-  { name: "Spotify", icon: "https://s3.macosicons.com/macosicons/icons/tQBv6ezYwU/lowResPngFile_2966a8081bf2a5de2e69f29bb1915822_low_res_Spotify___Liquid_Glass__Dark_.png", },
-  { name: "facetime", icon: "https://s3.macosicons.com/macosicons/icons/E0Ws4w1yiC/lowResPngFile_b04a7c53fd9f231f804bd3261bcb6430_low_res_Facetime.png", },
-  { name: "Notion", icon: "https://s3.macosicons.com/macosicons/icons/uToySGMoFX/lowResPngFile_71c01a72158ca05f472b688d0dd4360f_low_res_Notion.png", },
-];
-
-function useScrollReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll(".scroll-fade-in");
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add("visible");
-        });
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-}
-
+import { features, macApps, useScrollReveal } from "@/lib/utils";
 export default function Home() {
   const [time, setTime] = useState("");
+  
   useScrollReveal();
 
   useEffect(() => {
@@ -99,8 +36,12 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
+  const handleDownload = async () => {
+  window.open("/api/download", "_self");
+};
 
- 
+
+
   return (
     <>
 
@@ -161,10 +102,10 @@ export default function Home() {
               className="glass-button-primary rounded-full px-7 py-3 text-[15px] font-semibold cursor-pointer">
               Open Dashboard
             </Link>
-            <a href="#download"
+            <button onClick={()=>handleDownload()}
               className="glass-button rounded-full px-7 py-3 text-[15px] font-semibold text-gray-700 cursor-pointer">
                Download for Mac
-            </a>
+            </button>
           </div>
 
           {/* Version badge */}
@@ -179,7 +120,7 @@ export default function Home() {
 
             <MacKeyBoard
               className="w-fit drop-shadow-[#9b9b9b75] drop-shadow-2xl "
-              
+
             />
           </div>
         </section>
@@ -291,7 +232,7 @@ export default function Home() {
           </div>
         </section>
 
-      
+
         <section className=" w-[70%] max-md:w-[95%]  shadow-[#f7f7f7]  shadow-xl my-20 mt-32 glass-panel-dark overflow-hidden relative mx-auto rounded-4xl flex justify-between flex-col h-[600px] bg-gradient-to-t  from-[#0E161B] to-[#252f35]  ">
 
           <div className="w-[70%] max-md:w-full max-md:px-8 max-md:ml-0  ml-[10%] flex flex-col  items-start justify-center  mt-20">
@@ -305,20 +246,20 @@ export default function Home() {
             </p>
 
             <div className=" hidden max-md:flex max-md:w-full  flex-col w-[40%]  items-start  justify-center  mb-20 gap-3">
-              <button
+              <button onClick={()=>handleDownload()}
                 className="glass-button-primary rounded-full px-8 py-3  text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
                  Download for Mac
               </button>
 
               <p className="text-[10px] text-gray-400 ml-6">macOS 13 Ventura or later</p>
             </div>
- 
+
           </div>
 
           <div className=" w-full flex mb-32  justify-start  ">
 
             <div className="flex max-md:hidden flex-col w-[40%]  items-center justify-center  mb-20 gap-3">
-              <button
+              <button onClick={()=>handleDownload()}
                 className="glass-button-primary rounded-full px-8 py-3 text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
                  Download for Mac
               </button>
@@ -349,7 +290,7 @@ export default function Home() {
         <div className="w-full h-[30vh] max-md:h-[10vh] relative overflow-hidden">
 
           <h1 className=" last-text bg-clip-text text-transparent text-[170px] max-md:text-6xl max-md:-bottom-[20%] absolute -bottom-[30%] w-full text-center  font-extrabold  tracking-wide">
-            MAC in AIR 💨 
+            MAC in AIR 💨
           </h1>
         </div>
 

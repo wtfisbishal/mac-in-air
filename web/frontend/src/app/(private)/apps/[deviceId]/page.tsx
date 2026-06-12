@@ -3,9 +3,7 @@
 import { use, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft, Search, RefreshCw, Loader2, AppWindow, Play, MonitorOff, Grid2x2, List,
-  Link as Link2,
-  ShieldAlert
+  ArrowLeft, Search, RefreshCw, Loader2,  Play, MonitorOff, Link as Link2,ShieldAlert
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -63,14 +61,8 @@ function AppIcon({
 
   return (
     <div
-      className={`flex items-center justify-center rounded-3xl text-4xl font-bold select-none w-full h-full`}
-      style={{
-        background: style.bg,
-        color: style.color,
-        border: `1px solid ${style.color}25`,
-      }}
+      className={`flex items-center glass-panel-dark justify-center rounded-3xl text-4xl font-bold select-none w-full h-full`}
     >
-
       {initials}
     </div>
   );
@@ -198,7 +190,7 @@ if (!pairToken) return (
   );
   return (
     <AppLayout>
-      <div className="flex flex-col w-full -mt-16 max-md:mt-0 h-screen p-5">
+      <div className="flex flex-col w-full  max-md:mt-0 h-screen p-5">
 
         <div className="flex items-center justify-between mb-5 animate-fade-up">
           <div className="flex items-center gap-3">
@@ -251,7 +243,7 @@ if (!pairToken) return (
         </div>
 
         {/* ── Content  */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 ">
 
           {loading && (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -271,7 +263,7 @@ if (!pairToken) return (
           )}
 
           {!loading && filtered.length > 0 && (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))] w-[90% mx-auto gap-3 animate-fade-in pb-4">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]   mx-auto gap-3 animate-fade-in pb-4">
               {filtered.map((app) => {
                 const isOpening = opening === app.name;
                 return (
@@ -283,7 +275,7 @@ if (!pairToken) return (
                       active:scale-95 transition-all duration-150
                       disabled:opacity-60 disabled:cursor-wait"
                   >
-                    {/* Icon */}
+                    
                     <div className="w-20 h-20 relative">
                       <AppIcon name={app.name} icon={app.icon} size='md' />
                       {isOpening && (
@@ -292,11 +284,11 @@ if (!pairToken) return (
                         </div>
                       )}
                     </div>
-                    {/* Label */}
+                    
                     <span className="text-[11px] text-slate-300 group-hover:text-white font-medium text-center leading-tight line-clamp-2 w-full">
                       {app.name}
                     </span>
-                    {/* Launch hint */}
+                     
                     <span className="opacity-0 group-hover:opacity-100 flex items-center gap-1 text-[9px] text-indigo-400 font-semibold transition-opacity">
                       <Play size={8} fill="currentColor" /> Launch
                     </span>
