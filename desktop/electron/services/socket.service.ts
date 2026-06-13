@@ -9,7 +9,7 @@ export interface WebClient {
   connectedAt: number;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://mac-in-wind.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://mac-in-wind.onrender.com" ;
 const KEEP_ALIVE_INTERVAL_MS = 30000;
 
 export class SocketService {

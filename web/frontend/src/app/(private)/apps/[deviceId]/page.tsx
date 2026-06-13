@@ -22,38 +22,21 @@ interface AppInfo {
   path: string;
   icon?: string | null;
 }
-function getAppStyle(name: string): { color: string; bg: string } {
-  const lower = name.toLowerCase();
-
-  return { color: '#818cf8', bg: 'rgba(129,140,248,.15)' };
-}
-
-function AppIcon({
-  name,
-  icon,
-  size = 'md',
-}: {
-  name: string;
-  icon?: string | null;
-  size?: 'sm' | 'md';
-}) {
-  const style = getAppStyle(name);
+ 
+function AppIcon({ name,icon, }: { name: string;icon?: string | null; }) {
+  
   const initials = name
     .split(/[\s\-_]+/)
     .slice(0, 2)
     .map(w => w[0]?.toUpperCase() ?? '')
     .join('');
-
-  const rounded = size === 'sm' ? 'rounded-xl' : 'rounded-2xl';
-
-
   if (icon) {
     return (
       <img
         src={icon}
         alt={name}
         draggable={false}
-        className={`${rounded}  object-contain select-none w-full h-full`}
+        className={`rounded-3xl  object-contain select-none w-full h-full`}
         style={{ imageRendering: 'auto' }}
       />
     );
@@ -117,7 +100,7 @@ export default function AppsPage({ params }: PageProps) {
 
   useEffect(() => { loadApps(); }, [loadApps]);
 
-  // ⌘K to focus search
+  // ⌘+K to focus search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -254,10 +237,9 @@ if (!pairToken) return (
 
           {!loading && filtered.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
-              {/* <AppWindow size={36} className="text-slate-600" /> */}
-              <Image src={'/apps.png'} height={65} width={65} alt='apps' />
+               <Image src={'/apps.png'} className=' saturate-0 ' height={65} width={65} alt='apps' />
               <p className="text-slate-400 text-sm font-medium">
-                {search ? `No apps matching "${search}"` : 'No apps found'}
+                {search ? `No apps matching "${search}"` : ' No apps found '}
               </p>
             </div>
           )}
@@ -277,7 +259,7 @@ if (!pairToken) return (
                   >
                     
                     <div className="w-20 h-20 relative">
-                      <AppIcon name={app.name} icon={app.icon} size='md' />
+                      <AppIcon name={app.name} icon={app.icon}  />
                       {isOpening && (
                         <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
                           <Loader2 size={16} className="animate-spin text-white" />

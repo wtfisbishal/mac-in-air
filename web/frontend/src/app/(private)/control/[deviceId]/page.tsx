@@ -4,9 +4,10 @@ import { use, useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  MonitorOff, Keyboard, MousePointer2, Power, 
-  Moon, Lock, Terminal, Globe, ArrowLeft,Loader,
-  Maximize2, Minimize2, Link as Link2,  ShieldAlert,
+  MonitorOff, Keyboard, MousePointer2, Power,
+  Moon, Lock, Terminal, Globe, ArrowLeft, Loader,
+  Maximize2, Minimize2, Link as Link2, ShieldAlert,
+  NotepadText,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -28,11 +29,11 @@ interface Action {
   variant?: 'default' | 'danger';
 }
 
-const ACTIONS: Action[] = [ 
+const ACTIONS: Action[] = [
   { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
   { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
-  { label: 'Sleep', icon: Moon, type: 'SLEEP' },
-  { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' }, 
+  { label: 'Notes', icon: NotepadText, type: 'OPEN_APP', payload: { app: 'Notes' } },
+  // { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' },
 ];
 export function normalizeKey(key: string) {
   switch (key.toLowerCase()) {
@@ -43,7 +44,7 @@ export function normalizeKey(key: string) {
     case "control":
     case "ctrl":
       return "control";
-     
+
     case "option":
       return "alt";
 
@@ -80,6 +81,9 @@ function ScreenCanvas({
         'join-device',
         { deviceId, pairToken },
         (res?: { success: boolean; message?: string }) => {
+          if(res?.success === false) {
+            sessionStorage.removeItem(`rmac_pair_${deviceId}`)
+          }
           console.log('join-device response', res);
         }
       );
@@ -185,7 +189,7 @@ function ScreenCanvas({
         className="w-full h-full object-contain   pointer-events-none"
       />
 
-      
+
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         {!hasFrame && (
           <div className="text-center">
@@ -220,7 +224,10 @@ export default function ControlPage({ params }: PageProps) {
     const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
     setPairToken(token);
     setAuthChecked(true);
- 
+
+
+    //  socket.emit('screen-share-stop', { sessionId });
+
   }, [deviceId]);
 
   const [streaming, setStreaming] = useState(false);
@@ -228,6 +235,7 @@ export default function ControlPage({ params }: PageProps) {
   const [mouseCapture, setMouseCapture] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [sessionId, setSessionId] = useState('');
+  const [warning , setWarning] = useState<string | null>(null);
 
 
   const KEY_MAP: Record<string, string> = {
@@ -344,7 +352,6 @@ export default function ControlPage({ params }: PageProps) {
     </AppLayout>
   );
 
-  //   Not authorized: no pairToken in sessionStorage  
   if (!pairToken) return (
     <AppLayout>
       <div className="w-full flex items-center justify-center">
@@ -358,7 +365,7 @@ export default function ControlPage({ params }: PageProps) {
             Pairing tokens expire after 15 min  or when you close the tab.
           </p>
           <Link href="/pair" className="btn !rounded-full glass-button-primary">
-          <Link2 size={20}/>
+            <Link2 size={20} />
             Pair Device
           </Link>
         </div>
@@ -382,7 +389,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={`flex w-full flex-col h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
+      <div className={`flex w-full flex-col min-h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
         {/* Top bar */}
 
         {!fullscreen && (
@@ -403,7 +410,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() =>{ setFullscreen(true) ; sessionStorage.setItem('full-screen','true') }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
+            <button onClick={() => { setFullscreen(true); sessionStorage.setItem('full-screen', 'true') }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -419,7 +426,7 @@ export default function ControlPage({ params }: PageProps) {
             style={{ outline: 'none' }}
           >
             {/* Toolbar */}
-            <div className="glas glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 flex-wrap animate-fade-up delay-1">
+            <div className="glas glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap animate-fade-up delay-1">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
@@ -466,7 +473,7 @@ export default function ControlPage({ params }: PageProps) {
 
               {/* Fullscreen exit */}
               {fullscreen && (
-                <button onClick={() => {setFullscreen(false) ; ; sessionStorage.setItem('full-screen','true') }} className="ctrl-btn ml-auto">
+                <button onClick={() => { setFullscreen(false);; sessionStorage.setItem('full-screen', 'true') }} className="ctrl-btn ml-auto">
                   <Minimize2 size={12} /> Exit
                 </button>
               )}
@@ -477,24 +484,8 @@ export default function ControlPage({ params }: PageProps) {
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} />
             </div>
 
-            {/* Keyboard type bar  */}
-            <div className="glass-panel-dark rounded-full w-full px-3 py-2 flex items-center gap-3 animate-fade-up delay-3">
-              <input
-                type="text"
-                placeholder="Type text and press Enter to send directly to Mac…"
-                className="flex-1 bg-transparent outline-none text-sm text-slate-200 placeholder:text-slate-600"
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    const val = e.currentTarget.value.trim();
-                    if (val) { emit('KEYBOARD_TYPE', { text: val }); e.currentTarget.value = ''; toast(`Typed: ${val}`, 'info'); }
-                  }
-                }}
-              />
-              <kbd className="px-3 py-2 rounded-3xl text-[10px] bg-zinc-500 text-slate-200 font-mono">Enter</kbd>
-            </div>
-
             {kbCapture && (
-              <div className="animate-fade-up delay-4 min-h-[400px] w-fit overflow-x-auto pb-4 flex justify-center">
+              <div className="animate-fade-up delay-4 min-h-[400px] w-fit overflow-x-auto max-md:justify-start pb-4 flex justify-center">
                 <MacKeyboards onVirtualShortcut={handleVirtualShortcut} onPhysicalKeyDown={handlePhysicalKeyDown} />
               </div>
             )}
@@ -507,6 +498,7 @@ export default function ControlPage({ params }: PageProps) {
               {/* Apps launcher */}
               <Link
                 href={`/apps/${deviceId}`}
+               
                 className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
                 <Image src={'/apps.png'} height={35} width={35} alt='apps' />
@@ -544,9 +536,7 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
-
-
-
+ 
               {/* System actions */}
               <div className="glass-panel-dark rounded-3xl p-4">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">System</p>
@@ -559,7 +549,7 @@ export default function ControlPage({ params }: PageProps) {
                   ].map(a => (
                     <button
                       key={a.type}
-                      onClick={() => { emit(a.type); toast(`Sent: ${a.label}`, 'info'); }}
+                      onClick={() => { setWarning(a.type)}}
                       className={`w-full  flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
                         ${['RESTART', 'SHUTDOWN'].includes(a.type)
                           ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
@@ -578,6 +568,60 @@ export default function ControlPage({ params }: PageProps) {
             </div>
           )}
         </div>
+
+        
+        {
+  warning && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
+      <div className="w-[450px] rounded-3xl p-6 glass-panel shadow-2xl">
+        
+        
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">⚠️</span>
+          <h2 className="text-xl font-semibold text-yellow-400">
+            System Action Confirmation
+          </h2>
+        </div>
+
+        
+        <div className="mt-5">
+          <p className="text-gray-300">
+            You are about to perform the following system action:
+          </p>
+
+          <div className="mt-3   p-4">
+            <p className="text-center text-2xl font-bold capitalize text-red-500">
+              {warning.replace('_', ' ').toLowerCase()}
+            </p>
+          </div>
+
+          
+        </div>
+
+         
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={() => setWarning(null)}
+            className="rounded-full px-6 py-2 glass-button"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={() => {
+              emit(warning);
+              toast(`${warning} command sent`, "info");
+              setWarning(null);
+            }}
+            className="rounded-full px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium transition"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
