@@ -378,7 +378,7 @@ body {
 
 
 .last-text {
-  background-image: linear-gradient(1deg, #111119, #ffffff73);
+  background-image: linear-gradient(0deg, #111119 25%, #ffffff69 133% );
 }
 
 .logo-text {

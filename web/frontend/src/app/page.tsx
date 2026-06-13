@@ -8,7 +8,7 @@ import { Battery, Search, Wifi } from "lucide-react";
 import { features, macApps, useScrollReveal } from "@/lib/utils";
 export default function Home() {
   const [time, setTime] = useState("");
-  
+
   useScrollReveal();
 
   useEffect(() => {
@@ -37,10 +37,16 @@ export default function Home() {
   }, []);
 
   const handleDownload = async () => {
-  window.open("/api/download", "_self");
-};
+    window.open("/api/download", "_self");
+  };
 
+  const [copied, setCopied] = useState(false);
 
+  const handleCopy = async (text) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <>
@@ -102,7 +108,7 @@ export default function Home() {
               className="glass-button-primary rounded-full px-7 py-3 text-[15px] font-semibold cursor-pointer">
               Open Dashboard
             </Link>
-            <button onClick={()=>handleDownload()}
+            <button onClick={() => handleDownload()}
               className="glass-button rounded-full px-7 py-3 text-[15px] font-semibold text-gray-700 cursor-pointer">
                Download for Mac
             </button>
@@ -155,12 +161,13 @@ export default function Home() {
 
         <section className="py-20 px-4">
 
-          <div className="max-w-4xl mx-auto">
+          <div className=" w-[80%] max-md:w-[97%] mx-auto">
             <div className="text-center mb-14 scroll-fade-in">
 
               <p className="text-xs font-semibold tracking-[0.2em] text-gray-300 uppercase mb-3">Setup</p>
               <h2 className="text-4xl font-bold  tracking-tight" style={{ letterSpacing: "-0.025em" }}>
-                Ready in three steps.
+                Ready in
+                <span className="text-clip bg-clip-text text-transparent bg-gradient-to-t from-[#5d43ab] to-[#a88df9] text-8xl "> 4 </span> steps.
               </h2>
 
             </div>
@@ -171,25 +178,78 @@ export default function Home() {
                 <span className="traffic-light" style={{ background: "#28C840" }} />
 
               </div>
-              <div className="grid sm:grid-cols-3  mt-5 !text-white gap-8 relative z-10">
+              <div className="grid sm:grid-cols-4  mt-5 !text-white gap-8 relative z-10">
                 {[
-                  { step: "01", title: "Install the Mac app", desc: "Download the lightweight helper app and install it on your Mac in seconds." },
-                  { step: "02", title: "Sign in on the web", desc: "Open MAC in AIR in any browser and log in with the same account." },
-                  { step: "03", title: "Take control", desc: "Your Mac appears instantly. Stream, click, type — it's all yours remotely." },
+                  {
+                    step: "01",
+                    title: "Install the Mac App",
+                    desc: "Download the lightweight Mac app and complete the installation in just a few seconds.",
+                    additional: ' xattr -cr "/Applications/MAC in AIR.app" '
+                  },
+                  {
+                    step: "02",
+                    title: "Sign In on the Web",
+                    desc: "Open MAC in AIR in your preferred browser and sign in."
+                  },
+                  {
+                    step: "03",
+                    title: "Pair Your Device",
+                    desc: "Open the Pair section in the Mac app, copy the pairing code, and enter it on the web application."
+                  },
+                  {
+                    step: "04",
+                    title: "Take Control",
+                    desc: "Once the devices are paired, you can stream your Mac, click, type, and control it remotely from anywhere."
+                  }
                 ].map((s) => (
                   <div key={s.step} className="flex flex-col gap-3">
-                    <span className="text-[11px] font-bold tracking-[0.15em] text-gray-300">{s.step}</span>
-                    <h3 className="text-[16px] font-semibold text-blue-400">{s.title}</h3>
-                    <p className="text-[13px] text-gray-200 leading-relaxed">{s.desc}</p>
+                    <span className="text-[28px] font-bold tracking-[0.15em] text-gray-300">{s.step}</span>
+                    <p className="text-[16px] font-semibold text-blue-500">{s.title}</p>
+                    <p className="text-[16px] text-gray-200 leading-relaxed">{s.desc}</p>
                   </div>
                 ))}
               </div>
+
+              <div className="mt-10 space-y-4">
+                <h1 className="text-2xl font-bold text-blue-500">
+                 How Install on macOS
+                </h1>
+
+                <ol className="list-decimal space-y-2 pl-5 text-gray-300">
+                  <li>Download the Applications If macOS blocks the application from opening.</li>
+                  <li>Open Terminal.</li>
+                  <li>Paste the command below and press Enter.</li>
+                  <li>Launch the app normally.</li>
+                </ol>
+              </div>
+              <div className="relative  mt-10 shadow-xl shadow-[#0000005f] rounded-2xl w-full overflow-hidden">
+                {/* Terminal Header */}
+                <div className="flex items-center justify-between bg-zinc-900 px-4 py-2 border-b border-zinc-700">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+
+                  <button
+                    onClick={(e) => handleCopy(`xattr -cr "/Applications/MAC in AIR.app `)}
+                    className="text-xs text-zinc-300 hover:text-white px-2 py-1 rounded bg-zinc-800"
+                  >
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+
+                <pre className="bg-black text-green-400 p-4 overflow-x-auto font-mono text-sm min-h-[120px]">
+                  <code> xattr -cr "/Applications/MAC in AIR.app </code>
+                </pre>
+              </div>
+
             </div>
           </div>
         </section>
 
         {/* Apps */}
-        <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto drop-shadow-[#9b9b9b75] drop-shadow-2xl ">
+        <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto  ">
           <div className="text-center mb-12 scroll-fade-in">
             <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-3">App Library</p>
             <h2 className="text-4xl font-bold text-gray-50 tracking-tight" style={{ letterSpacing: "-0.025em" }}>
@@ -246,7 +306,7 @@ export default function Home() {
             </p>
 
             <div className=" hidden max-md:flex max-md:w-full  flex-col w-[40%]  items-start  justify-center  mb-20 gap-3">
-              <button onClick={()=>handleDownload()}
+              <button onClick={() => handleDownload()}
                 className="glass-button-primary rounded-full px-8 py-3  text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
                  Download for Mac
               </button>
@@ -259,7 +319,7 @@ export default function Home() {
           <div className=" w-full flex mb-32  justify-start  ">
 
             <div className="flex max-md:hidden flex-col w-[40%]  items-center justify-center  mb-20 gap-3">
-              <button onClick={()=>handleDownload()}
+              <button onClick={() => handleDownload()}
                 className="glass-button-primary rounded-full px-8 py-3 text-[15px] font-semibold flex items-center gap-2 cursor-pointer">
                  Download for Mac
               </button>
@@ -280,11 +340,8 @@ export default function Home() {
                 className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "
               />
             </div>
-
           </div>
-
         </section>
-
 
 
         <div className="w-full h-[30vh] max-md:h-[10vh] relative overflow-hidden">
