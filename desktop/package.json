@@ -1,6 +1,6 @@
 {
   "name": "MACinAIR",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A MAC app ",
   "author": "Bishal Kandi",
   "license": "MIT",
@@ -16,10 +16,10 @@
     "build:next": "next build",
     "build:main": "tsc -p tsconfig.main.json",
     "build": "npm run build:next && npm run build:main",
-    "release": "npm run build && electron-builder --publish always",
-    "package": "npm run build && electron-builder",
-    "package:mac": "npm run build && electron-builder --mac",
-    "postinstall": "electron-builder install-app-deps"
+    "release": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder --publish always",
+    "package": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder",
+    "package:mac": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder --mac",
+    "postinstall": "NODE_OPTIONS=\"--experimental-require-module\" electron-builder install-app-deps"
   },
   "keywords": [
     "mac-in-air",
@@ -60,7 +60,8 @@
       "dist/**/*",
       "out/**/*",
       "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "assets/**/*"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DeviceCard } from '@/components/DeviceCard';
 import PairingStatusWidget from '@/components/PairingStatusWidget';
-import Link from 'next/link';
 
 interface DeviceInfo {
   hostname: string;
@@ -16,10 +15,10 @@ interface DeviceInfo {
   uptime: number;
 }
 
-interface WebClient {
-  socketId: string;
-  connectedAt: number;
-}
+// interface WebClient {
+//   socketId: string;
+//   connectedAt: number;
+// }
 
 export default function DashboardPage() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);

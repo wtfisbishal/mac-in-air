@@ -41,7 +41,7 @@ export function DeviceCard({
         delay: 0.1,
         duration: 0.6,
       }}
-      className="p-5 rounded-xl bg-gradient-to- t glass-panel  from-[#0E161B] to-[#374750]  drop-shadow-2xl drop-shadow-[#0000006d] transition-colors">
+      className="p-5 rounded-xl drop-shadow-2xl drop-shadow-[#4d4d4d] glass-panel  drop-shadow-2xl drop-shadow-[#0000006d] transition-colors">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 rounded-lg shadow-lg shadow-black/50 bg-gradient-to-br from-zinc-500/20 to-zinc-600/20 border border-white/[0.08] flex items-center justify-center text-4xl">
