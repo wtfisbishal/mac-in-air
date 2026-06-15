@@ -42,16 +42,14 @@ export default function Home() {
 
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (text) => {
+  const handleCopy = async (text:string) => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <>
-
-
+    <> 
       <div className=" relative min-h-screen overflow-x-hidden">
 
         <div className="fixed top-0 left-0 w-full h-screen bg-[url('/walpaper.png') bg-[#0a0908  bg-gradient-to-t  from-[#0B0B12] to-[#111119]   bg-cover bg-center ">
@@ -71,15 +69,11 @@ export default function Home() {
             <p className=" flex justify-center items-center !gap-4"><Battery size={15} /> <Wifi size={15} /> <Search size={15} />   </p>
             <p className="text-xs  tabular-nums">{time}</p>
           </div>
-        </nav>
-
-
-
+        </nav> 
 
         {/* Hero  */}
         <section className="min-h-screen flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
-
-
+ 
           {/* Mac window mockup */}
 
 
@@ -98,10 +92,7 @@ export default function Home() {
               Full Mac control from any browser. Stream your screen, move the mouse,
               type, open apps — everything, from anywhere.
             </p>
-          </div>
-
-
-
+          </div> 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-10 z-10">
             <Link href="/home"
