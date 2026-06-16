@@ -35,8 +35,9 @@ export function DeviceCard({
   isConnected,
 }: DeviceCardProps) {
   return (
-    <motion.div initial={{ y: 30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+    <motion.div initial={{ y: 30, opacity: 0 ,filter: 'blur(6px)'}}
+      animate={{ y: 0, opacity: 1 ,filter: 'blur(0px)'}}
+
       transition={{
         delay: 0.1,
         duration: 0.6,

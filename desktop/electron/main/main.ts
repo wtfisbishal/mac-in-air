@@ -20,19 +20,19 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
   width: 1000,
   height: 600,
-  frame: false, // Removes native title bar and borders
+  frame: false,
   transparent: true, 
   titleBarStyle: 'hidden',
   trafficLightPosition: {
-    x: 18,
-    y: 18,
+    x: 20,
+    y: 20,
   }, 
   vibrancy: 'sidebar',
   visualEffectState: 'active',
 
   webPreferences: {
     preload: path.join(__dirname, '../preload.js'),
-    contextIsolation: true,
+    contextIsolation: true, 
   },
 });
 

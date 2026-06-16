@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-
+import {motion} from 'framer-motion';
 interface PairingCodeCardProps {
   onRefresh?: () => void;
   isLoading?: boolean;
@@ -77,9 +77,16 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
 
   if (loading) {
     return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 animate-pulse">
-        <div className="h-4 bg-gray-700 rounded w-1/4 mb-4"></div>
-        <div className="h-12 bg-gray-700 rounded"></div>
+      <div className="bg-gray-800/50 border flex flex-col h-[220px] items-center justify-center  border-gray-700 rounded-xl p-6 animate-pulse">
+
+        <div className=' mt-3'>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <span key={index} className='bg-gray-700 font-extrabold ml-2 text-transparent font-mono !text-5xl px-6 rounded-4xl p-5'>
+              {index}
+            </span>
+          ))}
+        </div> 
+         
       </div>
     );
   }
@@ -93,7 +100,15 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
   }
 
   return (
-    <div className="space-y-4">
+    <motion.div
+    initial={{   opacity: 0 ,filter: 'blur(6px)'}}
+      animate={{   opacity: 1 ,filter: 'blur(0px)'}}
+
+      transition={{
+        delay: 0.1,
+        duration: 0.6,
+      }}
+    className="space-y-4">
 
       <div className="relative group">
         <div
@@ -154,6 +169,6 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
       <div className="text-xs w-[560px]  text-gray-400 text-center">
         Code expires in 15 minutes
       </div>
-    </div>
+    </motion.div>
   );
 }

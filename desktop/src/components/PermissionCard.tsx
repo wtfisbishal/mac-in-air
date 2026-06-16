@@ -15,7 +15,7 @@ export function PermissionCard({ title, description, status }: PermissionCardPro
           transition={{
             delay: 0.1,
             duration: 0.6,
-          }} className={`p-4   rounded-xl flex items-center justify-between transition-colors ${isGranted ? ' bg-gradient-to-b from-[#0ee000] to-[#076a00] ' : '  bg-gradient-to-t  from-[#8F101B] to-[#DF303A]'}`}>
+          }} className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${isGranted ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900] ' : '  bg-gradient-to-t  from-[#8F101B] to-[#DF303A]'}`}>
       <div>
         <h3 className="font-semibold text-lg">{title}</h3>
         <p className="text-sm text-gray-200">{description}</p>

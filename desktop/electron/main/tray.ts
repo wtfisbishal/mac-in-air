@@ -1,5 +1,6 @@
 import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron';
 import * as path from 'path';
+import { socketService } from '../services/socket.service';
 
 let tray: Tray | null = null;
 
@@ -8,8 +9,9 @@ export function createTray() {
  
   try {
     const icon = nativeImage.createFromPath(iconPath).resize({ width: 19, height: 19 });
-    tray = new Tray(icon);
-
+    tray = new Tray(icon); 
+    const conntected = socketService.isConnected ;
+ 
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'MAC in AIR', 
@@ -17,12 +19,11 @@ export function createTray() {
         icon: icon
       },
       { type: 'separator' },
-      // { 
-      //   label: 'Status: Online', 
-      //   type: 'normal', 
-      //   enabled: false,
-      //   icon: nativeImage.createFromNamedImage('NSStatusAvailable').resize({ width: 14, height: 14 })
-      // },
+      { 
+        label: `${conntected?'Conntected to server':'Disconntected '}`, 
+        type: 'normal', 
+        enabled: false,
+       },
       { type: 'separator' },
       { 
         label: 'Open Mac in Air', 
@@ -33,18 +34,7 @@ export function createTray() {
             mainWindow.focus();
           }
         },
-       },
-      // {
-      //   label: 'Settings',
-      //   click: () => {
-      //     const mainWindow = BrowserWindow.getAllWindows()[0];
-      //     if (mainWindow) {
-      //       mainWindow.show();
-      //       mainWindow.focus();
-      //     }
-      //   },
-      //   icon: nativeImage.createFromNamedImage('NSPreferencesGeneral').resize({ width: 16, height: 16 })
-      // },
+       }, 
       { type: 'separator' },
       {
         label: 'Open at Login',
@@ -68,14 +58,12 @@ export function createTray() {
       { 
         label: 'Restart app', 
         click: () => { app.relaunch(); app.exit(0); },
-        // icon: nativeImage.createFromNamedImage('NSRefreshTemplate').resize({ width: 16, height: 16 })
-      },
+       },
       { 
         label: 'Quit', 
         accelerator: 'CmdOrCtrl+Q',
         click: () => { app.quit(); },
-        // icon: nativeImage.createFromNamedImage('NSStopProgressTemplate').resize({ width: 16, height: 16 })
-      }
+       }
     ]);
 
     tray.setToolTip('MAC in AIR');

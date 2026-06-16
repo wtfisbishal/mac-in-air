@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { DeviceCard } from '@/components/DeviceCard';
 import PairingStatusWidget from '@/components/PairingStatusWidget';
+import Link from 'next/link';
 
 interface DeviceInfo {
   hostname: string;
@@ -29,7 +30,7 @@ export default function DashboardPage() {
     if (typeof window !== 'undefined' && window.electronAPI) {
       const fetchData = async () => {
         const info = await window.electronAPI.getDeviceInfo();
-        setDeviceInfo(info);
+        setDeviceInfo(info as DeviceInfo);
         const connected = await window.electronAPI.getConnectionStatus();
         setIsConnected(connected);
         // const clients = await window.electronAPI.getConnectedClients?.() ?? [];

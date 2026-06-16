@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { commandService, CommandPayload } from './command.service';
 import { screenService } from './screen.service';
 import { logInfo, logError, logWarn } from '../utils/logger';
+import { machineIdSync } from 'node-machine-id';
 
 export interface WebClient {
   socketId: string;
@@ -17,7 +18,7 @@ export class SocketService {
   private backendUrl: string = BACKEND_URL;
   private _isConnected: boolean = false;
   private pairingCode: string | null = null;
-  private deviceId: string = 'mac-01';
+  private deviceId: string = machineIdSync();;
   private connectedClients: WebClient[] = [];
   private keepAliveTimer: ReturnType<typeof setInterval> | null = null;
 

@@ -42,8 +42,8 @@ export default function Home() {
 
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (text:string) => {
-    await navigator.clipboard.writeText(text);
+  const handleCopy = async ( ) => {
+    await navigator.clipboard.writeText(`xattr -cr "/Applications/MAC in AIR.app"`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -223,7 +223,7 @@ export default function Home() {
                   </div>
 
                   <button
-                    onClick={(e) => handleCopy(`xattr -cr "/Applications/MAC in AIR.app `)}
+                    onClick={(e) => handleCopy()}
                     className="text-xs text-zinc-300 hover:text-white px-2 py-1 rounded bg-zinc-800"
                   >
                     {copied ? "Copied!" : "Copy"}
@@ -231,7 +231,7 @@ export default function Home() {
                 </div>
 
                 <pre className="bg-black text-green-400 p-4 overflow-x-auto font-mono text-sm min-h-[120px]">
-                  <code> xattr -cr "/Applications/MAC in AIR.app </code>
+                  <code> xattr -cr "/Applications/MAC in AIR.app" </code>
                 </pre>
               </div>
 

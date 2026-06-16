@@ -48,9 +48,9 @@ export default function PermissionsPage() {
             delay: 0.1,
             duration: 0.6,
           }}
-          className={`p-4  rounded-xl flex items-center justify-between transition-colors ${
+          className={`p-4  rounded-2xl flex items-center justify-between transition-colors ${
             permissions?.accessibility
-              ? ' bg-gradient-to-b from-[#0ee000] to-[#076a00]'
+              ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900]'
               : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A] '
           }`}
         >
@@ -82,16 +82,16 @@ export default function PermissionsPage() {
             delay: 0.1,
             duration: 0.6,
           }}
-          className={`p-4   rounded-xl flex items-center justify-between transition-colors ${
+          className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${
             permissions?.automation
-              ? ' bg-gradient-to-b from-[#0ee000] to-[#076a00] '
+              ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900] '
               : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A]'
           }`}
         >
           <div>
             <h3 className="font-semibold text-lg">Automation</h3>
             <p className="text-sm text-gray-200">
-              Required to launch apps and control system settings via AppleScript
+              Required to launch apps and control system settings 
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -103,8 +103,8 @@ export default function PermissionsPage() {
         </motion.div>
       </div>
 
-      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-        <p className="text-xs text-gray-500">
+      <div className="p-4 rounded-3xl bg-black/20 border border-white/15">
+        <p className="text-xs text-gray-300">
           💡 If a permission is denied, go to <strong>System Settings → Privacy & Security</strong> and enable the relevant permission for this app, then restart the agent.
         </p>
       </div>

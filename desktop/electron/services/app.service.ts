@@ -96,48 +96,7 @@ export class AppService {
     } catch (error: any) {
       return { success: false, message: `Failed to list apps: ${error.message}` };
     }
-  }
-
-  private async extractIcon(appPath: string): Promise<string | null> {
-    const tmpFile = path.join(
-      os.tmpdir(),
-      `rmac_icon_${Buffer.from(appPath).toString('base64').slice(0, 16)}.png`
-    );
-
-    try {
-       try {
-        const cached = await fs.readFile(tmpFile);
-        return `data:image/png;base64,${cached.toString('base64')}`;
-      } catch {   }
-
-      const plistPath = `${appPath}/Contents/Info.plist`;
-
-      // Get the icon filename from the app's Info.plist
-      let { stdout: iconFilename } = await execAsync(
-        `/usr/libexec/PlistBuddy -c "Print :CFBundleIconFile" "${plistPath}" 2>/dev/null || echo ""`
-      );
-      iconFilename = iconFilename.trim();
-      if (!iconFilename) return null;
-
-      // Ensure .icns extension
-      if (!iconFilename.endsWith('.icns')) iconFilename += '.icns';
-
-      const icnsPath = `${appPath}/Contents/Resources/${iconFilename}`;
-
-      // Convert .icns → 48×48 PNG using macOS sips
-      await execAsync(
-        `sips -s format png "${icnsPath}" -z 48 48 --out "${tmpFile}" 2>/dev/null`
-      );
-
-      const buffer = await fs.readFile(tmpFile);
-      return `data:image/png;base64,${buffer.toString('base64')}`;
-    } catch {
-      // Silently ignore — icon is optional
-      return null;
-    }
-  }
-
-  
+  } 
   public async lockScreen(): Promise<{ success: boolean; message: string }> {
     try {
       await execAsync(
@@ -148,8 +107,7 @@ export class AppService {
       return { success: false, message: `Failed to lock screen: ${error.message}` };
     }
   }
-
-   
+ 
   public async shutdown(): Promise<{ success: boolean; message: string }> {
     try {
       await execAsync(
@@ -159,9 +117,7 @@ export class AppService {
     } catch (error: any) {
       return { success: false, message: `Failed to shutdown: ${error.message}` };
     }
-  }
-
-   
+  } 
   public async restart(): Promise<{ success: boolean; message: string }> {
     try {
       await execAsync(
@@ -172,8 +128,7 @@ export class AppService {
       return { success: false, message: `Failed to restart: ${error.message}` };
     }
   }
-
-   
+ 
   public async sleep(): Promise<{ success: boolean; message: string }> {
     try {
       await execAsync('pmset sleepnow');

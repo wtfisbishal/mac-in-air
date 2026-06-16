@@ -10,7 +10,7 @@ export default function Home() {
   const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const exitTimer = setTimeout(() => setExiting(true), 2400);
+    const exitTimer = setTimeout(() => setExiting(true), 2900);
     const navTimer = setTimeout(() => router.replace('/home'), 2900);
     return () => {
       clearTimeout(exitTimer);
