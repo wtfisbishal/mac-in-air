@@ -5,7 +5,10 @@ import Link from "next/link";
 import MacKeyBoard from "@uiw/react-mac-keyboard";
 import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
-import { features, macApps, useScrollReveal } from "@/lib/utils"; 
+import { features, macApps, useScrollReveal } from "@/lib/utils";
+import { MacbookScroll } from "@/components/ui/macbook-scroll";
+ 
+
 export default function Home() {
   const [time, setTime] = useState("");
 
@@ -42,23 +45,27 @@ export default function Home() {
 
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async ( ) => {
+  const handleCopy = async () => {
     await navigator.clipboard.writeText(`xattr -cr "/Applications/MAC in AIR.app"`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <> 
+    <>
       <div className=" relative min-h-screen overflow-x-hidden">
 
-        <div className="fixed top-0 left-0 w-full h-screen bg-[url('/walpaper.png') bg-[#0a0908  bg-gradient-to-t  from-[#0B0B12] to-[#111119]   bg-cover bg-center ">
-
+      <div className=" bg- mac-bg-gradient">
+        <MacbookScroll
+        src={`/bg2.png`}
+        showGradient={false}
+        />
         </div>
+      
+
         {/* Menu Bar */}
 
-
-        <nav className="  fixed top-0 !text-white bg-[#00000000] z-[100] backdrop-blur-[4px] left-0 right-0  h-8 flex items-center justify-between px-5">
+        <nav className="  fixed top-0 !text-white bg-[#111119] z-[100] backdrop-blur-[4px] left-0 right-0  h-8 flex items-center justify-between px-5">
           <div className="flex items-center gap-5 text-[11px] font-medium  ">
             <span className="text-lg"></span>
             <span className="font-semibold">MAC in AIR</span>
@@ -71,17 +78,13 @@ export default function Home() {
             <p className=" flex justify-center items-center !gap-4"><Battery size={15} /> <Wifi size={15} /> <Search size={15} />   </p>
             <p className="text-xs  tabular-nums">{time}</p>
           </div>
-        </nav> 
+        </nav>
 
         {/* Hero  */}
-        <section className="min-h-screen flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
- 
-          {/* Mac window mockup */}
+        <section className="min-h-screen  flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
 
-
-          <img src="/logo.png" className=" mt-20 mb-5 h-[100px]" alt="" />
-
-          {/* Headline */}
+        
+          {/* <img src="/logo.png" className=" mt-20 mb-5 h-[100px]" alt="" />
           <div className="text-center z-10 px-4">
             <p className="text-xs   font-semibold tracking-[0.2em] text-gray-100 uppercase mb-4">
               Your Mac · Anywhere
@@ -94,9 +97,9 @@ export default function Home() {
               Full Mac control from any browser. Stream your screen, move the mouse,
               type, open apps — everything, from anywhere.
             </p>
-          </div> 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 mt-10 z-10">
+          </div> */}
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-16 z-10">
             <Link href="/home"
               className="glass-button-primary rounded-full px-7 py-3 text-[15px] font-semibold cursor-pointer">
               Open Dashboard
@@ -108,11 +111,11 @@ export default function Home() {
           </div>
 
           {/* Version badge */}
-          <div className="mt-6 z-10">
+          {/* <div className="mt-6 z-10">
             <span className=" glass-panel-dark rounded-full px-3 py-1 text-[11px] text-gray-400 font-medium">
               macOS 13+ · Free during beta
             </span>
-          </div>
+          </div> */}
 
 
           <div className=" mt-10   py-20  w-full">
@@ -197,14 +200,14 @@ export default function Home() {
                   <div key={s.step} className="flex flex-col gap-3">
                     <span className="text-[28px] font-bold tracking-[0.15em] text-gray-300">{s.step}</span>
                     <p className="text-[16px] font-semibold text-blue-500">{s.title}</p>
-                    <p className="text-[16px] text-gray-200 leading-relaxed">{s.desc}</p>
+                    <p className="text-[13px] text-gray-200 leading-relaxed">{s.desc}</p>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10 space-y-4">
                 <h1 className="text-2xl font-bold text-blue-500">
-                 How Install on macOS
+                  How Install on macOS
                 </h1>
 
                 <ol className="list-decimal space-y-2 pl-5 text-gray-300">
@@ -339,7 +342,7 @@ export default function Home() {
         <div className="w-full h-[30vh] max-md:h-[10vh] relative overflow-hidden">
 
           <h1 className=" last-text bg-clip-text text-transparent text-[170px] max-md:text-6xl max-md:-bottom-[20%] absolute -bottom-[30%] w-full text-center  font-extrabold  tracking-wide">
-            MAC in AIR 💨
+            MAC in AIR ✈️
           </h1>
         </div>
 

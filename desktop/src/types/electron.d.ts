@@ -44,6 +44,12 @@ export interface ElectronAPI {
   sendWebRTCSignaling: (data: any) => void;
   onStartWebRTC: (callback: (data: any) => void) => void;
   onStopWebRTC: (callback: () => void) => void;
+
+  onUpdateAvailable:? (callback: (info: { version: string; releaseNotes: string }) => void) => void;
+  onUpdateProgress:? (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => void;
+  onUpdateDownloaded:? (callback: (info: { version: string }) => void) => void;
+  onUpdateError:? (callback: (err: { message: string }) => void) => void;
+  installUpdate:? () => void;
 }
 
 declare global {

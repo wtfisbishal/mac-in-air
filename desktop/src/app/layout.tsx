@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import TitleBar from "@/components/titleBar";
 import WebRTCManager from "@/components/WebRTCManager";
+import UpdateBanner from "@/components/UpdateBanner";
 
 
 const inter = Inter({
@@ -27,6 +28,7 @@ export default function RootLayout({
          
         <TitleBar />
         <WebRTCManager />
+        <UpdateBanner />
         <div className="flex mt-16   text-white ">
           <main className="flex-1 overflow-auto">{children}</main>
         </div>

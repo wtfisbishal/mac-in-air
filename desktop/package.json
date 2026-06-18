@@ -1,6 +1,6 @@
 {
   "name": "MACinAIR",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A MAC app ",
   "author": "Bishal Kandi",
   "license": "MIT",
@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "electron-serve": "^2.1.1",
+    "electron-updater": "^6.8.9",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "node-machine-id": "^1.1.12",
@@ -94,7 +95,7 @@
         "provider": "github",
         "owner": "bisxxal",
         "repo": "mac-in-air",
-        "private": false,
+        "private": true,
         "releaseType": "release",
         "publishAutoUpdate": true
       }

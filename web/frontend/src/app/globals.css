@@ -244,17 +244,7 @@ body {
 }
 
 .code-cell {
-  width: 69px;
-  height: 88px;
-  background: #06091196;
-  backdrop-filter: blur(12px);
   border: 1.5px solid rgba(255, 255, 255, .1);
-  border-radius: 24px;
-  font-size: 28px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: #f1f5f9;
-  text-align: center;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
   caret-color: #6366f1;
@@ -484,16 +474,36 @@ body {
    
   0% {
     opacity: 0;
-    transform: scale(3.5);
+    transform: scale(1.5);
+    filter: blur(10px);
   }
   100% {
     opacity: 1;
     transform:   scale(1);
+    filter: blur(0px);
   }
 }
 
 .animate-logo {
   animation: animate-logo 600ms ease-out ;
   transition: all ;
-
 }
+
+.mac-bg-gradient{
+  background: #FAF5FA;
+      /* background: radial-gradient(145% 20% at 50% 100%, #111119 -3% 38%, #f5dacc 29%); */
+      background: radial-gradient(300% 165% at 50% 36.8%, #FAF5FA -3% 38%, #111119 29%);
+}
+
+@media screen and (max-width: 768px) {
+  .mac-bg-gradient{
+  background: #FAF5FA;
+       background: radial-gradient(440% 165% at 50% 36.8%, #FAF5FA -3% 38%, #111119 29%);
+}
+}
+ 
+
+.mac-button-shadow{
+  box-shadow: -1px 2px 9px #ffffff7a, inset 2px -2px 15px #0000000f !important;
+}
+ 

@@ -15,6 +15,13 @@ files:
 extraMetadata:
   main: dist/electron/main/main.js
 
+publish:
+  provider: github
+  owner: bisxxal
+  repo: mac-in-air
+  private: true
+  releaseType: release
+
 mac:
   target:
     - target: dmg

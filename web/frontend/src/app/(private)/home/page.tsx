@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap, Link as Link3, } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap, Link as Link3, Wifi, WifiOffIcon, } from 'lucide-react';
 import { useDevices, DEVICES_KEY } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
@@ -115,8 +115,8 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
           {[
-            { label: 'Online Now', value: online, icon: Circle, color: 'text-emerald-400' },
-            { label: 'Offline', value: total - online, icon: Circle, color: 'text-red-500' },
+            { label: 'Online Now', value: online, icon: Wifi, color: 'text-emerald-400' },
+            { label: 'Offline', value: total - online, icon: WifiOffIcon, color: 'text-red-500' },
           ].map(s => (
             <div key={s.label} className="glass-panel-dark !rounded-3xl p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-[#ffffff45] flex items-center justify-center">

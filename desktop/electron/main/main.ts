@@ -6,6 +6,7 @@ import { setupIpc } from './ipc';
 import { createTray } from './tray';
 import { socketService } from '../services/socket.service';
 import { powerSaveBlocker } from 'electron';
+import { setupUpdater } from '../services/updater.service';
 
 // Register the custom protocol before app is ready
 protocol.registerSchemesAsPrivileged([
@@ -75,6 +76,12 @@ app.whenReady().then(() => {
   socketService.connect();
 
   createWindow();
+
+  // Auto-updater — pass the main window for IPC event forwarding
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  if (mainWindow) {
+    setupUpdater(mainWindow);
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

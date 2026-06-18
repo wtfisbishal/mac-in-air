@@ -1,9 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // Basic
-  ping: () => 'pong',
-
+  
   // Screen
   getDesktopSources: () => ipcRenderer.invoke('get-desktop-sources'),
 
@@ -40,4 +38,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onStopWebRTC: (callback: () => void) => {
     ipcRenderer.on('stop-webrtc', () => callback());
   },
+
+  // Auto-updater
+  onUpdateChecking: (cb: () => void) =>
+    ipcRenderer.on('update-checking', () => cb()),
+  onUpdateAvailable: (cb: (info: { version: string; releaseNotes?: any }) => void) =>
+    ipcRenderer.on('update-available', (_e, info) => cb(info)),
+  onUpdateNotAvailable: (cb: () => void) =>
+    ipcRenderer.on('update-not-available', () => cb()),
+  onUpdateProgress: (cb: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) =>
+    ipcRenderer.on('update-progress', (_e, p) => cb(p)),
+  onUpdateDownloaded: (cb: (info: { version: string }) => void) =>
+    ipcRenderer.on('update-downloaded', (_e, info) => cb(info)),
+  onUpdateError: (cb: (err: { message: string }) => void) =>
+    ipcRenderer.on('update-error', (_e, err) => cb(err)),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
 });

@@ -125,12 +125,12 @@ export default function PairPage() {
           </div>
  
           <form onSubmit={submit}>
-            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl w-[500px] p-7 mb-4">
+            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl w-[500px] max-md:w-[98%] max-md:px-5 p-7 mb-4">
               <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest text-center mb-5">
                 Pairing Code
               </p>
 
-              <div className="flex gap-2.5 justify-center mb-6">
+              <div className="flex gap-2.5 max-md:gap-1 w-full justify-center mb-6">
                 {digits.map((d, i) => (
                   <input
                     key={i}
@@ -142,7 +142,7 @@ export default function PairPage() {
                     onChange={e => handleInput(i, e.target.value)}
                     onKeyDown={e => handleKeyDown(i, e)}
                     onPaste={handlePaste}
-                    className="code-cell !backdrop-blur-2xl !text-5xl"
+                    className="code-cell bg-[#06091196] font-mono rounded-3xl font-extrabold text-center text-[28px] text-[#f1f5f9] backdrop-blur-2xl h-[88px] w-[69px] max-md:w-[56px] max-md:h-[79px] !backdrop-blur-2xl !text-5xl"
                     placeholder="-"
                   />
                 ))}
@@ -161,9 +161,8 @@ export default function PairPage() {
             </div>
           </form>
 
-          
-          <div>
-          <div className="bg-blue-500/10 border !w-[500px]  border-blue-500/30 rounded-3xl p-5 ">
+           
+          <div className="bg-blue-500/10 border max-md:w-full w-[500px]  border-blue-500/30 rounded-3xl p-5 ">
             <p className="text-xs font-semibold text-blue-300 mb-3 uppercase tracking-wide">How to get the code</p>
             <ol className="space-y-2.5">
               {[
@@ -180,12 +179,9 @@ export default function PairPage() {
                 </li>
               ))}
             </ol>
-          </div>
+          </div> 
 
-  
-        </div>
-
-
+          
         </div>
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

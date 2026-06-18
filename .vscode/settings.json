@@ -1,0 +1,6 @@
+{
+  "tailwindCSS.experimental.configFile": "web/frontend/src/app/globals.css",
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}

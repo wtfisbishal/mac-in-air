@@ -14,8 +14,7 @@ out/
 .env.local
 .env.*.local
 
-# IDE
-.vscode/
+# IDE 
 .idea/
 *.swp
 *.swo
