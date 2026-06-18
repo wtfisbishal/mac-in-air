@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiLogin, apiRegister } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,7 +50,7 @@ export default function LoginPage() {
           </div>
 
           {/* Card */}
-          <div className="glass-panel-dark rounded-4xl p-7 animate-fade-up delay-1">
+          <div className="glass-panel-dark animate-spotlight rounded-4xl p-7 animate-fade-up delay-1">
             {/* Tab toggle */}
             <div className="flex gap-1 glass-panel p-1  !rounded-full mb-6">
               {(['login', 'register'] as const).map(m => (
@@ -112,8 +112,8 @@ export default function LoginPage() {
                 className="btn glass-button-primary !rounded-full w-full mt-2"
               >
                 {mutation.isPending
-                  ? <><Loader2 size={16} className="animate-spin" /> {mode === 'login' ? 'Signing in…' : 'Creating account…'}</>
-                  : mode === 'login' ? 'Sign In' : 'Create Account'
+                  ? <><Loader size={16} className="animate-spin" /> {mode === 'login' ? 'Signing in…' : 'Creating account…'}</>
+                  : mode === 'login' ? 'Sign In ' : 'Create new Account'
                 }
               </button>
             </form>

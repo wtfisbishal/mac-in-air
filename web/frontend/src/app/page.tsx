@@ -5,7 +5,7 @@ import Link from "next/link";
 import MacKeyBoard from "@uiw/react-mac-keyboard";
 import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
-import { features, macApps, useScrollReveal } from "@/lib/utils";
+import { features, macApps, useScrollReveal } from "@/lib/utils"; 
 export default function Home() {
   const [time, setTime] = useState("");
 
@@ -56,7 +56,9 @@ export default function Home() {
 
         </div>
         {/* Menu Bar */}
-        <nav className="  fixed top-0 !text-white bg-[#00000000] z-[100] backdrop-blur-2xl left-0 right-0  h-8 flex items-center justify-between px-5">
+
+
+        <nav className="  fixed top-0 !text-white bg-[#00000000] z-[100] backdrop-blur-[4px] left-0 right-0  h-8 flex items-center justify-between px-5">
           <div className="flex items-center gap-5 text-[11px] font-medium  ">
             <span className="text-lg"></span>
             <span className="font-semibold">MAC in AIR</span>
@@ -77,14 +79,14 @@ export default function Home() {
           {/* Mac window mockup */}
 
 
-          <img src="/logo.png" className="mt-20 mb-5 h-[100px]" alt="" />
+          <img src="/logo.png" className=" mt-20 mb-5 h-[100px]" alt="" />
 
           {/* Headline */}
           <div className="text-center z-10 px-4">
-            <p className="text-xs font-semibold tracking-[0.2em] text-gray-100 uppercase mb-4">
+            <p className="text-xs   font-semibold tracking-[0.2em] text-gray-100 uppercase mb-4">
               Your Mac · Anywhere
             </p>
-            <h1 className="text-6xl   sm:text-8xl font-black logo-text text-clip text-transparent  bg-clip-text tracking-tight leading-none mb-4"
+            <h1 className="text-6xl  animate-logo transition-all !duration-700 sm:text-8xl font-black logo-text text-clip text-transparent  bg-clip-text tracking-tight leading-none mb-4"
               style={{ letterSpacing: "-0.03em" }}>
               <span className=" text-white pb-3 !mb-5">   </span> MAC in AIR
             </h1>
@@ -116,8 +118,7 @@ export default function Home() {
           <div className=" mt-10   py-20  w-full">
 
             <MacKeyBoard
-              className="w-fit drop-shadow-[#9b9b9b75] drop-shadow-2xl "
-
+              className="w-fit  drop-shadow-[#9b9b9b75] drop-shadow-2xl "
             />
           </div>
         </section>
@@ -284,7 +285,7 @@ export default function Home() {
         </section>
 
 
-        <section className=" w-[70%] max-md:w-[95%]  shadow-[#f7f7f7]  shadow-xl my-20 mt-32 glass-panel-dark overflow-hidden relative mx-auto rounded-4xl flex justify-between flex-col h-[600px] bg-gradient-to-t  from-[#0E161B] to-[#252f35]  ">
+        <section className=" w-[70%] max-md:w-[95%]  shadow-[#f7f7f7]  shadow-xl my-20 mt-32 glass-panel-dark overflow-hidden relative mx-auto rounded-4xl flex justify-between flex-col h-[600px]    ">
 
           <div className="w-[70%] max-md:w-full max-md:px-8 max-md:ml-0  ml-[10%] flex flex-col  items-start justify-center  mt-20">
             <h2 className="text-3xl sm:text-5xl font-bold text-gray-200 mb-3 tracking-tight"

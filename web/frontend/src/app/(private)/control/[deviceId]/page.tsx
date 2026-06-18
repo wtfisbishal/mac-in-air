@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef, useState, useCallback } from 'react';
+import { use, useEffect, useRef, useState, useCallback, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -8,6 +8,7 @@ import {
   Moon, Lock, Terminal, Globe, ArrowLeft, Loader,
   Maximize2, Minimize2, Link as Link2, ShieldAlert,
   NotepadText,
+  X,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -16,6 +17,8 @@ import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import MacKeyboards from '@/components/MacKeyBoards';
 import Image from 'next/image';
+import AppsIcons from '../../apps/_components/AppsIcons';
+import {  useFullscreen } from '@/hooks/useFullscreen';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -81,7 +84,7 @@ function ScreenCanvas({
         'join-device',
         { deviceId, pairToken },
         (res?: { success: boolean; message?: string }) => {
-          if(res?.success === false) {
+          if (res?.success === false) {
             sessionStorage.removeItem(`rmac_pair_${deviceId}`)
           }
           console.log('join-device response', res);
@@ -224,18 +227,15 @@ export default function ControlPage({ params }: PageProps) {
     const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
     setPairToken(token);
     setAuthChecked(true);
-
-
-    //  socket.emit('screen-share-stop', { sessionId });
-
+ 
   }, [deviceId]);
 
   const [streaming, setStreaming] = useState(false);
   const [kbCapture, setKbCapture] = useState(false);
-  const [mouseCapture, setMouseCapture] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [mouseCapture, setMouseCapture] = useState(false); 
   const [sessionId, setSessionId] = useState('');
-  const [warning , setWarning] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const { fullscreen, setFullscreen } = useFullscreen();
 
 
   const KEY_MAP: Record<string, string> = {
@@ -344,10 +344,22 @@ export default function ControlPage({ params }: PageProps) {
     toast(`Sent: ${action.label}`, 'info');
   };
 
+  const [visiblePanel, setVisiblePanel] = useState(false);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
+        e.preventDefault();
+        setVisiblePanel(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
-        <Loader className="animate-spin text-indigo-400" size={32} />
+        <Loader className="animate-spin" size={32} />
       </div>
     </AppLayout>
   );
@@ -379,7 +391,7 @@ export default function ControlPage({ params }: PageProps) {
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">Device not found</p>
-          <button onClick={() => router.push('/home')} className="btn btn-ghost mt-4 text-sm">
+          <button onClick={() => router.push('/home')} className="btn glass-button !rounded-full mt-4 text-sm">
             Back to Dashboard
           </button>
         </div>
@@ -389,9 +401,20 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={`flex w-full flex-col min-h-screen ${fullscreen ? 'p-0' : 'p-5'}`}>
-        {/* Top bar */}
+      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : 'p-5'}`}>
 
+        {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
+          <div className='animate-spotlight !transition-all !duration-700   h-[800px]   max-md:py-5  max-md:p-0   w-[80%] max-md:w-[95%] glass-panel-dark p-4   rounded-4xl top-[10%] h-[80%] overflow-y-scroll  '>
+
+          <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
+            <X />
+          </div>
+
+          <AppsIcons />
+        </div>
+        </div> }
+
+        {/* Top bar */}
         {!fullscreen && (
           <div className="flex items-center   max-md:-mt-1 justify-between mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
@@ -410,7 +433,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => { setFullscreen(true); sessionStorage.setItem('full-screen', 'true') }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
+            <button onClick={() => { setFullscreen(true)  }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -426,7 +449,7 @@ export default function ControlPage({ params }: PageProps) {
             style={{ outline: 'none' }}
           >
             {/* Toolbar */}
-            <div className="glas glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap animate-fade-up delay-1">
+            <div className="animate-spotlight glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap animate-fade-up delay-1">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
@@ -473,7 +496,7 @@ export default function ControlPage({ params }: PageProps) {
 
               {/* Fullscreen exit */}
               {fullscreen && (
-                <button onClick={() => { setFullscreen(false);; sessionStorage.setItem('full-screen', 'true') }} className="ctrl-btn ml-auto">
+                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ml-auto">
                   <Minimize2 size={12} /> Exit
                 </button>
               )}
@@ -498,12 +521,12 @@ export default function ControlPage({ params }: PageProps) {
               {/* Apps launcher */}
               <Link
                 href={`/apps/${deviceId}`}
-               
+
                 className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
                 <Image src={'/apps.png'} height={35} width={35} alt='apps' />
                 <div>
-                  <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher</p>
+                  <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher (⌘J) </p>
                 </div>
               </Link>
 
@@ -536,7 +559,7 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
- 
+
               {/* System actions */}
               <div className="glass-panel-dark rounded-3xl p-4">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">System</p>
@@ -549,7 +572,7 @@ export default function ControlPage({ params }: PageProps) {
                   ].map(a => (
                     <button
                       key={a.type}
-                      onClick={() => { setWarning(a.type)}}
+                      onClick={() => { setWarning(a.type) }}
                       className={`w-full  flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
                         ${['RESTART', 'SHUTDOWN'].includes(a.type)
                           ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
@@ -562,66 +585,65 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
-
-
+ 
 
             </div>
           )}
         </div>
 
-        
+
         {
-  warning && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
-      <div className="w-[450px] rounded-3xl p-6 glass-panel shadow-2xl">
-        
-        
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">⚠️</span>
-          <h2 className="text-xl font-semibold text-yellow-400">
-            System Action Confirmation
-          </h2>
-        </div>
+          warning && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
+              <div className="w-[450px] rounded-3xl p-6 glass-panel shadow-2xl">
 
-        
-        <div className="mt-5">
-          <p className="text-gray-300">
-            You are about to perform the following system action:
-          </p>
 
-          <div className="mt-3   p-4">
-            <p className="text-center text-2xl font-bold capitalize text-red-500">
-              {warning.replace('_', ' ').toLowerCase()}
-            </p>
-          </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⚠️</span>
+                  <h2 className="text-xl font-semibold text-yellow-400">
+                    System Action Confirmation
+                  </h2>
+                </div>
 
-          
-        </div>
 
-         
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={() => setWarning(null)}
-            className="rounded-full px-6 py-2 glass-button"
-          >
-            Cancel
-          </button>
+                <div className="mt-5">
+                  <p className="text-gray-300">
+                    You are about to perform the following system action:
+                  </p>
 
-          <button
-            onClick={() => {
-              emit(warning);
-              toast(`${warning} command sent`, "info");
-              setWarning(null);
-            }}
-            className="rounded-full px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium transition"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+                  <div className="mt-3   p-4">
+                    <p className="text-center text-2xl font-bold capitalize text-red-500">
+                      {warning.replace('_', ' ').toLowerCase()}
+                    </p>
+                  </div>
+
+
+                </div>
+
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    onClick={() => setWarning(null)}
+                    className="rounded-full px-6 py-2 glass-button"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      emit(warning);
+                      toast(`${warning} command sent`, "info");
+                      setWarning(null);
+                    }}
+                    className="rounded-full px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium transition"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>

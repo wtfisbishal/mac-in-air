@@ -1,44 +1,9 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+ 
 import PairingCodeCard from '@/components/PairingCodeCard';
 
 export default function PairingPage() {
-  const [deviceInfo, setDeviceInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const initialize = async () => {
-      if (typeof window !== 'undefined' && window.electronAPI) {
-        try {
-          const info = await window.electronAPI.getDeviceInfo();
-          setDeviceInfo(info);
-        } catch (err) {
-          console.error('Failed to load device info');
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
-
-    initialize();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen  ">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4">
-          </div>
-          <p className="text-gray-400">Loading device info...</p>
-        </div>
-      </div>
-    );
-  }
-
-
+  
   return (
     <div className="flex items-center max-w-4xl mx-auto justify-center min-h-screen   p-4">
       <div className="  space-y-8">
@@ -50,12 +15,8 @@ export default function PairingPage() {
             Share this code with your web dashboard to connect your Mac
           </p>
         </div>
- 
-       
- 
-        <PairingCodeCard />
-
-         
+  
+        <PairingCodeCard /> 
         <div className="bg-blue-500/10 border w-[560px]  border-blue-500/30 rounded-lg p-4 space-y-3">
           <p className="text-blue-300 font-semibold text-sm">How to pair:</p>
           <ol className="text-blue-200/80 text-sm space-y-2">

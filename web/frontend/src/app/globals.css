@@ -27,8 +27,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -170,7 +169,7 @@ body {
 
 
 .skeleton {
-  background: linear-gradient(90deg, rgba(30, 41, 59, .5) 25%, rgba(51, 65, 85, .35) 50%, rgba(30, 41, 59, .5) 75%);
+  background: linear-gradient(90deg, #58585880 25%, #9d9d9d48 50%, #58585880 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 6px;
@@ -245,12 +244,12 @@ body {
 }
 
 .code-cell {
-  width: 52px;
-  height: 64px;
-  background: #0f172a96;
+  width: 69px;
+  height: 88px;
+  background: #06091196;
   backdrop-filter: blur(12px);
   border: 1.5px solid rgba(255, 255, 255, .1);
-  border-radius: 12px;
+  border-radius: 24px;
   font-size: 28px;
   font-weight: 700;
   font-family: var(--font-mono);
@@ -262,7 +261,7 @@ body {
 }
 
 .code-cell:focus {
-  border-color: #6366f1;
+  border-color: #4d4fbd;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, .2);
 }
 
@@ -371,11 +370,12 @@ body {
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.262);
-  box-shadow:
+  box-shadow: -2px 6px 32px #00000014, inset 1px 1px #ffffff96 ;
+   /* box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 #ffffffb5;
+    inset 0 1px 0 #ffffffb5; */
 }
-
+ 
 
 .last-text {
   background-image: linear-gradient(0deg, #111119 25%, #ffffff69 133% );
@@ -428,4 +428,72 @@ body {
 .w-mac-keyboard li:nth-child(78) {
 
   right: 91px !important;
+}
+
+
+.box {
+
+  background: rgba(88, 88, 88, 0.546);
+  box-shadow: inset 0 0 4px 0px white;
+  cursor: pointer;
+} 
+ 
+.overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  width: 100vw;
+  height: 100vh;
+  animation: move 10s infinite alternate ease-in-out;
+}
+
+@keyframes move {
+  0% {
+    transform: translateY(10vh);
+  }
+  100% {
+    transform: translateY(-10vh);
+  }
+}
+
+ @keyframes spotlight {
+   
+  0% {
+    opacity: 0;
+    transform:   scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform:   scale(1);
+  }
+}
+
+.animate-spotlight {
+  animation: spotlight 200ms ease-out ;
+  transition: all ;
+
+}
+
+ @keyframes animate-logo {
+   
+  0% {
+    opacity: 0;
+    transform: scale(3.5);
+  }
+  100% {
+    opacity: 1;
+    transform:   scale(1);
+  }
+}
+
+.animate-logo {
+  animation: animate-logo 600ms ease-out ;
+  transition: all ;
+
 }

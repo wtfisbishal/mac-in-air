@@ -1,8 +1,9 @@
-'use client' 
+'use client'
+import { useFullscreen } from '@/hooks/useFullscreen'
 import { Laptop } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import {   useEffect, useRef, useState } from 'react'
 
 const Navigation = () => {
     const path = usePathname()
@@ -11,22 +12,16 @@ const Navigation = () => {
 
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
     const profileRef = useRef<HTMLAnchorElement | null>(null)
-    const [fullscreen, setFullscreen] = useState(false);
-
+    
     const navItems = [
         { href: '/home', title: 'Home' },
         { href: '/pair', title: 'pair' },
         { href: '/settings', title: 'Settings' },
     ]
+    const { fullscreen  } = useFullscreen();
 
     useEffect(() => {
         const activeIndex = navItems.findIndex((item) => item.href === path)
-
-         const f = sessionStorage.getItem('full-screen')
-            if(f === 'true'){
-                setFullscreen(true)
-            }
-
 
         if (activeIndex !== -1) {
             const el = itemRefs.current[activeIndex]
@@ -40,24 +35,17 @@ const Navigation = () => {
         } else {
             setPillStyle({ left: 0, width: 0, opacity: 0 })
         }
-    }, [path,fullscreen])
+    }, [path])
 
-    useEffect(() => {
-        
-         const f = sessionStorage.getItem('full-screen')
-            if(f === 'true'){
-                setFullscreen(true)
-            }
+    
+    if(fullscreen){
+        return null ;
+    }
 
-            
-            console.log(fullscreen)
-        }, [ fullscreen , ])
 
     return (
-        <div className={ `   top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none `}>
-
-
-             <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-dark relative flex items-center p-2 rounded-full'>
+        <div className={`   top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none `}>
+            <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-dark relative flex items-center p-2 rounded-full'>
 
                 {pillStyle.opacity === 1 && (
                     <div
@@ -68,8 +56,6 @@ const Navigation = () => {
                         }}
                     />
                 )}
-
-                 
 
                 {navItems.map((item, index) => {
                     const isActive = path === item.href
@@ -92,13 +78,13 @@ const Navigation = () => {
             </div>
 
             {/* Profile Button */}
-         { control &&  <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-24 w-32 h-12 rounded-full'>
+            {control && <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-24 w-32 h-12 rounded-full'>
                 <Link
                     ref={profileRef}
                     href={path}
                     className={`relative center w-full h-full rounded-full gap-2 flex items-center justify-center  bg-[#ffffff1b] border-none text-white `}>
 
-                    <Laptop  size={18} /> 
+                    <Laptop size={18} />
                     <p className=' max-md:text-xs text-sm'> Control</p>
 
                 </Link>

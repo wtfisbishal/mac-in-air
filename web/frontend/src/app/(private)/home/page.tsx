@@ -74,8 +74,7 @@ export default function DashboardPage() {
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
   const qc = useQueryClient();
-
-  // Live device status updates via socket
+ 
   useEffect(() => {
     if (!socket) return;
     const handler = (data: { deviceId: string; isOnline: boolean }) => {
@@ -114,9 +113,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
+        <div className="grid grid-cols-2 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
           {[
-            { label: 'Total Devices', value: total, icon: Monitor, color: 'text-indigo-400' },
             { label: 'Online Now', value: online, icon: Circle, color: 'text-emerald-400' },
             { label: 'Offline', value: total - online, icon: Circle, color: 'text-red-500' },
           ].map(s => (
@@ -137,9 +135,9 @@ export default function DashboardPage() {
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Devices</h2>
 
           {isLoading && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
               {[1, 2].map(i => (
-                <div key={i} className="glass-panel-dark rounded-2xl p-5 space-y-3">
+                <div key={i} className="glass-panel-dark rounded-3xl p-5 space-y-3">
                   <div className="skeleton h-5 w-2/3" />
                   <div className="skeleton h-4 w-1/3" />
                   <div className="grid grid-cols-2 gap-2">
@@ -153,9 +151,9 @@ export default function DashboardPage() {
           )}
 
           {isError && (
-            <div className="glass-panel rounded-2xl p-6 text-center text-red-400 border border-red-500/10">
+            <div className="glass-panel-dark h-[200px] flex items-center justify-center rounded-3xl p-6 text-center text-red-400 border border-red-500/10">
               <p className="text-sm font-medium">Failed to load devices</p>
-              <p className="text-xs text-red-400/60 mt-1">{(error as Error).message}</p>
+              {/* <p className="text-xs text-red-400/60 mt-1">{(error as Error).message}</p> */}
             </div>
           )}
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import {  Loader2, CheckCircle, ArrowRight } from 'lucide-react';
+import {  Loader, CheckCircle, ArrowRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { pairDevice } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
@@ -35,9 +35,7 @@ export default function PairPage() {
       const device = data.device as Device;
       setPaired({ name: device.name, id: device.id });
       toast('Device paired successfully!', 'success');
-  
-      // Store in localStorage so it survives page refresh AND window close/reopen.
-      // Token is valid for 15 min; revoked server-side when desktop goes offline.
+   
       if (data?.pairToken) {
          sessionStorage.setItem(`rmac_pair_${device.id}`, data.pairToken);
       }
@@ -88,14 +86,13 @@ export default function PairPage() {
   if (paired) {
     return (
       <AppLayout>
-        <div className=" h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
+        <div className="animate-spotlight h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
           <div className="text-center animate-fade-up max-w-sm">
 
             <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={36} className="text-emerald-400" />
             </div>
 
-             
             <h2 className="text-2xl font-bold text-white mb-2">Paired!</h2>
             <p className="text-slate-400 text-sm mb-6">
               <span className="text-white font-semibold">{paired.name}</span> is now connected.
@@ -114,8 +111,8 @@ export default function PairPage() {
 
   return (
     <AppLayout>
-      <div className=" h-fit    w-full flex items-center justify-center p-6">
-        <div className="w-full max-w-md animate-fade-up">
+      <div className=" h-fit w-full flex items-center justify-center p-6">
+        <div className="w-full flex items-center flex-col animate-fade-up">
           {/* Header */}
           <div className="text-center mb-8">
             <div className=" text-5xl drop-shadow-xl drop-shadow-[#ffffff4f]  flex items-center justify-center mx-auto mb-4">
@@ -128,7 +125,7 @@ export default function PairPage() {
           </div>
  
           <form onSubmit={submit}>
-            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl p-7 mb-4">
+            <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl w-[500px] p-7 mb-4">
               <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest text-center mb-5">
                 Pairing Code
               </p>
@@ -157,7 +154,7 @@ export default function PairPage() {
                 className="flex items-center justify-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer w-full"
               >
                 {mutation.isPending
-                  ? <><Loader2 size={15} className="animate-spin" /> Connecting…</>
+                  ? <><Loader size={15} className="animate-spin" /> Connecting…</>
                   : <>Connect Device <ArrowRight size={15} /></>
                 }
               </button>
@@ -166,8 +163,7 @@ export default function PairPage() {
 
           
           <div>
-
-          <div className="bg-blue-500/10 border  border-blue-500/30 rounded-3xl p-5 ">
+          <div className="bg-blue-500/10 border !w-[500px]  border-blue-500/30 rounded-3xl p-5 ">
             <p className="text-xs font-semibold text-blue-300 mb-3 uppercase tracking-wide">How to get the code</p>
             <ol className="space-y-2.5">
               {[
