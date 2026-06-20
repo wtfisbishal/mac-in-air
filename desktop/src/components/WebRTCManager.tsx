@@ -49,9 +49,11 @@ export default function WebRTCManager() {
         // Handle ICE candidates
         pc.onicecandidate = (event) => {
           if (event.candidate) {
+            // Use toJSON() to serialize to a plain object so that sdpMid and
+            // sdpMLineIndex survive Electron IPC structured-clone + Socket.IO JSON.
             window.electronAPI.sendWebRTCSignaling({
               type: 'ice-candidate',
-              candidate: event.candidate,
+              candidate: event.candidate.toJSON(),
             });
           }
         };
@@ -86,7 +88,10 @@ export default function WebRTCManager() {
         if (data.type === 'answer') {
           await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
         } else if (data.type === 'ice-candidate') {
-          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+          // Guard: skip end-of-candidates signal (null/undefined candidate fields)
+          if (data.candidate && (data.candidate.sdpMid != null || data.candidate.sdpMLineIndex != null)) {
+            await pc.addIceCandidate(data.candidate);
+          }
         }
       } catch (err) {
         console.error('[WebRTCManager] Error handling signaling', err);

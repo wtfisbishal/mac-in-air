@@ -4,13 +4,12 @@ import { commandService, CommandPayload } from './command.service';
 import { screenService } from './screen.service';
 import { logInfo, logError, logWarn } from '../utils/logger';
 import { machineIdSync } from 'node-machine-id';
+import { BACKEND_URL } from '../utils';
 
 export interface WebClient {
   socketId: string;
   connectedAt: number;
 }
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://mac-in-wind.onrender.com" ;
 const KEEP_ALIVE_INTERVAL_MS = 30000;
 
 export class SocketService {

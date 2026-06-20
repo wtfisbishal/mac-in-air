@@ -3,6 +3,16 @@ import { deviceManager } from '../managers/devices';
 import { roomManager } from '../managers/rooms';
 import { pairTokenManager } from '../managers/pairTokens';
 import { CommandPayload } from '../types';
+import { wsWebRtcEventsTotal, wsConnectionsActive, serverErrorsTotal, wsDisconnectionsTotal } from '../metrics';
+
+type IceCandidatePayload = {
+  candidate?: {
+    candidate?: string;
+    sdpMid?: string | null;
+    sdpMLineIndex?: number | null;
+  };
+  deviceId: string;
+};
 
 export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
 
@@ -11,10 +21,8 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
   // The token is valid for 15 minutes and can be reused across page refreshes
   // and window reopens. It is revoked when the desktop agent goes offline.
   socket.on('join-device',
-    (
-      data: { deviceId: string; pairToken?: string },
-      callback?: (res: { success: boolean; message?: string }) => void
-    ) => {
+    (data: { deviceId: string; pairToken?: string }, callback?: (res: { success: boolean; message?: string }) => void) => {
+
       const { deviceId, pairToken } = data;
 
       if (!pairToken) {
@@ -56,10 +64,13 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
 
       // Notify the desktop agent that a web client connected
       const desktopSocket = io.sockets.sockets.get(device.socketId);
-      desktopSocket?.emit('web-client-connected', {
-        socketId: socket.id,
-        connectedAt: Date.now(),
-      });
+      if (desktopSocket) {
+        desktopSocket.emit('web-client-connected', {
+          socketId: socket.id,
+          connectedAt: Date.now(),
+        });
+
+      }
 
       callback?.({ success: true });
     }
@@ -86,7 +97,6 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     }
 
     console.log(`[Frontend] → Desktop [${deviceId}] command: ${command.type}`);
-
     if (callback) {
       desktopSocket.timeout(10000).emit('command', command, (_err: Error | null, result: unknown) => {
         callback(result ?? { success: false, message: 'No response' });
@@ -96,50 +106,49 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     }
   });
 
-  // Mouse Move  
+  // Mouse Move
   socket.on('mouse-move', (data: { x: number; y: number }) => {
     relayToDesktop(io, socket, { type: 'MOUSE_MOVE', payload: data });
   });
 
-  // Mouse Click 
+  // Mouse Click
   socket.on('mouse-click', (data: { button?: string; doubleClick?: boolean }) => {
     relayToDesktop(io, socket, { type: 'MOUSE_CLICK', payload: data });
   });
 
-  // Mouse Scroll 
+  // Mouse Scroll
   socket.on('mouse-scroll', (data: { x: number; y: number }) => {
     relayToDesktop(io, socket, { type: 'MOUSE_SCROLL', payload: data });
   });
 
-
-
-  // Keyboard Type 
+  // Keyboard Type
   socket.on('keyboard-type', (data: { text: string }) => {
     relayToDesktop(io, socket, { type: 'KEYBOARD_TYPE', payload: data });
   });
 
-  // Keyboard Shortcut 
+  // Keyboard Shortcut
   socket.on('keyboard-shortcut', (data: { key: string; modifier?: string | string[] }) => {
     relayToDesktop(io, socket, { type: 'KEYBOARD_SHORTCUT', payload: data });
   });
 
-  // Open App 
+  // Open App
   socket.on('open-app', (data: { app: string }, callback?: (res: unknown) => void) => {
     relayToDesktop(io, socket, { type: 'OPEN_APP', payload: data }, callback);
   });
 
-  // System Commands 
+  // System Commands
   socket.on('system-command', (data: { action: 'SHUTDOWN' | 'RESTART' | 'SLEEP' | 'LOCK_SCREEN' }, callback?: (res: unknown) => void) => {
     relayToDesktop(io, socket, { type: data.action }, callback);
   });
 
-  // Screenshot 
+  // Screenshot
   socket.on('request-screenshot', (callback?: (res: unknown) => void) => {
     relayToDesktop(io, socket, { type: 'SCREENSHOT' }, callback);
   });
 
-  // Screen Share 
+  // Screen Share Start
   socket.on('screen-share-start', (data: { sessionId: string; frameRate?: number; quality?: number }) => {
+
     const deviceId = roomManager.getDeviceForSocket(socket.id);
     if (!deviceId) return;
 
@@ -147,13 +156,17 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     if (!device?.isOnline) return;
 
     const desktopSocket = io.sockets.sockets.get(device.socketId);
-    desktopSocket?.emit('screen-share-request', data);
+    if (desktopSocket) {
+      desktopSocket.emit('screen-share-request', data);
+    }
 
     console.log(`[Frontend] Screen share requested for device ${deviceId}`);
   });
 
-  // Screen Share Stop 
+  // Screen Share Stop
   socket.on('screen-share-stop', (data: { sessionId: string }) => {
+
+
     const deviceId = roomManager.getDeviceForSocket(socket.id);
     if (!deviceId) return;
 
@@ -161,25 +174,60 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     if (!device?.isOnline) return;
 
     const desktopSocket = io.sockets.sockets.get(device.socketId);
-    desktopSocket?.emit('screen-share-stop', data);
+    if (desktopSocket) {
+
+      desktopSocket?.emit('screen-share-stop', data);
+    }
+
+
   });
 
-  // WebRTC Signaling relay 
-  // Relay WebRTC offer/answer/ICE between frontend and desktop
+  // WebRTC Signaling relay — frontend → desktop
   socket.on('webrtc-offer', (data: { sdp: unknown; deviceId: string }) => {
+
+    wsWebRtcEventsTotal.inc({ signal_type: 'offer', direction: 'frontend→desktop' });
+
     console.log(`[Backend] webrtc-offer received from frontend ${socket.id} to device ${data.deviceId}`);
     const device = deviceManager.getDevice(data.deviceId);
     if (!device?.isOnline) return;
     const desktopSocket = io.sockets.sockets.get(device.socketId);
-    desktopSocket?.emit('webrtc-offer', { ...data, fromSocketId: socket.id });
-  });
+    if (desktopSocket) {
+      desktopSocket?.emit('webrtc-offer', { ...data, fromSocketId: socket.id });
 
-  socket.on('webrtc-ice-candidate', (data: { candidate: unknown; deviceId: string }) => {
+    }
+  }); 
+
+  socket.on('webrtc-ice-candidate', (data: IceCandidatePayload) => {
+    const candidate = data?.candidate;
+
+    // no candidate object
+    if (!candidate) {
+      console.warn('[Backend] Missing ICE candidate');
+      return;
+    }
+
+    // invalid candidate
+    if (candidate.sdpMid == null && candidate.sdpMLineIndex == null) {
+      console.warn('[Backend] Invalid ICE candidate');
+      return;
+    }
+
     console.log(`[Backend] webrtc-ice-candidate received from frontend ${socket.id}`);
+
     const device = deviceManager.getDevice(data.deviceId);
-    if (!device?.isOnline) return;
+
+    if (!device?.isOnline) {
+      console.warn(`[Backend] Device ${data.deviceId} offline`);
+      return;
+    }
+
     const desktopSocket = io.sockets.sockets.get(device.socketId);
-    desktopSocket?.emit('webrtc-ice-candidate', { ...data, fromSocketId: socket.id });
+
+    if (!desktopSocket) {
+      console.warn('[Backend] Desktop socket missing');
+      return;
+    }
+    desktopSocket.emit('webrtc-ice-candidate', { ...data, fromSocketId: socket.id, });
   });
 
   socket.on('webrtc-answer', (data: { sdp: unknown; deviceId: string }) => {
@@ -188,46 +236,66 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     if (!device?.isOnline) return;
     const desktopSocket = io.sockets.sockets.get(device.socketId);
     desktopSocket?.emit('webrtc-answer', { ...data, fromSocketId: socket.id });
+
+    wsWebRtcEventsTotal.inc({signal_type: 'answer',direction: 'frontend→desktop',});
   });
 
-  // disconnect 
+  // disconnect
   socket.on('disconnect', (reason) => {
     console.log(`[Frontend] Disconnected: ${socket.id} (reason: ${reason})`);
+    // wsDisconnectionsTotal is already incremented in socket/index.ts
+
+    wsDisconnectionsTotal.inc({ role: 'frontend', reason, });
+
     const deviceId = roomManager.leave(socket.id);
     if (deviceId) {
       deviceManager.removePairedRoom(deviceId, socket.id);
-
       // Notify the desktop agent that its web client disconnected
       const device = deviceManager.getDevice(deviceId);
       if (device?.isOnline) {
         const desktopSocket = io.sockets.sockets.get(device.socketId);
-        desktopSocket?.emit('web-client-disconnected', { socketId: socket.id });
+        if (desktopSocket) {
+          desktopSocket.emit('web-client-disconnected', { socketId: socket.id });
+
+          wsConnectionsActive.dec({ role: 'frontend' });
+        }
       }
     }
   });
 }
 
-//  Helper -> relay a command to the desktop agent for a socket's paired device 
+//  Helper → relay a command to the desktop agent for a socket's paired device  
 function relayToDesktop(
   io: SocketServer,
   socket: Socket,
   command: CommandPayload,
   callback?: (res: unknown) => void
 ): void {
-  const deviceId = roomManager.getDeviceForSocket(socket.id);
-  if (!deviceId) return;
 
-  const device = deviceManager.getDevice(deviceId);
-  if (!device?.isOnline) return;
+  try {
 
-  const desktopSocket = io.sockets.sockets.get(device.socketId);
-  if (!desktopSocket) return;
+    const deviceId = roomManager.getDeviceForSocket(socket.id);
+    if (!deviceId) return;
 
-  if (callback) {
-    desktopSocket.timeout(10000).emit('command', command, (_err: Error | null, result: unknown) => {
-      callback(result ?? { success: false, message: 'No response' });
-    });
-  } else {
-    desktopSocket.emit('command', command);
+    const device = deviceManager.getDevice(deviceId);
+    if (!device?.isOnline) return;
+
+    const desktopSocket = io.sockets.sockets.get(device.socketId);
+    if (!desktopSocket) return;
+
+
+
+    if (callback) {
+      desktopSocket.timeout(10000).emit('command', command, (_err: Error | null, result: unknown) => {
+        callback(result ?? { success: false, message: 'No response' });
+      });
+    } else {
+      desktopSocket.emit('command', command);
+    }
+  }
+
+  catch (e) {
+    serverErrorsTotal.inc({ type: 'command_relay_error', });
+
   }
 }

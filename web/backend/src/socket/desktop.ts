@@ -1,42 +1,46 @@
 import { Server as SocketServer, Socket } from 'socket.io';
 import { deviceManager } from '../managers/devices';
 import { pairingManager } from '../managers/pairing';
-import { roomManager } from '../managers/rooms';
+import {
+  wsFrameBytesHistogram,
+  wsWebRtcEventsTotal,
+  wsConnectionsActive,
+  serverErrorsTotal,
+  wsDisconnectionsTotal,
+} from '../metrics';
 
 export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
-  socket.on('device-online',
-    (
-      data: { deviceId: string; name: string; platform: string; arch: string, user: string },
-      ack?: () => void
-    ) => {
-      const { deviceId, name, platform, arch, user } = data;
 
-      if (!deviceId) {
-        console.warn('[Desktop] device-online missing deviceId');
-        ack?.();
-        return;
-      }
+  socket.on('device-online', (data:
+    { deviceId: string; name: string; platform: string; arch: string, user: string }, ack?: () => void) => {
 
+    const { deviceId, name, platform, arch, user } = data;
 
-      const device = deviceManager.registerDevice(deviceId, {
-        name: name || 'Unknown',
-        platform: platform || 'unknown',
-        arch: arch || 'unknown',
-        socketId: socket.id,
-        user: user || ''
-      });
-
-      // Join the device's own room so we can target it by deviceId
-      socket.join(deviceId);
-
-      // Broadcast device status to all connected frontends
-      io.emit('device-status-changed', { deviceId: device.id, isOnline: true });
-
-      console.log(`[Desktop] device-online: ${deviceId} (socket: ${socket.id})`);
-
-      // Acknowledge so desktop can safely request pairing code next
+    if (!deviceId) {
+      console.warn('[Desktop] device-online missing deviceId');
       ack?.();
+      return;
     }
+
+    const device = deviceManager.registerDevice(deviceId, {
+      name: name || 'Unknown',
+      platform: platform || 'unknown',
+      arch: arch || 'unknown',
+      socketId: socket.id,
+      user: user || ''
+    });
+
+    // Join the device's own room so we can target it by deviceId
+    socket.join(deviceId);
+
+    // Broadcast device status to all connected frontends
+    io.emit('device-status-changed', { deviceId: device.id, isOnline: true });
+
+    console.log(`[Desktop] device-online: ${deviceId} (socket: ${socket.id})`);
+
+    // Acknowledge so desktop can safely request pairing code next
+    ack?.();
+  }
   );
 
   // Desktop agent requests (or refreshes) its pairing code.
@@ -60,6 +64,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         }
         callback({ success: true, code });
       } catch (err: any) {
+        serverErrorsTotal.inc({ type: 'pairing_error', });
         callback({ success: false, error: err.message });
       }
     }
@@ -68,125 +73,129 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
   // Desktop agent sends a raw screen frame; relay to all paired frontends.
   socket.on('screen-frame',
     (data: { sessionId: string; frame: Buffer | string; width: number; height: number }) => {
-      // Find which device this socket belongs to
-      const device = deviceManager.getDeviceBySocketId(socket.id);
-      if (!device) return;
 
-      // Forward to all frontends in this device's room
-      const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-      for (const fid of frontendSocketIds) {
-        const frontendSocket = io.sockets.sockets.get(fid);
-        if (frontendSocket) {
-          frontendSocket.emit('screen-frame', data);
+      try {
+        if (!data?.frame) {
+          serverErrorsTotal.inc({ type: 'invalid_screen_frame', });
+          return;
         }
+        // Track frame payload size
+        const frameSize = data.frame instanceof Buffer
+          ? data.frame.byteLength
+          : Buffer.byteLength(data.frame as string, 'base64');
+
+          console.log("{desktop} /FPS ",frameSize);
+
+        wsFrameBytesHistogram.observe(frameSize);
+
+        // Find which device this socket belongs to
+        const device = deviceManager.getDeviceBySocketId(socket.id);
+        if (!device) return;
+
+        socket.volatile.to(device.id).emit('screen-frame', data);
+
       }
+      catch (err) {
+        serverErrorsTotal.inc({ type: 'screen_frame_error', });
+        console.error('[Desktop] screen-frame failed:', err);
+      } 
     }
   );
 
   // Desktop agent confirms screen share has started.
   socket.on('screen-share-started', (data: { sessionId: string; success: boolean }) => {
+
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
-
-    // Notify all paired frontends
-    const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-    for (const fid of frontendSocketIds) {
-      const frontendSocket = io.sockets.sockets.get(fid);
-      if (frontendSocket) {
-        frontendSocket.emit('screen-share-started', data);
-      }
-    }
+    socket.to(device.id).emit('screen-share-started', data);
+ 
   });
 
   // Desktop agent emits command result (non-callback style).
   socket.on('command-result', (result: unknown) => {
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
-
-    const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-    for (const fid of frontendSocketIds) {
-      const frontendSocket = io.sockets.sockets.get(fid);
-      if (frontendSocket) {
-        frontendSocket.emit('command-result', result);
-      }
-    }
+    socket.to(device.id).emit('command-result', result);
   });
 
-  //   webrtc relay
+  // WebRTC relay — desktop → frontend
   socket.on('webrtc-offer', (data: any) => {
+    wsWebRtcEventsTotal.inc({ signal_type: 'offer', direction: 'desktop→frontend' });
+
     console.log(`[Backend] webrtc-offer received from desktop ${socket.id}`);
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
-    const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-    console.log(`[Backend] relaying webrtc-offer to ${frontendSocketIds.length} frontends`);
-    for (const fid of frontendSocketIds) {
-      const frontendSocket = io.sockets.sockets.get(fid);
-      if (frontendSocket) {
-        frontendSocket.emit('webrtc-offer', data);
-      }
-    }
+
+    socket.to(device.id).emit('webrtc-offer', data);
+
   });
 
   socket.on('webrtc-answer', (data: any) => {
+
+    wsWebRtcEventsTotal.inc({ signal_type: 'answer', direction: 'desktop→frontend' });
+
     console.log(`[Backend] webrtc-answer received from desktop ${socket.id} (unusual)`);
-    // Answer is usually sent FROM frontend, so this might not be needed here,
-    // but just in case, we relay it the same way.
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
-    const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-    for (const fid of frontendSocketIds) {
-      const frontendSocket = io.sockets.sockets.get(fid);
-      if (frontendSocket) {
-        frontendSocket.emit('webrtc-answer', data);
-      }
-    }
+
+    socket.to(device.id).emit('webrtc-answer', data);
+ 
   });
 
   socket.on('webrtc-ice-candidate', (data: any) => {
-    console.log(`[Backend] webrtc-ice-candidate received from desktop ${socket.id}`);
+
+    wsWebRtcEventsTotal.inc({ signal_type: 'ice', direction: 'desktop→frontend' });
+
+    const candidate = data?.candidate;
+    // missing candidate
+    if (!candidate) {
+      console.warn(`[Backend] Missing ICE candidate from desktop ${socket.id}`);
+      return;
+    }
+    // malformed candidate
+    if (candidate.sdpMid == null && candidate.sdpMLineIndex == null) {
+      console.warn(`[Backend] Invalid ICE candidate from desktop ${socket.id}`);
+      return;
+    }
+
+    // console.log(`[Backend] webrtc-ice-candidate received from desktop ${socket.id}`);
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
-    const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-    for (const fid of frontendSocketIds) {
-      const frontendSocket = io.sockets.sockets.get(fid);
-      if (frontendSocket) {
-        frontendSocket.emit('webrtc-ice-candidate', data);
-      }
-    }
-  });
 
+    socket.to(device.id).emit('webrtc-ice-candidate', data);
+
+  });
 
   socket.on('disconnect', (reason) => {
     console.log(`[Desktop] Disconnected: ${socket.id} (reason: ${reason})`);
+    
+    wsDisconnectionsTotal.inc({role: 'desktop',reason,});
 
     const device = deviceManager.getDeviceBySocketId(socket.id);
-
     if (!device) return;
 
     setTimeout(() => {
       const current = deviceManager.getDevice(device.id);
 
-      if (
-        current &&
-        current.socketId === socket.id &&
-        !io.sockets.sockets.has(socket.id)
-      ) {
+      if (current && current.socketId === socket.id && !io.sockets.sockets.has(socket.id)) {
         deviceManager.markOffline(socket.id);
+        io.emit('device-status-changed', { deviceId: device.id, isOnline: false });
+        io.to(device.id).emit('device-disconnected', { deviceId: device.id });
+        wsConnectionsActive.dec({ role: 'desktop' });
+      }
 
-        io.emit('device-status-changed', {
-          deviceId: device.id,
-          isOnline: false,
-        });
-      }
       // Notify paired frontends that their session ended
-      const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-      for (const fid of frontendSocketIds) {
-        const frontendSocket = io.sockets.sockets.get(fid);
-        if (frontendSocket) {
-          frontendSocket.emit('device-disconnected', { deviceId: device.id });
-        }
-        roomManager.leave(fid);
-      }
+      
+      // const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
+      // for (const fid of frontendSocketIds) {
+      //   const frontendSocket = io.sockets.sockets.get(fid);
+      //   if (frontendSocket) {
+      //     frontendSocket.emit('device-disconnected', { deviceId: device.id });
+
+      //     wsConnectionsActive.dec({ role: 'desktop' });
+      //   }
+      //   roomManager.leave(fid);
+      // }
 
     }, 30000);
   });

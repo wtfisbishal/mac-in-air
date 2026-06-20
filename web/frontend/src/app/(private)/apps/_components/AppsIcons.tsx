@@ -1,20 +1,20 @@
 'use client';
 
-import {   useEffect, useState, useCallback, useRef } from 'react';
-import {ArrowLeft, Search, RefreshCw,   Play,  Loader} from 'lucide-react';
-import { getSocket } from '@/lib/socket'; 
-import { useToast } from '@/hooks/useToast'; 
-import Image from 'next/image'; 
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { ArrowLeft, Search, RefreshCw, Play, Loader } from 'lucide-react';
+import { getSocket } from '@/lib/socket';
+import { useToast } from '@/hooks/useToast';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useDevice } from '@/hooks/useDevices';
- 
+
 interface AppInfo {
   name: string;
   path: string;
   icon?: string | null;
 }
-function AppIcon({ name,icon, }: { name: string;icon?: string | null; }) {
-  
+function AppIcon({ name, icon, }: { name: string; icon?: string | null; }) {
+
   const initials = name
     .split(/[\s\-_]+/)
     .slice(0, 2)
@@ -34,20 +34,20 @@ function AppIcon({ name,icon, }: { name: string;icon?: string | null; }) {
 
   return (
     <div
-      className={`flex items-center glass-panel-dark  justify-center rounded-3xl text-4xl font-bold select-none w-full h-full`}
+      className={`flex items-center glass-panel-card  justify-center rounded-3xl text-4xl font-bold select-none w-full h-full`}
     >
       {initials}
     </div>
   );
 }
- 
-export default function AppsIcons  ({deviceId}:{deviceId?:string | null} ) {
-  
-  const {   toast } = useToast();
+
+export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
+
+  const { toast } = useToast();
   const router = useRouter();
 
-    const { data: device, isLoading: deviceLoading } = useDevice(deviceId!);
-  
+  const { data: device, isLoading: deviceLoading } = useDevice(deviceId!);
+
 
   const [apps, setApps] = useState<AppInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function AppsIcons  ({deviceId}:{deviceId?:string | null} ) {
   const searchRef = useRef<HTMLInputElement>(null);
 
 
-   const sendCommand = useCallback(
+  const sendCommand = useCallback(
     (type: string, payload?: Record<string, unknown>) =>
       new Promise<{ success: boolean; message?: string; data?: unknown }>((resolve) => {
         const socket = getSocket();
@@ -68,7 +68,7 @@ export default function AppsIcons  ({deviceId}:{deviceId?:string | null} ) {
     []
   );
 
-   const loadApps = useCallback(async () => {
+  const loadApps = useCallback(async () => {
     setLoading(true);
     try {
       const result = await sendCommand('LIST_APPS') as { success: boolean; data?: AppInfo[]; message?: string };
@@ -99,7 +99,7 @@ export default function AppsIcons  ({deviceId}:{deviceId?:string | null} ) {
   }, []);
 
 
-   const openApp = async (app: AppInfo) => {
+  const openApp = async (app: AppInfo) => {
     setOpening(app.name);
     try {
       const result = await sendCommand('OPEN_APP', { app: app.name }) as { success: boolean; message?: string };
@@ -118,109 +118,109 @@ export default function AppsIcons  ({deviceId}:{deviceId?:string | null} ) {
   return (
     <>
 
-    {deviceId && device && <div className="flex items-center  justify-between mb-5 animate-fade-up">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="btn btn-ghost glass-panel-dark  !rounded-2xl !p-3">
-              <ArrowLeft size={16} />
-            </button>
-            <div>
-              <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight">
-                Apps — <span className="text-indigo-400 capitalize"> {device?.user}'s {device.name}</span>
-              </h1>
-              <p className="text-xs text-slate-500">
-                {loading ? 'Loading…' : `${filtered.length} of ${apps.length} apps`}
-              </p>
-            </div>
+      {deviceId && device && <div className="flex items-center  justify-between mb-5 animate-fade-up">
+        <div className="flex items-center gap-3">
+          <button onClick={() => router.back()} className="btn btn-ghost glass-panel-dark  !rounded-2xl !p-3">
+            <ArrowLeft size={16} />
+          </button>
+          <div>
+            <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight">
+              Apps — <span className="text-indigo-400 capitalize"> {device?.user}'s {device.name}</span>
+            </h1>
+            <p className="text-xs text-slate-500">
+              {loading ? 'Loading…' : `${filtered.length} of ${apps.length} apps`}
+            </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
 
 
-            <button
-              onClick={loadApps}
-              disabled={loading}
-              className="btn btn-ghost glass-panel-dark  !rounded-3xl  p-2"
-              title="Refresh app list"
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            </button>
+          <button
+            onClick={loadApps}
+            disabled={loading}
+            className="btn btn-ghost glass-panel-dark  !rounded-3xl  p-2"
+            title="Refresh app list"
+          >
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
+      </div>}
+
+      {!loading && filtered.length > 0 && <div className="relative animate-spotlight glass-panel-dark py-1 px-5 w-1/2 max-md:w-[90%] max-md:ml-5  mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
+        <Search size={17} className=" text-slate-200 pointer-events-none" />
+        <input
+          ref={searchRef}
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search apps… (⌘K)"
+          className=" !w-full border-none outline-none !pl-2 py-2.5 ml-2 text-sm"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="   text-slate-200 hover:text-slate-300 text-sm"
+          >
+            ✕
+          </button>
+        )}
+      </div>}
+
+      <div className="flex-1 h-full ">
+
+        {loading && (
+          <div className="flex flex-col h-full items-center justify-center py-20 gap-3">
+            <Loader className="animate-spin  " size={28} />
+            <p className="text-slate-500 text-sm">Scanning applications…</p>
           </div>
-        </div>}
+        )}
 
-      {  !loading && filtered.length > 0 && <div className="relative animate-spotlight glass-panel-dark py-1 px-5 w-1/2 max-md:w-[70%] max-md:ml-5  mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
-          <Search size={17} className=" text-slate-200 pointer-events-none" />
-          <input
-            ref={searchRef}
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search apps… (⌘K)"
-            className=" !w-full border-none outline-none !pl-2 py-2.5 ml-2 text-sm"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="   text-slate-200 hover:text-slate-300 text-sm"
-            >
-              ✕
-            </button>
-          )}
-        </div>}
-        
-     <div className="flex-1 h-full ">
+        {!loading && filtered.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <Image src={'/apps.png'} className=' saturate-0 ' height={65} width={65} alt='apps' />
+            <p className="text-slate-400 text-sm font-medium">
+              {search ? `No apps matching "${search}"` : ' No apps found '}
+            </p>
+          </div>
+        )}
 
-          {loading && (
-            <div className="flex flex-col h-full items-center justify-center py-20 gap-3">
-              <Loader className="animate-spin  " size={28} />
-              <p className="text-slate-500 text-sm">Scanning applications…</p>
-            </div>
-          )}
-
-          {!loading && filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-               <Image src={'/apps.png'} className=' saturate-0 ' height={65} width={65} alt='apps' />
-              <p className="text-slate-400 text-sm font-medium">
-                {search ? `No apps matching "${search}"` : ' No apps found '}
-              </p>
-            </div>
-          )}
-
-          {!loading && filtered.length > 0 && (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-10 mx-auto gap-3 animate-fade-in pb-4">
-              {filtered.map((app) => {
-                const isOpening = opening === app.name;
-                return (
-                  <button
+        {!loading && filtered.length > 0 && (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-10 mx-auto gap-3 animate-fade-in pb-4">
+            {filtered.map((app) => {
+              const isOpening = opening === app.name;
+              return (
+                <button
                   key={app.path}
                   onClick={() => openApp(app)}
                   disabled={isOpening}
                   className="group flex  flex-col items-center gap-2.5 p-3 cursor-pointer rounded-2xl
                   active:scale-95 transition-all duration-150
                   disabled:opacity-60 disabled:cursor-wait"
-                  >
-                    
-                    <div className="w-20 h-20 relative">
-                      <AppIcon name={app.name} icon={app.icon}  />
-                      {isOpening && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
-                          <Loader size={16} className="animate-spin text-white" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <span className="text-[11px] text-slate-300 group-hover:text-white font-medium text-center leading-tight line-clamp-2 w-full">
-                      {app.name}
-                    </span>
-                     
-                    <span className="opacity-0 group-hover:opacity-100 flex items-center gap-1 text-[9px] text-indigo-400 font-semibold transition-opacity">
-                      <Play size={8} fill="currentColor" /> Launch
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-          </>
+                >
+
+                  <div className="w-20 h-20 relative">
+                    <AppIcon name={app.name} icon={app.icon} />
+                    {isOpening && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
+                        <Loader size={16} className="animate-spin text-white" />
+                      </div>
+                    )}
+                  </div>
+
+                  <span className="text-[11px] text-slate-300 group-hover:text-white font-medium text-center leading-tight line-clamp-2 w-full">
+                    {app.name}
+                  </span>
+
+                  <span className="opacity-0 group-hover:opacity-100 flex items-center gap-1 text-[9px] text-indigo-400 font-semibold transition-opacity">
+                    <Play size={8} fill="currentColor" /> Launch
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
   )
 }

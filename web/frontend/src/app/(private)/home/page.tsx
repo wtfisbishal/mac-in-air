@@ -15,7 +15,7 @@ function DeviceCard({ device }: { device: Device }) {
   const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
 
   return (
-    <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel -dark rounded-3xl p-5 transition-all   group
+    <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel-card rounded-3xl p-5 transition-all   group
       ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
     >
       <div className="flex items-start justify-between mb-4">

@@ -18,7 +18,7 @@ import AppLayout from '@/components/AppLayout';
 import MacKeyboards from '@/components/MacKeyBoards';
 import Image from 'next/image';
 import AppsIcons from '../../apps/_components/AppsIcons';
-import {  useFullscreen } from '@/hooks/useFullscreen';
+import { useFullscreen } from '@/hooks/useFullscreen';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -119,8 +119,9 @@ function ScreenCanvas({
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
+        // Use toJSON() so sdpMid / sdpMLineIndex survive JSON serialization over socket
         socket.emit('webrtc-ice-candidate', {
-          candidate: event.candidate,
+          candidate: event.candidate.toJSON(),
           deviceId,
         });
       }
@@ -143,7 +144,14 @@ function ScreenCanvas({
 
     const handleIceCandidate = async (data: { candidate: any; deviceId: string }) => {
       try {
-        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        const c = data.candidate;
+        // Skip missing / end-of-candidates markers.
+        // Guard against both null and undefined since they behave identically
+        // when serialized through IPC + Socket.IO JSON.
+        if (!c || (c.sdpMid == null && c.sdpMLineIndex == null)) return;
+        // Pass the init dict directly — addIceCandidate() accepts RTCIceCandidateInit
+        // without needing `new RTCIceCandidate()`, which has stricter constructor validation.
+        await pc.addIceCandidate(c);
       } catch (err) {
         console.error('[WebRTC] Error adding ICE candidate', err);
       }
@@ -227,12 +235,12 @@ export default function ControlPage({ params }: PageProps) {
     const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
     setPairToken(token);
     setAuthChecked(true);
- 
+
   }, [deviceId]);
 
   const [streaming, setStreaming] = useState(false);
   const [kbCapture, setKbCapture] = useState(false);
-  const [mouseCapture, setMouseCapture] = useState(false); 
+  const [mouseCapture, setMouseCapture] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [warning, setWarning] = useState<string | null>(null);
   const { fullscreen, setFullscreen } = useFullscreen();
@@ -404,15 +412,15 @@ export default function ControlPage({ params }: PageProps) {
       <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : 'p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
-          <div className='animate-spotlight !transition-all !duration-700   h-[800px]   max-md:py-5  max-md:p-0   w-[80%] max-md:w-[95%] glass-panel-dark p-4   rounded-4xl top-[10%] h-[80%] overflow-y-scroll  '>
+          <div className='animate-spotlight !transition-all !duration-700   h-[800px]   max-md:py-5  max-md:p-0   w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl top-[10%] h-[80%] overflow-y-scroll  '>
 
-          <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
-            <X />
+            <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
+              <X />
+            </div>
+
+            <AppsIcons />
           </div>
-
-          <AppsIcons />
-        </div>
-        </div> }
+        </div>}
 
         {/* Top bar */}
         {!fullscreen && (
@@ -433,7 +441,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => { setFullscreen(true)  }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
+            <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -585,7 +593,7 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
- 
+
 
             </div>
           )}
@@ -595,7 +603,7 @@ export default function ControlPage({ params }: PageProps) {
         {
           warning && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
-              <div className="w-[450px] rounded-3xl p-6 glass-panel shadow-2xl">
+              <div className="w-[450px] max-md:w-[90%] rounded-3xl p-6 glass-panel-dark shadow-2xl">
 
 
                 <div className="flex items-center gap-3">
@@ -608,7 +616,7 @@ export default function ControlPage({ params }: PageProps) {
 
                 <div className="mt-5">
                   <p className="text-gray-300">
-                    You are about to perform the following system action:
+                    You are about to perform the following system action
                   </p>
 
                   <div className="mt-3   p-4">
@@ -617,9 +625,7 @@ export default function ControlPage({ params }: PageProps) {
                     </p>
                   </div>
 
-
                 </div>
-
 
                 <div className="mt-6 flex justify-end gap-3">
                   <button

@@ -89,6 +89,7 @@ export function setupIpc() {
     } else if (data.type === 'answer') {
       socket.emit('webrtc-answer', data);
     } else if (data.type === 'ice-candidate') {
+        //  if (!event?.candidate) return;   // important
       socket.emit('webrtc-ice-candidate', data);
     }
   });
