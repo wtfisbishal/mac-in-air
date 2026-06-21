@@ -39,12 +39,12 @@ const Navigation = () => {
         return null ;
     }
     return (
-        <div className='fixed top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none'>
+        <div className='fixed top-0 z-[100] w-full titlebar  flex items-center justify-center gap-5 h-[80px] pointer-events-none'>
             <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-dark relative flex items-center p-2 rounded-full'>
 
                 {pillStyle.opacity === 1 && (
                     <div
-                        className="absolute h-[calc(100%-14px)] top-1.5 backdrop-blur-3xl rounded-full bg-[#ffffff1b] transition-all duration-500 ease-in-out -z-10"
+                        className="absolute  h-[calc(100%-14px)] top-2 backdrop-blur-3xl rounded-full bg-[#ffffff1b] transition-all duration-500 ease-in-out -z-10"
                         style={{
                             left: `${pillStyle.left}px`,
                             width: `${pillStyle.width}px`,
@@ -60,7 +60,7 @@ const Navigation = () => {
                             key={item.href}
                             href={item.href}
                             ref={(el) => { itemRefs.current[index] = el }}
-                            className={`relative px-6 py-2 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'
+                            className={`relative px-6 window-controls py-2 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'
                                 }`}
                         >
 

@@ -1,7 +1,6 @@
 import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron';
 import * as path from 'path';
-import { socketService } from '../services/socket.service';
-
+ 
 let tray: Tray | null = null;
 
 export function createTray() {
@@ -10,8 +9,7 @@ export function createTray() {
   try {
     const icon = nativeImage.createFromPath(iconPath).resize({ width: 19, height: 19 });
     tray = new Tray(icon); 
-    const conntected = socketService.isConnected ;
- 
+    
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'MAC in AIR', 
@@ -19,12 +17,12 @@ export function createTray() {
         icon: icon
       },
       { type: 'separator' },
-      { 
-        label: `${conntected?'Conntected to server':'Disconntected '}`, 
-        type: 'normal', 
-        enabled: false,
-       },
-      { type: 'separator' },
+      // { 
+      //   label: `${ conntected ?'Conntected to server':'Disconntected '}`, 
+      //   type: 'normal', 
+      //   enabled: false,
+      //  },
+      // { type: 'separator' },
       { 
         label: 'Open Mac in Air', 
         click: () => { 

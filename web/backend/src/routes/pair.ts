@@ -37,7 +37,6 @@ router.post('/', (req: Request, res: Response): void => {
   }
 
   // Issue a 15-min pairToken the frontend stores in localStorage.
-  // This token can be reused on page refresh / window reopen.
   const pairToken = pairTokenManager.issueToken(entry.deviceId);
 
   // Notify the desktop agent

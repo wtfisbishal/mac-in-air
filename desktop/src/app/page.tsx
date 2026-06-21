@@ -41,7 +41,7 @@ export default function Home() {
           />
           <img
             src="/logo.png"
-            alt="Mac In Wind"
+            alt="Mac In air"
             className="relative w-24 h-24 object-contain drop-shadow-2xl"
           />
         </motion.div>
@@ -52,7 +52,7 @@ export default function Home() {
           animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
           transition={{ delay: 0.35, duration: 0.6, ease: 'easeOut' }}
         >
-          Mac In Wind
+          Mac In AIR
         </motion.h1>
 
         <motion.p

@@ -39,8 +39,7 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:3000');
-    // mainWindow.webContents.openDevTools();
-  } else {
+   } else {
     mainWindow.loadURL('app://-/');
   }
 }

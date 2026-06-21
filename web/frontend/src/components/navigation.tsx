@@ -15,7 +15,7 @@ const Navigation = () => {
     
     const navItems = [
         { href: '/home', title: 'Home' },
-        { href: '/pair', title: 'pair' },
+        { href: '/pair', title: 'Pair' },
         { href: '/settings', title: 'Settings' },
     ]
     const { fullscreen  } = useFullscreen();
@@ -44,7 +44,7 @@ const Navigation = () => {
 
 
     return (
-        <div className={`   top-0 z-[100] w-full buttombar  flex items-center justify-center gap-5 h-[80px] pointer-events-none `}>
+        <div className={`   top-0 z-[100] w-full buttombar  flex items-center justify-center max-md:gap-2 gap-5 h-[80px] pointer-events-none `}>
             <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-card relative flex items-center p-2 rounded-full'>
 
                 {pillStyle.opacity === 1 && (
@@ -61,15 +61,10 @@ const Navigation = () => {
                     const isActive = path === item.href
 
                     return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            ref={(el) => { itemRefs.current[index] = el }}
-                            className={`relative px-6 py-2 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'
-                                }`}
-                        >
+                        <Link key={item.href} href={item.href} ref={(el) => { itemRefs.current[index] = el }}
+                            className={`relative px-6 py-2 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'}`} >
 
-                            <p className=' text-[13px]  '>
+                            <p className=' text-[13px]'>
                                 {item.title}
                             </p>
                         </Link>
@@ -78,13 +73,13 @@ const Navigation = () => {
             </div>
 
             {/* Profile Button */}
-            {control && <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-24 w-32 h-12 rounded-full'>
+            {control && <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-20 w-24 h-12 rounded-full'>
                 <Link
                     ref={profileRef}
                     href={path}
                     className={`relative center w-full h-full rounded-full gap-2 flex items-center justify-center  bg-[#ffffff1b] border-none text-white `}>
 
-                    <Laptop size={18} />
+                    {/* <Laptop size={18} /> */}
                     <p className=' max-md:text-xs text-sm'> Control</p>
 
                 </Link>

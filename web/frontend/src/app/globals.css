@@ -368,7 +368,7 @@ body {
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.135);
-  box-shadow: -2px 6px 32px #00000014, inset 1px 1px #eeececa9, inset 15px 17px 20px 0px #bfbfbf1a;
+  box-shadow: -2px 6px 32px #00000014, inset 1px 1px #eeececa9, inset 15px 17px 30px 0px #bfbfbf0e;
     
 }
  
@@ -513,3 +513,14 @@ body {
   box-shadow: -1px 2px 9px #ffffff7a, inset 2px -2px 15px #0000000f !important;
 }
  
+
+.hg-theme-default .hg-button {
+    
+    background: #949494 !important;
+    
+}
+
+.hg-activeModifier {
+  background: #007aff !important;
+  color: white !important;
+}

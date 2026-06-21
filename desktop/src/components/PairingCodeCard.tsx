@@ -49,14 +49,14 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
     fetchCode();
   }, []);
 
-  const copyToClipboard = (e) => {
+  const copyToClipboard = (e:any) => {
     e.preventDefault();
     navigator.clipboard.writeText(pairingCode);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  const handleRefresh = async (e) => {
+  const handleRefresh = async (e:any) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -167,7 +167,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
       </div>
 
       <div className="text-xs w-[560px]  text-gray-400 text-center">
-        Code expires in 15 minutes
+        Code expires in 30 minutes
       </div>
     </motion.div>
   );

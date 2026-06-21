@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
  
-const TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 interface PairTokenEntry {
   token: string;
@@ -23,7 +23,7 @@ class PairTokenManager {
       issuedAt: now,
       expiresAt: now + TOKEN_TTL_MS,
     });
-    console.log(`[PairTokenManager] Token issued for device ${deviceId} (expires in 15 min)`);
+    console.log(`[PairTokenManager] Token issued for device ${deviceId} (expires in 30 min)`);
     return token;
   }
 
@@ -64,5 +64,5 @@ class PairTokenManager {
 
 export const pairTokenManager = new PairTokenManager();
 
-// Housekeeping every 5 minutes
-setInterval(() => pairTokenManager.purge(), 5 * 60 * 1000);
+// Housekeeping every 30 minutes
+setInterval(() => pairTokenManager.purge(), 30 * 60 * 1000);

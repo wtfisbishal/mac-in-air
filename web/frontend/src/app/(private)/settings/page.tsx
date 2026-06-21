@@ -7,6 +7,7 @@ import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import MyComponent from '@/components/NewKeyboard';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -24,7 +25,7 @@ export default function SettingsPage() {
 
         <div className="space-y-5 animate-fade-up delay-1">
 
-          <div className="glass-panel-dark rounded-3xl p-5">
+          <div className="glass-panel-card rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <User size={15} className="text-indigo-400" />
               <p className="text-sm font-semibold text-white">Account</p>
@@ -64,6 +65,10 @@ export default function SettingsPage() {
           </div>
 
         </div>
+
+
+
+        <MyComponent />
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>

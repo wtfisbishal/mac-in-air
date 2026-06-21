@@ -61,10 +61,7 @@ export async function sendCommand(
 }
 
 export async function pairDevice(code: string, frontendSocketId: string) {
-  return req<{
-    success: boolean;
-    device: Device;
-  }>('/pair', {
+  return req<{success: boolean;device: Device;}>('/pair', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, frontendSocketId }),

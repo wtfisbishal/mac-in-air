@@ -58,7 +58,7 @@ export default function AppsPage({ params }: PageProps) {
           <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
           <p className="text-slate-400 text-sm mb-6">
             You must pair this device before you can control it.
-            Pairing tokens expire after 15 min  or when you close the tab.
+            Pairing tokens expire after 30 min  or when you close the tab.
           </p>
           <Link href="/pair" className="btn !rounded-full glass-button-primary">
             <Link2 size={20} />

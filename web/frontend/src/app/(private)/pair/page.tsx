@@ -2,7 +2,7 @@
 
 import { useState, useRef, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import {  Loader, CheckCircle, ArrowRight } from 'lucide-react';
+import { Loader, CheckCircle, ArrowRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { pairDevice } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
@@ -35,9 +35,9 @@ export default function PairPage() {
       const device = data.device as Device;
       setPaired({ name: device.name, id: device.id });
       toast('Device paired successfully!', 'success');
-   
+
       if (data?.pairToken) {
-         sessionStorage.setItem(`rmac_pair_${device.id}`, data.pairToken);
+        sessionStorage.setItem(`rmac_pair_${device.id}`, data.pairToken);
       }
 
       // Seed the React Query cache so the control page renders immediately
@@ -83,19 +83,21 @@ export default function PairPage() {
     mutation.mutate({ code });
   };
 
+  console.log(paired)
+
   if (paired) {
     return (
       <AppLayout>
         <div className="animate-spotlight h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
-          <div className="text-center animate-fade-up max-w-sm">
+          <div className="text-center flex flex-col items-center  animate-fade-up ">
 
             <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={36} className="text-emerald-400" />
             </div>
 
-            <h2 className="text-2xl font-bold text-white mb-2">Paired!</h2>
+            <h2 className="text-2xl font-bold text-emerald-500 mb-2">Connected to !</h2>
             <p className="text-slate-400 text-sm mb-6">
-              <span className="text-white font-semibold">{paired.name}</span> is now connected.
+              <span className="text-white text-7xl font-extrabold">{paired.name}</span>  
             </p>
             <button
               onClick={() => router.push(`/control/${paired.id}`)}
@@ -123,7 +125,7 @@ export default function PairPage() {
               Open the Desktop App on your Mac, find the 6-digit pairing code, and enter it below.
             </p>
           </div>
- 
+
           <form onSubmit={submit}>
             <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl w-[500px] max-md:w-[98%] max-md:px-5 p-7 mb-4">
               <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest text-center mb-5">
@@ -161,7 +163,7 @@ export default function PairPage() {
             </div>
           </form>
 
-           
+
           <div className="bg-blue-500/10 border max-md:w-full w-[500px]  border-blue-500/30 rounded-3xl p-5 ">
             <p className="text-xs font-semibold text-blue-300 mb-3 uppercase tracking-wide">How to get the code</p>
             <ol className="space-y-2.5">
@@ -179,9 +181,8 @@ export default function PairPage() {
                 </li>
               ))}
             </ol>
-          </div> 
+          </div>
 
-          
         </div>
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

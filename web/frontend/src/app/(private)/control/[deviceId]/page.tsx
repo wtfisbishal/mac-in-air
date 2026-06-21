@@ -1,14 +1,15 @@
 'use client';
 
-import { use, useEffect, useRef, useState, useCallback, useContext } from 'react';
+import { use, useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   MonitorOff, Keyboard, MousePointer2, Power,
-  Moon, Lock, Terminal, Globe, ArrowLeft, Loader,
+  Moon, Lock, Terminal, Globe, ArrowLeft,
   Maximize2, Minimize2, Link as Link2, ShieldAlert,
   NotepadText,
   X,
+  Loader2,
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -19,6 +20,7 @@ import MacKeyboards from '@/components/MacKeyBoards';
 import Image from 'next/image';
 import AppsIcons from '../../apps/_components/AppsIcons';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import MyComponent from '@/components/NewKeyboard';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -307,28 +309,66 @@ export default function ControlPage({ params }: PageProps) {
     [kbCapture]
   );
 
+  // const handlePhysicalKeyDown = useCallback(
+  //   (e: KeyboardEvent) => {
+  //     if (!kbCapture) return;
+  //     e.preventDefault();
+
+  //     const modifiers: string[] = [];
+  //     if (e.metaKey) modifiers.push('command');
+  //     if (e.ctrlKey) modifiers.push('control');
+  //     if (e.altKey) modifiers.push('alt');
+  //     if (e.shiftKey) modifiers.push('shift');
+
+  //     const socket = getSocket();
+
+  //     if (e.key.length === 1 && modifiers.length === 0) {
+  //       socket.emit('keyboard-type', { text: e.key });
+  //     } else {
+  //       const mappedKey = KEY_MAP[e.key.toLowerCase()] ?? e.key;
+  //       socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
+  //     }
+  //   },
+  //   [kbCapture]
+  // );
+
   const handlePhysicalKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!kbCapture) return;
+
       e.preventDefault();
 
       const modifiers: string[] = [];
-      if (e.metaKey) modifiers.push('command');
-      if (e.ctrlKey) modifiers.push('control');
-      if (e.altKey) modifiers.push('alt');
-      if (e.shiftKey) modifiers.push('shift');
 
-      const socket = getSocket();
+      if (e.metaKey) modifiers.push("command");
+      if (e.ctrlKey) modifiers.push("control");
+      if (e.altKey) modifiers.push("alt");
+      if (e.shiftKey) modifiers.push("shift");
 
-      if (e.key.length === 1 && modifiers.length === 0) {
-        socket.emit('keyboard-type', { text: e.key });
-      } else {
-        const mappedKey = KEY_MAP[e.key.toLowerCase()] ?? e.key;
-        socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
-      }
+      const mappedKey =
+        KEY_MAP[e.key.toLowerCase()] ?? e.key;
+
+      sendKeyToMac(mappedKey, modifiers);
     },
     [kbCapture]
   );
+  const sendKeyToMac = (
+    key: string,
+    modifiers: string[] = []
+  ) => {
+    const socket = getSocket();
+
+    if (key.length === 1 && modifiers.length === 0) {
+      socket.emit("keyboard-type", {
+        text: key
+      });
+    } else {
+      socket.emit("keyboard-shortcut", {
+        key,
+        modifier: modifiers
+      });
+    }
+  };
 
   //   Screen share start/stop  
   const toggleStream = () => {
@@ -367,7 +407,7 @@ export default function ControlPage({ params }: PageProps) {
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
-        <Loader className="animate-spin" size={32} />
+        <Loader2 className="animate-spin" size={32} />
       </div>
     </AppLayout>
   );
@@ -382,7 +422,7 @@ export default function ControlPage({ params }: PageProps) {
           <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
           <p className="text-slate-400 text-sm mb-6">
             You must pair this device before you can control it.
-            Pairing tokens expire after 15 min  or when you close the tab.
+            Pairing tokens expire after 30 min  or when you close the tab.
           </p>
           <Link href="/pair" className="btn !rounded-full glass-button-primary">
             <Link2 size={20} />
@@ -412,7 +452,7 @@ export default function ControlPage({ params }: PageProps) {
       <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : 'p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
-          <div className='animate-spotlight !transition-all !duration-700   h-[800px]   max-md:py-5  max-md:p-0   w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl top-[10%] h-[80%] overflow-y-scroll  '>
+          <div className='animate-spotlight !transition-all !duration-700  max-md:py-5  max-md:p-0  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
 
             <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
               <X />
@@ -515,11 +555,13 @@ export default function ControlPage({ params }: PageProps) {
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} />
             </div>
 
-            {kbCapture && (
-              <div className="animate-fade-up delay-4 min-h-[400px] w-fit overflow-x-auto max-md:justify-start pb-4 flex justify-center">
-                <MacKeyboards onVirtualShortcut={handleVirtualShortcut} onPhysicalKeyDown={handlePhysicalKeyDown} />
+           {/* {kbCapture && (
+              <div className="animate-fade-up delay-4 min-h-[400px] w-full overflow-x-auto max-md:justify-start pb-4 flex justify-center">
+                 <MacKeyboards onVirtualShortcut={handleVirtualShortcut} onPhysicalKeyDown={handlePhysicalKeyDown} /> 
+
+                <MyComponent  />
               </div>
-            )}
+            )}*/}
           </div>
 
           {/*  Side panel */}
@@ -603,7 +645,7 @@ export default function ControlPage({ params }: PageProps) {
         {
           warning && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
-              <div className="w-[450px] max-md:w-[90%] rounded-3xl p-6 glass-panel-dark shadow-2xl">
+              <div className="w-[450px] max-md:w-[90%] rounded-3xl p-6 glass-panel-card shadow-2xl">
 
 
                 <div className="flex items-center gap-3">
@@ -630,7 +672,7 @@ export default function ControlPage({ params }: PageProps) {
                 <div className="mt-6 flex justify-end gap-3">
                   <button
                     onClick={() => setWarning(null)}
-                    className="rounded-full px-6 py-2 glass-button"
+                    className="rounded-full px-6 py-2 cursor-pointer glass-button"
                   >
                     Cancel
                   </button>
@@ -641,7 +683,7 @@ export default function ControlPage({ params }: PageProps) {
                       toast(`${warning} command sent`, "info");
                       setWarning(null);
                     }}
-                    className="rounded-full px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium transition"
+                    className="rounded-full px-6 py-2 bg-red-500 cursor-pointer hover:bg-red-600 text-white font-medium transition"
                   >
                     Confirm
                   </button>
@@ -650,6 +692,13 @@ export default function ControlPage({ params }: PageProps) {
             </div>
           )
         }
+
+         {kbCapture && (
+              <div className="animate-fade-up delay-4 min-h-[300px]   max-md:w-full max-md:px-5 max-md:overflow-x-auto mx-auto w-[80%] overflow-x-auto max-md:justify-start pb-4 flex justify-center">
+                
+                <MyComponent  />
+              </div>
+            )}
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>

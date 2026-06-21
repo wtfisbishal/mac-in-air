@@ -18,7 +18,7 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
 
   // join-device — Frontend joins the device's control room.
   // SECURITY: Requires a valid pairToken issued by POST /pair.
-  // The token is valid for 15 minutes and can be reused across page refreshes
+  // The token is valid for 30 minutes and can be reused across page refreshes
   // and window reopens. It is revoked when the desktop agent goes offline.
   socket.on('join-device',
     (data: { deviceId: string; pairToken?: string }, callback?: (res: { success: boolean; message?: string }) => void) => {
@@ -31,7 +31,7 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
         return;
       }
 
-      // validateToken does NOT consume the token — it stays valid for 15 min
+      // validateToken does NOT consume the token — it stays valid for 30 min
       // so the same browser can rejoin after page refresh or window close/reopen
       const tokenEntry = pairTokenManager.validateToken(pairToken);
       if (!tokenEntry) {

@@ -1,7 +1,7 @@
  
 import { PairingEntry } from '../types';
 
-const CODE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const CODE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 class PairingManager {
   // code → PairingEntry  
@@ -115,5 +115,5 @@ class PairingManager {
 
 export const pairingManager = new PairingManager();
 
-// Purge expired codes every 15 minutes
-setInterval(() => pairingManager.purgeExpired(), 15 * 60 * 1000);
+// Purge expired codes every 30 minutes
+setInterval(() => pairingManager.purgeExpired(), 30 * 60 * 1000);
