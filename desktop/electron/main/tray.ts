@@ -16,13 +16,12 @@ export function createTray() {
         enabled: false,
         icon: icon
       },
-      { type: 'separator' },
       // { 
       //   label: `${ conntected ?'Conntected to server':'Disconntected '}`, 
       //   type: 'normal', 
       //   enabled: false,
       //  },
-      // { type: 'separator' },
+      { type: 'separator' },
       { 
         label: 'Open Mac in Air', 
         click: () => { 

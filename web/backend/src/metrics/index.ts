@@ -1,14 +1,8 @@
-//All metric definitions live here so every module imports from one place
-//instead of creating duplicate metrics that would cause registration errors.
-
 import client from 'prom-client'; 
 export const register = new client.Registry();
-
-// Attach default Node.js / process metrics (event-loop lag, heap, GC, etc.)
+ 
 client.collectDefaultMetrics({ register });
-
-// HTTP Metrics 
-
+ 
 // Total HTTP requests broken down by method, route, and status code.
 export const httpRequestsTotal = new client.Counter({
   name: 'http_requests_total',
@@ -67,29 +61,4 @@ export const serverErrorsTotal = new client.Counter({
   labelNames: ['type'] as const,
   registers: [register],
 });
-
-
-// Counter: total Socket.IO events received (inbound). 
-// export const wsEventsReceivedTotal = new client.Counter({
-//   name: 'ws_events_received_total',
-//   help: 'Total Socket.IO events received from clients',
-//   labelNames: ['event', 'role'] as const,
-//   registers: [register],
-// });
-
-// Counter: total Socket.IO events emitted (outbound). 
-// export const wsEventsEmittedTotal = new client.Counter({
-//   name: 'ws_events_emitted_total',
-//   help: 'Total Socket.IO events emitted to clients',
-//   labelNames: ['event', 'role'] as const,
-//   registers: [register],
-// });
  
-// Counter: pairing code requests. 
-// export const wsPairingRequestsTotal = new client.Counter({
-//   name: 'ws_pairing_requests_total',
-//   help: 'Total pairing code requests from desktop agents',
-//   registers: [register],
-// });
-
-   

@@ -73,14 +73,18 @@
           "arch": [
             "arm64"
           ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
         }
       ],
       "artifactName": "mac-in-air-${arch}.${ext}",
       "icon": "assets/icons/mac/icon.icns",
-      "hardenedRuntime": true,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
       "identity": null,
       "notarize": false,
       "protocols": {

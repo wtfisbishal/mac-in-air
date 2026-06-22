@@ -8,6 +8,7 @@ import {
   serverErrorsTotal,
   wsDisconnectionsTotal,
 } from '../metrics';
+import { loggerError } from '../logger';
 
 export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
@@ -65,6 +66,10 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         callback({ success: true, code });
       } catch (err: any) {
         serverErrorsTotal.inc({ type: 'pairing_error', });
+        loggerError('Error generating pairing code', {
+          error: err instanceof Error ? err.message : String(err),
+          deviceId,
+        });
         callback({ success: false, error: err.message });
       }
     }
@@ -77,6 +82,9 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
       try {
         if (!data?.frame) {
           serverErrorsTotal.inc({ type: 'invalid_screen_frame', });
+          loggerError('Received screen-frame event with missing frame data', {
+            deviceId: deviceManager.getDeviceBySocketId(socket.id)?.id,
+          });
           return;
         }
         // Track frame payload size
@@ -96,8 +104,12 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
       }
       catch (err) {
-        serverErrorsTotal.inc({ type: 'screen_frame_error', });
         console.error('[Desktop] screen-frame failed:', err);
+        serverErrorsTotal.inc({ type: 'screen_frame_error', });
+        loggerError('Error relaying screen-frame to frontends', {
+          error: err instanceof Error ? err.message : String(err),
+          deviceId: deviceManager.getDeviceBySocketId(socket.id)?.id,
+        });
       } 
     }
   );

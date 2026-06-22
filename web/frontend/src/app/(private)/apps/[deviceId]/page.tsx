@@ -41,7 +41,7 @@ export default function AppsPage({ params }: PageProps) {
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">Device not found</p>
-          <button onClick={() => router.push('/home')} className="btn btn-ghost mt-4 text-sm">
+          <button onClick={() => router.push('/home')} className="btn glass-button mt-4 text-sm">
             Back to Dashboard
           </button>
         </div>

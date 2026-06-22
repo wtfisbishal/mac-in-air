@@ -4,6 +4,7 @@ import { roomManager } from '../managers/rooms';
 import { pairTokenManager } from '../managers/pairTokens';
 import { CommandPayload } from '../types';
 import { wsWebRtcEventsTotal, wsConnectionsActive, serverErrorsTotal, wsDisconnectionsTotal } from '../metrics';
+import { loggerInfo, loggerError } from '../logger';
 
 type IceCandidatePayload = {
   candidate?: {
@@ -161,6 +162,8 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     }
 
     console.log(`[Frontend] Screen share requested for device ${deviceId}`);
+
+    loggerInfo(`[Frontend] Screen share requested for device ${deviceId}`);
   });
 
   // Screen Share Stop
@@ -188,6 +191,10 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     wsWebRtcEventsTotal.inc({ signal_type: 'offer', direction: 'frontend→desktop' });
 
     console.log(`[Backend] webrtc-offer received from frontend ${socket.id} to device ${data.deviceId}`);
+    loggerInfo(`[Backend] webrtc-offer received from frontend ${socket.id} to device ${data.deviceId}`, {
+      deviceId: data.deviceId,
+    });
+
     const device = deviceManager.getDevice(data.deviceId);
     if (!device?.isOnline) return;
     const desktopSocket = io.sockets.sockets.get(device.socketId);
@@ -213,6 +220,11 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     }
 
     console.log(`[Backend] webrtc-ice-candidate received from frontend ${socket.id}`);
+    loggerInfo(`[Backend] webrtc-ice-candidate received from frontend ${socket.id}`, {
+      deviceId: data.deviceId,
+    });
+
+    wsWebRtcEventsTotal.inc({ signal_type: 'ice_candidate', direction: 'frontend→desktop' });
 
     const device = deviceManager.getDevice(data.deviceId);
 
@@ -232,6 +244,10 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
 
   socket.on('webrtc-answer', (data: { sdp: unknown; deviceId: string }) => {
     console.log(`[Backend] webrtc-answer received from frontend ${socket.id}`);
+
+    loggerInfo(`[Backend] webrtc-answer received from frontend ${socket.id}`, {
+      deviceId: data.deviceId,
+    });
     const device = deviceManager.getDevice(data.deviceId);
     if (!device?.isOnline) return;
     const desktopSocket = io.sockets.sockets.get(device.socketId);
@@ -243,7 +259,10 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
   // disconnect
   socket.on('disconnect', (reason) => {
     console.log(`[Frontend] Disconnected: ${socket.id} (reason: ${reason})`);
-    // wsDisconnectionsTotal is already incremented in socket/index.ts
+
+    loggerError(`[Frontend] Disconnected: ${socket.id} (reason: ${reason})`, {
+      deviceId: roomManager.getDeviceForSocket(socket.id),
+    });
 
     wsDisconnectionsTotal.inc({ role: 'frontend', reason, });
 
@@ -296,6 +315,9 @@ function relayToDesktop(
 
   catch (e) {
     serverErrorsTotal.inc({ type: 'command_relay_error', });
-
+    loggerError('Error relaying command to desktop agent', {
+      error: e instanceof Error ? e.message : String(e),
+      deviceId: roomManager.getDeviceForSocket(socket.id),
+    });
   }
 }

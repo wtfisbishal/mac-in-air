@@ -1,0 +1,106 @@
+
+    .mac-keyboard-wrapper .hg-theme-default {
+        background: #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px 14px;
+        box-shadow:
+            0 1px 0 #a0a5ad,
+            0 4px 16px rgba(0,0,0,0.35),
+            inset 0 1px 0 rgba(255,255,255,0.5);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+        width: 100%;
+        max-width: 1200px;
+        user-select: none;
+    }
+
+
+    .mac-keyboard-wrapper .hg-row {
+        margin-bottom: 5px;
+        display: flex;
+        gap: 5px;
+    }
+    .mac-keyboard-wrapper .hg-row:last-child { margin-bottom: 0; }
+
+
+    .mac-keyboard-wrapper .hg-button {
+        background: #f3f4f6;
+        border: none;
+        border-radius: 6px;
+        box-shadow:
+            0 1px 0 #9ca3af,
+            0 2px 4px rgba(0,0,0,0.18);
+        color: #1f2937;
+        font-size: 12px;
+        font-weight: 500;
+        height: 40px;
+        min-width: 36px;
+        padding: 0 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.08s, box-shadow 0.08s, transform 0.06s;
+        flex: 1;
+    }
+
+
+    .mac-keyboard-wrapper .hg-button:hover {
+        background: #e9eaec;
+    }
+
+
+    .mac-keyboard-wrapper .hg-button:active,
+    .mac-keyboard-wrapper .hg-activeButton {
+        background: #bfcbdb !important;
+        box-shadow: 0 0 0 rgba(0,0,0,0) !important;
+        transform: translateY(1px);
+    }
+
+
+    .mac-keyboard-wrapper .hg-row:first-child .hg-button {
+        height: 30px;
+        font-size: 10px;
+        color: #6b7280;
+        background: #e5e7eb;
+    }
+
+
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{bksp}"]      { flex: 1.6; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{tab}"]        { flex: 1.5; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="\\\\"]          { flex: 1.2; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{capslock}"]   { flex: 1.8; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{enter}"]      { flex: 1.8; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{shiftleft}"]  { flex: 2.3; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{shiftright}"] { flex: 2.3; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{space}"]      { flex: 5; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{control}"]    { flex: 1.5; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{option}"]     { flex: 1.5; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{command}"]    { flex: 2; }
+
+
+    .mac-keyboard-wrapper .hg-row:first-child .hg-button[data-skbtn="{esc}"] {
+        flex: 1;
+    }
+
+
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{control}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{option}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{command}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{shiftleft}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{shiftright}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{capslock}"] {
+        background: #e5e7eb;
+        color: #374151;
+        font-size: 11px;
+    }
+
+
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{left}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{right}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{up}"],
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{down}"] {
+        flex: 0 0 36px;
+        min-width: 36px;
+        max-width: 36px;
+        font-size: 11px;
+    }

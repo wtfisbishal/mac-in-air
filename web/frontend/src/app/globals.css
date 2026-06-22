@@ -29,27 +29,7 @@ body {
 ::-webkit-scrollbar {
   width: 0px;
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, .25);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, .4);
-}
-
-.glass {
-  background: #2306c90a;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, .06);
-}
-
+ 
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -199,50 +179,7 @@ body {
   border: none;
 }
 
-.btn-primary {
-  background: linear-gradient(325deg, #3235f9, #5261fb);
-  color: #fff;
-  box-shadow: 0 2px 12px rgba(99, 102, 241, .25);
-}
-
-.btn-primary:hover {
-  opacity: .9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(99, 102, 241, .35);
-}
-
-.btn-primary:active {
-  transform: none;
-}
-
-.btn-primary:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn-ghost {
-  background: rgba(255, 255, 255, .04);
-  color: #94a3b8;
-  border: 1px solid rgba(255, 255, 255, .07);
-}
-
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, .07);
-  color: #e2e8f0;
-}
-
-.btn-danger {
-  background: rgba(239, 68, 68, .15);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, .2);
-}
-
-.btn-danger:hover {
-  background: rgba(239, 68, 68, .25);
-}
-
+ 
 .code-cell {
   border: 1.5px solid rgba(255, 255, 255, .1);
   outline: none;
@@ -297,6 +234,7 @@ body {
 }
 
 .glass-button-primary {
+  @apply rounded-full ;
   background: #0a84ffd9;
   backdrop-filter: blur(20px);
   background: linear-gradient(325deg, #3235f9, #0a84ffd9);
@@ -462,7 +400,11 @@ body {
    
   0% {
     opacity: 0;
-    transform:   scale(1.05);
+    transform:   scale(1.09);
+  }
+  50% {
+     
+    transform:   scale(0.99);
   }
   100% {
     opacity: 1;
@@ -471,7 +413,7 @@ body {
 }
 
 .animate-spotlight {
-  animation: spotlight 200ms ease-out ;
+  animation: spotlight 400ms ease-out ;
   transition: all ;
 
 }
@@ -480,7 +422,7 @@ body {
    
   0% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: scale(1.2);
     filter: blur(10px);
   }
   100% {
@@ -491,7 +433,7 @@ body {
 }
 
 .animate-logo {
-  animation: animate-logo 600ms ease-out ;
+  animation: animate-logo 700ms ease-out ;
   transition: all ;
 }
 
@@ -515,8 +457,7 @@ body {
  
 
 .hg-theme-default .hg-button {
-    
-    background: #949494 !important;
+    color: #949494 !important;
     
 }
 
@@ -524,3 +465,5 @@ body {
   background: #007aff !important;
   color: white !important;
 }
+
+

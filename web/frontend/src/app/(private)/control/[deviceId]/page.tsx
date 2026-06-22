@@ -8,20 +8,18 @@ import {
   Moon, Lock, Terminal, Globe, ArrowLeft,
   Maximize2, Minimize2, Link as Link2, ShieldAlert,
   NotepadText,
-  X,
-  Loader2,
+  X, Loader
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
-import MacKeyboards from '@/components/MacKeyBoards';
 import Image from 'next/image';
 import AppsIcons from '../../apps/_components/AppsIcons';
 import { useFullscreen } from '@/hooks/useFullscreen';
-import MyComponent from '@/components/NewKeyboard';
-
+import NormalKeyboard from '../_components/NormalKeyboard';
+ 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
@@ -38,7 +36,6 @@ const ACTIONS: Action[] = [
   { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
   { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
   { label: 'Notes', icon: NotepadText, type: 'OPEN_APP', payload: { app: 'Notes' } },
-  // { label: 'Lock', icon: Lock, type: 'LOCK_SCREEN' },
 ];
 export function normalizeKey(key: string) {
   switch (key.toLowerCase()) {
@@ -103,7 +100,7 @@ function ScreenCanvas({
     pcRef.current = pc;
 
     pc.ontrack = (event) => {
-      console.log('[WebRTC] Track received', event.streams[0]);
+
       if (videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
         setHasFrame(true);
@@ -130,7 +127,6 @@ function ScreenCanvas({
     };
 
     const handleOffer = async (data: { sdp: any; deviceId: string }) => {
-      console.log('[WebRTC] Received offer');
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
         const answer = await pc.createAnswer();
@@ -248,28 +244,6 @@ export default function ControlPage({ params }: PageProps) {
   const { fullscreen, setFullscreen } = useFullscreen();
 
 
-  const KEY_MAP: Record<string, string> = {
-    meta: "command",
-    cmd: "command",
-    command: "command",
-
-    control: "control",
-    ctrl: "control",
-
-    option: "alt",
-    alt: "alt",
-
-    return: "enter",
-    escape: "escape",
-    delete: "backspace",
-
-    " ": "space",
-    space: "space",
-    tab: "tab",
-  };
-
-
-
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
 
@@ -288,87 +262,6 @@ export default function ControlPage({ params }: PageProps) {
     socket.emit(type, data); // fire-and-forget for low latency
   }, [mouseCapture]);
 
-
-
-  const handleVirtualShortcut = useCallback(
-    (keyName: string, modifiers: string[]) => {
-      if (!kbCapture) return;
-
-      const socket = getSocket();
-      const mapped = KEY_MAP[keyName.toLowerCase()] ?? keyName.toLowerCase();
-
-      if (modifiers.length === 0 && mapped.length === 1) {
-        socket.emit("keyboard-type", { text: mapped });
-      } else {
-        socket.emit("keyboard-shortcut", {
-          key: mapped,
-          modifier: modifiers,
-        });
-      }
-    },
-    [kbCapture]
-  );
-
-  // const handlePhysicalKeyDown = useCallback(
-  //   (e: KeyboardEvent) => {
-  //     if (!kbCapture) return;
-  //     e.preventDefault();
-
-  //     const modifiers: string[] = [];
-  //     if (e.metaKey) modifiers.push('command');
-  //     if (e.ctrlKey) modifiers.push('control');
-  //     if (e.altKey) modifiers.push('alt');
-  //     if (e.shiftKey) modifiers.push('shift');
-
-  //     const socket = getSocket();
-
-  //     if (e.key.length === 1 && modifiers.length === 0) {
-  //       socket.emit('keyboard-type', { text: e.key });
-  //     } else {
-  //       const mappedKey = KEY_MAP[e.key.toLowerCase()] ?? e.key;
-  //       socket.emit('keyboard-shortcut', { key: mappedKey, modifier: modifiers });
-  //     }
-  //   },
-  //   [kbCapture]
-  // );
-
-  const handlePhysicalKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!kbCapture) return;
-
-      e.preventDefault();
-
-      const modifiers: string[] = [];
-
-      if (e.metaKey) modifiers.push("command");
-      if (e.ctrlKey) modifiers.push("control");
-      if (e.altKey) modifiers.push("alt");
-      if (e.shiftKey) modifiers.push("shift");
-
-      const mappedKey =
-        KEY_MAP[e.key.toLowerCase()] ?? e.key;
-
-      sendKeyToMac(mappedKey, modifiers);
-    },
-    [kbCapture]
-  );
-  const sendKeyToMac = (
-    key: string,
-    modifiers: string[] = []
-  ) => {
-    const socket = getSocket();
-
-    if (key.length === 1 && modifiers.length === 0) {
-      socket.emit("keyboard-type", {
-        text: key
-      });
-    } else {
-      socket.emit("keyboard-shortcut", {
-        key,
-        modifier: modifiers
-      });
-    }
-  };
 
   //   Screen share start/stop  
   const toggleStream = () => {
@@ -395,19 +288,23 @@ export default function ControlPage({ params }: PageProps) {
   const [visiblePanel, setVisiblePanel] = useState(false);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
+      if (e.altKey && e.code === "Space") {
         e.preventDefault();
         setVisiblePanel(prev => !prev);
       }
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+
+    window.addEventListener("keydown", handler);
+
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
   }, []);
 
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
-        <Loader2 className="animate-spin" size={32} />
+        <Loader className="animate-spin" size={32} />
       </div>
     </AppLayout>
   );
@@ -452,12 +349,11 @@ export default function ControlPage({ params }: PageProps) {
       <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : 'p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
+
+          <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
+            <X />
+          </div>
           <div className='animate-spotlight !transition-all !duration-700  max-md:py-5  max-md:p-0  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
-
-            <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
-              <X />
-            </div>
-
             <AppsIcons />
           </div>
         </div>}
@@ -466,7 +362,7 @@ export default function ControlPage({ params }: PageProps) {
         {!fullscreen && (
           <div className="flex items-center   max-md:-mt-1 justify-between mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
-              <button onClick={() => router.push('/home')} className="btn  !rounded-3xl  glass-panel-dark btn-ghost p-2">
+              <button onClick={() => router.push('/home')} className="btn  !rounded-3xl  glass-panel-dark  p-2">
                 <ArrowLeft size={16} />
               </button>
               <div>
@@ -481,7 +377,7 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl btn-ghost p-2">
+            <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl  p-2">
               <Maximize2 size={15} />
             </button>
           </div>
@@ -551,22 +447,22 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {/* Canvas */}
-            <div className="flex-1 w-full min-h-[450px] rounded-3xl overflow-hidden relative animate-fade-up delay-2">
+            <div className="flex-1 w-full min-h-[550px] max-md:h-fit rounded-3xl overflow-hidden relative animate-fade-up delay-2">
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} />
             </div>
 
-           {/* {kbCapture && (
-              <div className="animate-fade-up delay-4 min-h-[400px] w-full overflow-x-auto max-md:justify-start pb-4 flex justify-center">
-                 <MacKeyboards onVirtualShortcut={handleVirtualShortcut} onPhysicalKeyDown={handlePhysicalKeyDown} /> 
+          
 
-                <MyComponent  />
+            {kbCapture && (
+              <div className="animate-fade-up overflow-x-auto delay-4 min-h-[300px] w-full   pb-4  max-md:hidden flex justify-center">
+                <NormalKeyboard />
               </div>
-            )}*/}
+            )}
           </div>
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className="w-[220px] flex-shrink-0 pb-20 max-md:w-full flex flex-col gap-3 animate-fade-up delay-2">
+            <div className="w-[220px] flex-shrink-0 flex max-md:hidden pb-20 max-md:w-full flex-col gap-3 animate-fade-up delay-2">
 
               {/* Apps launcher */}
               <Link
@@ -576,12 +472,10 @@ export default function ControlPage({ params }: PageProps) {
               >
                 <Image src={'/apps.png'} height={35} width={35} alt='apps' />
                 <div>
-                  <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher (⌘J) </p>
+                  <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher  </p>
+                  <p className=' text-sm'>(⌥ + space)</p>
                 </div>
               </Link>
-
-
-
               {/*  shortcuts   */}
               <div className="glass-panel-dark rounded-3xl p-4">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
@@ -592,6 +486,8 @@ export default function ControlPage({ params }: PageProps) {
                     { label: 'Select All', key: 'a', mod: 'command' },
                     { label: 'Undo', key: 'z', mod: 'command' },
                     { label: 'Find', key: 'f', mod: 'command' },
+                    { label: 'Next Desktop', key: 'right', mod: 'control' },
+                    { label: 'Prev Desktop', key: 'left', mod: 'control' },
                     { label: 'Spotlight', key: 'space', mod: 'command' },
                   ].map(s => (
                     <button
@@ -601,10 +497,9 @@ export default function ControlPage({ params }: PageProps) {
                         socket.emit('keyboard-shortcut', { key: s.key, modifier: s.mod });
                         toast(`Sent: ${s.label}`, 'info');
                       }}
-                      className="w-full flex items-center justify-between px-3 py-1.5  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
+                      className="w-full flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
                     >
-                      <span className="text-xs text-slate-400 group-hover:text-slate-200">{s.label}</span>
-                      <kbd className="text-[9.5px] glass-panel-dark px-2 flex items-center justify-center gap-1 rounded-xl font-bold text-slate-100 mr-1"> <span className=' text-base'>⌘</span> {s.key.toUpperCase().slice(0, 1)}</kbd>
+                      <span className="text-xs text-slate-400   group-hover:text-slate-200">{s.label}</span>
                     </button>
                   ))}
                 </div>
@@ -635,8 +530,6 @@ export default function ControlPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
-
-
             </div>
           )}
         </div>
@@ -693,12 +586,11 @@ export default function ControlPage({ params }: PageProps) {
           )
         }
 
-         {kbCapture && (
-              <div className="animate-fade-up delay-4 min-h-[300px]   max-md:w-full max-md:px-5 max-md:overflow-x-auto mx-auto w-[80%] overflow-x-auto max-md:justify-start pb-4 flex justify-center">
-                
-                <MyComponent  />
+           {kbCapture && (
+              <div className="animate-fade-up hidden -mt-34 max-md:flex overflow-x-auto delay-4 min-h-[300px]  w-full  px-0   justify-start pb-4  ">
+                <NormalKeyboard />
               </div>
-            )}
+            )} 
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>

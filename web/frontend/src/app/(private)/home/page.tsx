@@ -59,7 +59,7 @@ function DeviceCard({ device }: { device: Device }) {
       <div className="flex gap-2">
         <Link
           href={`/control/${device.id}`}
-          className={`btn !rounded-full glass-button-primary flex-1 text-xs py-2 ${device.isOnline ? 'btn-primary' : 'btn-ghost opacity-40 pointer-events-none'}`}
+          className={`btn !rounded-full glass-button-primary flex-1 text-xs py-2 ${device.isOnline ? 'glass-button-primary' : 'glass-button opacity-40 pointer-events-none'}`}
         >
           <Zap size={13} /> Control
         </Link>

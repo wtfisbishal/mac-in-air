@@ -2,6 +2,7 @@ import { getSocket } from "@/lib/socket";
 import React, { useState, useRef, useEffect } from "react";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
+import "./key.css";
  
 const BROWSER_TO_ROBOT: Record<string, string> = {
     ArrowLeft: "left",   ArrowRight: "right",
@@ -14,11 +15,22 @@ const BROWSER_TO_ROBOT: Record<string, string> = {
     F1: "f1",  F2: "f2",  F3: "f3",  F4: "f4",
     F5: "f5",  F6: "f6",  F7: "f7",  F8: "f8",
     F9: "f9",  F10: "f10", F11: "f11", F12: "f12",
+
+    ".": ".",  ",": ",",  "/": "/",  ";": ";",
+    "'": "'",  "[": "[",  "]": "]",  "\\": "\\",
+    "-": "-",  "=": "=",  "`": "`",
+
+    ">": ".",  "<": ",",  "?": "/",  ":": ";",
+    "\"": "'", "{": "[",  "}": "]",  "|": "\\",
+    "_": "-",  "+": "=",  "~": "`",
+    "!": "1",  "@": "2",  "#": "3",  "$": "4",
+    "%": "5",  "^": "6",  "&": "7",  "*": "8",
+    "(": "9",  ")": "0",
 };
- 
+
 const VIRTUAL_TO_ROBOT: Record<string, string> = {
     "{enter}": "enter",   "{tab}": "tab",
-    "{bksp}": "backspace","{space}": "space",
+    "{bksp}": "backspace", "{space}": "space",
     "{left}": "left",     "{right}": "right",
     "{up}": "up",         "{down}": "down",
     "{esc}": "escape",
@@ -27,17 +39,17 @@ const VIRTUAL_TO_ROBOT: Record<string, string> = {
     "{f9}": "f9",  "{f10}": "f10","{f11}": "f11","{f12}": "f12",
 };
 
-/** Modifier-only keys — never emit as main key */
+
 const MODIFIER_KEYS = new Set(["Meta", "Control", "Alt", "Shift", "CapsLock", "OS"]);
 
-/** Non-printable keys that must always use keyboard-shortcut (keyTap), not keyboard-type */
+
 const NON_TYPE_KEYS = new Set([
     "space", "enter", "tab", "backspace", "escape", "delete",
     "left", "right", "up", "down", "home", "end", "pageup", "pagedown",
     "f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12",
 ]);
 
-/** Virtual modifier button → { internal mod name, button keys to highlight } */
+
 const VMOD_MAP: Record<string, { mod: string; vkeys: string[] }> = {
     "{command}":   { mod: "command", vkeys: ["{command}"]                    },
     "{control}":   { mod: "control", vkeys: ["{control}"]                    },
@@ -46,17 +58,20 @@ const VMOD_MAP: Record<string, { mod: string; vkeys: string[] }> = {
     "{shiftright}":{ mod: "shift",   vkeys: ["{shiftleft}", "{shiftright}"]  },
 };
 
-// ─── Layouts ──────────────────────────────────────────────────────────────────
-
 const LAYOUTS = {
     default: [
+
         "{esc} {f1} {f2} {f3} {f4} {f5} {f6} {f7} {f8} {f9} {f10} {f11} {f12}",
+
         "` 1 2 3 4 5 6 7 8 9 0 - = {bksp}",
+
         "{tab} q w e r t y u i o p [ ] \\",
+
         "{capslock} a s d f g h j k l ; ' {enter}",
+
         "{shiftleft} z x c v b n m , . / {shiftright}",
-        "{control} {option} {command} {space} {command} {option} {up}",
-        "                  {left} {down} {right}",
+
+        "{control} {option} {command} {space} {command} {option} {left} {up} {down} {right}",
     ],
     shift: [
         "{esc} {f1} {f2} {f3} {f4} {f5} {f6} {f7} {f8} {f9} {f10} {f11} {f12}",
@@ -64,8 +79,7 @@ const LAYOUTS = {
         "{tab} Q W E R T Y U I O P { } |",
         "{capslock} A S D F G H J K L : \" {enter}",
         "{shiftleft} Z X C V B N M < > ? {shiftright}",
-        "{control} {option} {command} {space} {command} {option} {up} ",
-        "        {left} {down} {right}",
+        "{control} {option} {command} {space} {command} {option} {left} {up} {down} {right}",
     ],
 };
 
@@ -75,7 +89,7 @@ const DISPLAY_MAP: Record<string, string> = {
     "{shiftright}":"⇧",       "{capslock}":  "⇪ Caps",
     "{tab}":       "⇥ Tab",  "{bksp}":      "⌫",
     "{enter}":     "↵",       "{space}":     "Space",
-    "{esc}":       "Esc",     "{empty}":      "",
+    "{esc}":       "Esc",
     "{left}":      "◀",       "{right}":     "▶",
     "{up}":        "▲",       "{down}":      "▼",
     "{f1}": "F1",  "{f2}": "F2",  "{f3}": "F3",  "{f4}": "F4",
@@ -90,7 +104,7 @@ const lastEmitAt = new Map<string, number>();
 function emitKey(key: string, modifiers: string[]) {
     const dedupKey = key + "|" + modifiers.sort().join("+");
     const now = Date.now();
-    if (now - (lastEmitAt.get(dedupKey) ?? 0) < DEDUP_MS) return; // drop duplicate
+    if (now - (lastEmitAt.get(dedupKey) ?? 0) < DEDUP_MS) return;
     lastEmitAt.set(dedupKey, now);
 
     const socket = getSocket();
@@ -102,51 +116,42 @@ function emitKey(key: string, modifiers: string[]) {
     }
 }
  
-export default function MyComponent() {
+export default function NormalKeyboard() {
     const keyboardRef = useRef<any>(null);
 
     useEffect(() => {
-        // Tracks currently held keys (by e.code) to guard against rare
-        // browser quirks where keydown fires twice for the same physical key.
         const heldKeys = new Set<string>();
 
         const onKeyDown = (e: KeyboardEvent) => {
-            // Block key-repeat events (holding a key) — robotjs has no use for them
             if (e.repeat) return;
-
-            // Prevent browser from consuming Tab (focus-cycle), Space (scroll),
-            // and Arrow keys (page scroll) while this keyboard is active.
             e.preventDefault();
 
-            // Modifier-only press: just highlight the key on-screen, don't emit
             if (MODIFIER_KEYS.has(e.key)) {
                 highlightModifiers(e);
                 return;
             }
 
-            // Deduplicate held keys (safety net on top of the dedup gate)
             const keyId = e.code || e.key;
             if (heldKeys.has(keyId)) return;
             heldKeys.add(keyId);
 
-            // Resolve modifiers from the native event (most accurate source)
             const modifiers: string[] = [];
             if (e.metaKey)  modifiers.push("command");
             if (e.ctrlKey)  modifiers.push("control");
             if (e.altKey)   modifiers.push("alt");
             if (e.shiftKey) modifiers.push("shift");
 
-            // Resolve robot key name
-            const robotKey = BROWSER_TO_ROBOT[e.key] ?? (e.key.length === 1 ? e.key : null);
+            
+            let robotKey = BROWSER_TO_ROBOT[e.key] ?? (e.key.length === 1 ? e.key : null);
+ 
             if (!robotKey) return;
 
-            emitKey(robotKey, modifiers); // ← single emit
+            emitKey(robotKey, modifiers);
             highlightModifiers(e);
         };
 
         const onKeyUp = (e: KeyboardEvent) => {
             heldKeys.delete(e.code || e.key);
-            // Remove modifier highlights as soon as each modifier is released
             if (!e.metaKey)  removeTheme("{command}");
             if (!e.altKey)   removeTheme("{option}");
             if (!e.ctrlKey)  removeTheme("{control}");
@@ -172,14 +177,14 @@ export default function MyComponent() {
     }, []);
 
     return (
-        // tabIndex={-1} ensures the wrapper div can receive focus but is not part
-        // of the Tab order — prevents Tab key from cycling focus into keyboard buttons
         <div
-            className="w-full max-md:w-[900px] h-full  max-md:overflow-x-auto   flex flex-col items-center gap-4"
+            className="w-full   max-md:w-[1000px] h-full "
             tabIndex={-1}
             style={{ outline: "none" }}
         >
             <VirtualKeyboard keyboardRef={keyboardRef} />
+ 
+             
         </div>
     );
 }
@@ -207,9 +212,11 @@ function VirtualKeyboard({ keyboardRef }: VirtualKeyboardProps) {
 
     const fireAndDisarm = (key: string) => {
         const modifiers = Array.from(stickyMods.current);
-        emitKey(key, modifiers); // ← single emit (dedup gate handles any race)
 
-        // Disarm all sticky modifiers
+        // If shift is a sticky modifier and we're pressing a shift-variant key
+        // (e.g. ">"), pass the base key + shift modifier so the remote receives it correctly
+        emitKey(key, modifiers);
+
         stickyMods.current.clear();
         Object.values(VMOD_MAP).forEach(({ vkeys }) =>
             vkeys.forEach(k => keyboardRef.current?.removeButtonTheme(k, "hg-activeButton"))
@@ -221,24 +228,29 @@ function VirtualKeyboard({ keyboardRef }: VirtualKeyboardProps) {
         // Modifier toggle (sticky)
         const vmod = VMOD_MAP[button];
         if (vmod) { armModifier(vmod.mod, vmod.vkeys); return; }
+
         // Inert buttons
-        if (button === "{capslock}" || button === "{empty}") return;
-        // Regular key
-        fireAndDisarm(VIRTUAL_TO_ROBOT[button] ?? button);
+        if (button === "{capslock}") return;
+
+        // Resolve to robot key name
+        // For shift-layout keys like > < ? etc., map to base key (. , / etc.)
+        let robotKey = VIRTUAL_TO_ROBOT[button] ?? button;
+
+        // Strip any remaining curly-brace wrappers for unknown tokens
+        if (robotKey.startsWith("{") && robotKey.endsWith("}")) return;
+
+        fireAndDisarm(robotKey);
     };
 
     return (
-        <Keyboard
-            keyboardRef={(r) => (keyboardRef.current = r)}
-            layout={LAYOUTS}
-            display={DISPLAY_MAP}
-            layoutName={layout}
-            onKeyPress={onKeyPress}
-            //  physicalKeyboardHighlight is intentionally REMOVED.
-            // That prop adds its own document.addEventListener("keydown") inside
-            // the library and in some builds calls onKeyPress() for physical keys,
-            // creating a second emit path and causing infinite loops for Tab/Space.
-            // We do our own highlighting in the useEffect above.
-        />
+        <div className="mac-keyboard-wrapper w-full flex justify-center">
+            <Keyboard
+                keyboardRef={(r) => (keyboardRef.current = r)}
+                layout={LAYOUTS}
+                display={DISPLAY_MAP}
+                layoutName={layout}
+                onKeyPress={onKeyPress}
+            />
+        </div>
     );
 }

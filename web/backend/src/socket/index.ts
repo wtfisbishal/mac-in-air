@@ -5,6 +5,7 @@ import { setupDesktopHandlers } from './desktop';
 import { setupFrontendHandlers } from './frontend';
 import { verifyToken } from '../middleware/auth';
 import { serverErrorsTotal, wsConnectionsActive, } from '../metrics';
+import { loggerInfo, loggerError } from '../logger';
 
 let io: SocketServer;
 
@@ -42,6 +43,9 @@ export function initSocket(httpServer: HttpServer): SocketServer {
           console.warn(`[Socket] Invalid token from ${socket.id}, disconnecting`);
           socket.disconnect(true);
           serverErrorsTotal.inc({ type: 'auth_error', });
+          loggerError(`[Socket] Invalid token from ${socket.id}, disconnecting`,{
+            deviceId: socket.handshake.query.deviceId,
+          });
           return;
         }
       }
@@ -55,6 +59,9 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     // });
 
     console.log(`[Socket] ${isDesktop ? 'Desktop' : 'Frontend'} connected: ${socket.id}`);
+    loggerInfo(`[Socket] ${isDesktop ? 'Desktop' : 'Frontend'} connected: ${socket.id}`, {
+      deviceId: socket.handshake.query.deviceId,
+    });
 
     if (isDesktop) {
       setupDesktopHandlers(io, socket);
@@ -69,6 +76,7 @@ export function initSocket(httpServer: HttpServer): SocketServer {
 export function getIo(): SocketServer {
   if (!io){ 
     serverErrorsTotal.inc({ type: 'Socket.IO not initialized ', });
+    loggerError('Socket.IO not initialized ');
     throw new Error('Socket.IO not initialized — call initSocket() first');
   }
   return io;

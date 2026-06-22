@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/useToast';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useDevice } from '@/hooks/useDevices';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 interface AppInfo {
   name: string;
@@ -46,15 +47,36 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
   const { toast } = useToast();
   const router = useRouter();
 
-  const { data: device, isLoading: deviceLoading } = useDevice(deviceId!);
+  const { data: device  } = useDevice(deviceId!);
 
-
-  const [apps, setApps] = useState<AppInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [opening, setOpening] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
+   const [search, setSearch] = useState('');
 
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const fetchApps = async () => {
+    const result = await sendCommand('LIST_APPS') as {
+      success: boolean;
+      data?: AppInfo[];
+      message?: string;
+    };
+
+    if (!result.success) {
+       toast('Could not reach desktop agent', result?.message);
+      return [];
+    }
+
+    return result.data ?? [];
+  };
+
+  const { data: apps = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ['apps', deviceId],
+    queryFn: fetchApps,
+    // enabled: !!deviceId
+    staleTime: Infinity,
+    gcTime: 24 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
+  });
 
 
   const sendCommand = useCallback(
@@ -68,24 +90,6 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
     []
   );
 
-  const loadApps = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await sendCommand('LIST_APPS') as { success: boolean; data?: AppInfo[]; message?: string };
-      if (result.success && Array.isArray(result.data)) {
-        setApps(result.data);
-      } else {
-        toast(result.message ?? 'Failed to list apps', 'error');
-      }
-    } catch {
-      toast('Could not reach desktop agent', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [sendCommand, toast]);
-
-  useEffect(() => { loadApps(); }, [loadApps]);
-
   // ⌘+K to focus search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -98,20 +102,24 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+ 
+  const openAppMutation = useMutation({
+    mutationFn: async (app: AppInfo) => {
+      const result = await sendCommand('OPEN_APP', {
+        app: app.name
+      });
+      return result;
+    },
 
-  const openApp = async (app: AppInfo) => {
-    setOpening(app.name);
-    try {
-      const result = await sendCommand('OPEN_APP', { app: app.name }) as { success: boolean; message?: string };
-      if (result.success) {
-        toast(`Opened ${app.name}`, 'success');
-      } else {
-        toast(result.message ?? `Failed to open ${app.name}`, 'error');
-      }
-    } finally {
-      setOpening(null);
+    onSuccess: (_, app) => {
+      toast(`Opened ${app.name}`, 'success');
+    },
+
+    onError: (err: Error) => {
+      toast(err.message, 'error');
     }
-  };
+  });
+
   const filtered = apps.filter(a =>
     a.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -120,7 +128,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
       {deviceId && device && <div className="flex items-center  justify-between mb-5 animate-fade-up">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="btn btn-ghost glass-panel-dark  !rounded-2xl !p-3">
+          <button onClick={() => router.back()} className="btn  glass-panel-dark  !rounded-2xl !p-3">
             <ArrowLeft size={16} />
           </button>
           <div>
@@ -137,9 +145,9 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
 
           <button
-            onClick={loadApps}
+            onClick={() => refetch()}
             disabled={loading}
-            className="btn btn-ghost glass-panel-dark  !rounded-3xl  p-2"
+            className="btn  glass-panel-dark  !rounded-3xl  p-2"
             title="Refresh app list"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -188,12 +196,11 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
         {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-10 mx-auto gap-3 animate-fade-in pb-4">
             {filtered.map((app) => {
-              const isOpening = opening === app.name;
-              return (
+               return (
                 <button
                   key={app.path}
-                  onClick={() => openApp(app)}
-                  disabled={isOpening}
+                  onClick={() => openAppMutation.mutate(app)}
+                  disabled={openAppMutation.isPending}
                   className="group flex  flex-col items-center gap-2.5 p-3 cursor-pointer rounded-2xl
                   active:scale-95 transition-all duration-150
                   disabled:opacity-60 disabled:cursor-wait"
@@ -201,7 +208,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
                   <div className="w-20 h-20 relative">
                     <AppIcon name={app.name} icon={app.icon} />
-                    {isOpening && (
+                    {openAppMutation.isPending && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
                         <Loader size={16} className="animate-spin text-white" />
                       </div>
