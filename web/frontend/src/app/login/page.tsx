@@ -42,7 +42,7 @@ export default function LoginPage() {
 
           <div className="flex flex-col items-center mb-8 animate-fade-up">
 
-            <img src="/logo.png" height={120} width={120} className=' object-fit' alt="" />
+            <img src="/logo.webp" height={120} width={120} className=' object-fit' alt="" />
 
             <h1 className="text-5xl  font-black tracking-tight leading-none mt-4">MAC in AIR</h1>
 

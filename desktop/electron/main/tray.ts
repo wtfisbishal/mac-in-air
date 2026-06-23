@@ -4,7 +4,7 @@ import * as path from 'path';
 let tray: Tray | null = null;
 
 export function createTray() {
-  const iconPath = path.join(app.getAppPath(), 'assets/icons/logo.png');
+  const iconPath = path.join(app.getAppPath(), 'assets/icons/logo.webp');
  
   try {
     const icon = nativeImage.createFromPath(iconPath).resize({ width: 19, height: 19 });

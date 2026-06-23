@@ -346,7 +346,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : 'p-5'}`}>
+      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
 
@@ -470,7 +470,7 @@ export default function ControlPage({ params }: PageProps) {
 
                 className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
-                <Image src={'/apps.png'} height={35} width={35} alt='apps' />
+                <Image src={'/apps.webp'} height={35} width={35} alt='apps' />
                 <div>
                   <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher  </p>
                   <p className=' text-sm'>(⌥ + space)</p>

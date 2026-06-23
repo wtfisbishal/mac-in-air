@@ -438,15 +438,52 @@ body {
 }
 
 .mac-bg-gradient{
-  background: #FAF5FA;
-      /* background: radial-gradient(145% 20% at 50% 100%, #111119 -3% 38%, #f5dacc 29%); */
-      background: radial-gradient(300% 165% at 50% 36.8%, #FAF5FA -3% 38%, #111119 29%);
+  background: #e4dfff;
+
+  /* background: radial-gradient(145% 20% at 50% 100%, #111119 -3% 38%, #f5dacc 29%); */
+  background: radial-gradient(300% 165% at 50% 36.8%, #e4dfff -3% 38%, #111119 29%);
+}
+
+.stream-s-gradient{
+  background: #e4dfff;
+  rotate: 8deg;
+ 
+ background: radial-gradient(337% 101% at -60% 100%,
+  #e4dfff 50% 45%,
+     #d5c8ff 54%,
+   #b89cff 58%,
+    #8b5cf6 70%,
+    #4c328a 68%,
+     #11111A 79%);
+
+     filter: blur(30px);
+ 
+} 
+.stream-e-gradient{
+  background: #e4dfff;
+  rotate: 185deg;
+ background: radial-gradient(340% 130% at 50% 100%, #e4dfff 50% 45%, #ccd2f5 58%, #6b8eff 68%, #111119 75%);
+ filter: blur(30px);
+ 
+ background: radial-gradient(
+    340% 130% at 50% 100%,
+    #e4dfff 0%,
+    #d5c8ff 35%,
+    #b89cff 55%,
+    #8b5cf6 70%,
+    #4c328a 85%,
+    #111119 100%
+  );
+} 
+  
+.stream-img-shadow{
+  box-shadow: -1px 0px 32px 13px #00000087 ;
 }
 
 @media screen and (max-width: 768px) {
   .mac-bg-gradient{
-  background: #FAF5FA;
-       background: radial-gradient(440% 165% at 50% 36.8%, #FAF5FA -3% 38%, #111119 29%);
+  background: #e4dfff;
+       background: radial-gradient(440% 165% at 50% 36.8%, #e4dfff -3% 38%, #111119 29%);
 }
 }
  

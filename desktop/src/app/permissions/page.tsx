@@ -110,7 +110,7 @@ export default function PermissionsPage() {
       </div>
 
           <div className=" pb-7 ">
-      <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.png" alt="" />
+      <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.webp" alt="" />
           </div>
     </div>
   );

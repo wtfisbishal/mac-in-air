@@ -186,7 +186,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
         {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Image src={'/apps.png'} className=' saturate-0 ' height={65} width={65} alt='apps' />
+            <Image src={'/apps.webp'} className=' saturate-0 ' height={65} width={65} alt='apps' />
             <p className="text-slate-400 text-sm font-medium">
               {search ? `No apps matching "${search}"` : ' No apps found '}
             </p>

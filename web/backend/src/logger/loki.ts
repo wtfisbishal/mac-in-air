@@ -31,8 +31,8 @@ export const logger = winston.createLogger({
       replaceTimestamp: true,
 
       onConnectionError: (err) => {
-        console.error("Loki error:", err);
-        return false; // Prevents the error from being thrown and crashing the application
+        // console.error("Loki error:", err);
+        return false;  
       }
     })
   ]

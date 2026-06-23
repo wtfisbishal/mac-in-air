@@ -31,7 +31,7 @@ export default function Sidebar() {
         <Link href="/home" className="flex flex-col items-center gap-3 group">
         
           <div className='  '>
-          <img src="/logo.png" height={90} width={90} className=' object-fit' alt="" />
+          <img src="/logo.webp" height={90} width={90} className=' object-fit' alt="" />
 
           </div>
           <div className="leading-none">

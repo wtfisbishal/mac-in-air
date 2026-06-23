@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
 import { features, macApps, useScrollReveal } from "@/lib/utils";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
- 
+
 
 export default function Home() {
   const [time, setTime] = useState("");
@@ -55,18 +55,17 @@ export default function Home() {
     <>
       <div className=" relative min-h-screen overflow-x-hidden">
 
-      <div className=" bg- mac-bg-gradient">
-        <MacbookScroll
-        src={`/bg2.png`}
-        showGradient={false}
-        />
+        <div className=" bg- mac-bg-gradient">
+          <MacbookScroll
+            src={`/bg2.webp`} 
+          />
         </div>
-      
+
 
         {/* Menu Bar */}
 
-        <nav className="  fixed top-0 !text-white bg-[#111119] z-[100] backdrop-blur-[4px] left-0 right-0  h-8 flex items-center justify-between px-5">
-          <div className="flex items-center gap-5 text-[11px] font-medium  ">
+        <nav className="  fixed top-0 !text-white bg-[#111119] z-[100] backdrop-blur-[4px] left-0 right-0  h-8 flex items-center justify-between max-md:px-3 px-5">
+          <div className="flex items-center gap-5 text-[11px] max-md:gap-2 font-medium  ">
             <span className="text-lg"></span>
             <span className="font-semibold">MAC in AIR</span>
             <span className=" hidden sm:inline">File</span>
@@ -74,30 +73,14 @@ export default function Home() {
             <span className=" hidden sm:inline">Window</span>
             <span className=" hidden sm:inline">Help</span>
           </div>
-          <div className="flex justify-center items-center !gap-4 text-[13px] text-gray-100">
-            <p className=" flex justify-center items-center !gap-4"><Battery size={15} /> <Wifi size={15} /> <Search size={15} />   </p>
+          <div className="flex justify-center items-center max-md:gap-2  gap-4 text-[13px] text-gray-100">
+            <p className=" flex justify-center items-center max-md:gap-3 gap-4"><Battery size={15} /> <Wifi size={15} /> <Search size={15} />   </p>
             <p className="text-xs  tabular-nums">{time}</p>
           </div>
         </nav>
 
         {/* Hero  */}
         <section className="min-h-screen  flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
-
-        
-          {/* <img src="/logo.png" className=" mt-20 mb-5 h-[100px]" alt="" />
-          <div className="text-center z-10 px-4">
-            <p className="text-xs   font-semibold tracking-[0.2em] text-gray-100 uppercase mb-4">
-              Your Mac · Anywhere
-            </p>
-            <h1 className="text-6xl  animate-logo transition-all !duration-700 sm:text-8xl font-black logo-text text-clip text-transparent  bg-clip-text tracking-tight leading-none mb-4"
-              style={{ letterSpacing: "-0.03em" }}>
-              <span className=" text-white pb-3 !mb-5">   </span> MAC in AIR
-            </h1>
-            <p className=" text- text-gray-100 font-light max-w-xl max-md:text-sm mx-auto mt-4 leading-relaxed">
-              Full Mac control from any browser. Stream your screen, move the mouse,
-              type, open apps — everything, from anywhere.
-            </p>
-          </div> */}
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-16 z-10">
             <Link href="/home"
@@ -110,16 +93,8 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Version badge */}
-          {/* <div className="mt-6 z-10">
-            <span className=" glass-panel-dark rounded-full px-3 py-1 text-[11px] text-gray-400 font-medium">
-              macOS 13+ · Free during beta
-            </span>
-          </div> */}
-
-
-          <div className=" mt-10   py-20  w-full">
-
+          <div className=" mt-10  py-20  w-full">
+            <p className="text-xs font-semibold tracking-[0.2em] text-center text-gray-400 uppercase mb-3">Control fully Keyboard and Mouse </p>
             <MacKeyBoard
               className="w-fit  drop-shadow-[#9b9b9b75] drop-shadow-2xl "
             />
@@ -154,7 +129,7 @@ export default function Home() {
         {/* ── How it works ── */}
 
 
-        <section className="py-20 px-4">
+        <section className="py-20 px-4  z-10 relative   ">
 
           <div className=" w-[80%] max-md:w-[97%] mx-auto">
             <div className="text-center mb-14 scroll-fade-in">
@@ -166,8 +141,8 @@ export default function Home() {
               </h2>
 
             </div>
-            <div className="glass-panel-dark drop-shadow-[#9b9b9b57] drop-shadow-2xl rounded-4xl p-8 sm:p-12 relative overflow-hidden scroll-fade-in">
-              <div className="flex absolute top-6 left-8 items-center gap-2 mb-5">
+            <div className="glass-panel-dark drop-shadow-[#9b9b9b57] drop-shadow-2xl rounded-4xl p-6 sm:p-12 relative overflow-hidden scroll-fade-in">
+              <div className="flex absolute top-6 left-8 max-md:left-5 items-center gap-2 mb-5">
                 <span className="traffic-light" style={{ background: "#FF5F57" }} />
                 <span className="traffic-light" style={{ background: "#FFBD2E" }} />
                 <span className="traffic-light" style={{ background: "#28C840" }} />
@@ -242,6 +217,37 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+
+
+
+        <section className="flex  relative flex-col max-md:h-[60vh] h-screen justify-center items-center stream-s-g radient text-[#2a2a4a] bg-[#e4dfff]">
+          
+
+          <div className="stream-s-gradient absolute w-[200%] h-[49%] -top-40  b order border-black ">
+          </div>
+          <div className="stream-e-gradient absolute w-[200%] h-[67%]  b order border-black -bottom-32 max-md:-bottom-36 "></div>
+
+          <div className="text-center max-md:-mt-14 scroll-fade-in">
+
+            <p className="text-xs font-semibold tracking-[0.2em] text-[#2a2a4a] uppercase mb-3">Streaming</p>
+
+            <div className="text-4xl font-bold text-[#8b5cf6] tracking-tight"style={{ letterSpacing: "-0.025em" }}>
+              <h2> Go live instantly.{" "}</h2>
+              <p className="text- text-[#2a2a4a] font-light"> Just one click away.</p>
+            </div>
+
+            <p className="text-[15px] text-gray-500 mt-3 max-w-md mx-auto">
+              Stream in smooth, high-quality video at up to 60 FPS.
+            </p>
+          </div>
+
+          <div className="w-full max-md:w-[90%] mx-auto mt-7 flex justify-center items-center">
+            <Image loading="eager" className=" z-[2]  stream-img-shadow rounded-4xl max-md:rounded-3xl animate-spotlight  " src="/stream.webp" alt="" height={400} width={1000} />
+          </div>
+        </section>
+
+ 
 
         {/* Apps */}
         <section className="py-20 px-4 sm:px-8 max-w-6xl mx-auto  ">
@@ -329,7 +335,7 @@ export default function Home() {
                 <div className=" h-1 w-1 bg-green-500 ml-10 rounded-full"></div>
               </div>
               <Image
-                src="/desk.png"
+                src="/desk.webp"
                 alt="Desktop"
                 fill
                 className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "

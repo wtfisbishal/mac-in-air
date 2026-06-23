@@ -26,15 +26,10 @@ import { IconCaretDownFilled } from "@tabler/icons-react";
 
 
 export const MacbookScroll = ({
-  src,
-  showGradient,
-  title,
-  badge,
+  src
 }: {
   src?: string;
-  showGradient?: boolean;
-  title?: string | React.ReactNode;
-  badge?: React.ReactNode;
+  
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -60,7 +55,7 @@ export const MacbookScroll = ({
     [0, 0.3],
     [0.6, isMobile ? 1 : 1.5],
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0,  isMobile ? 1200 : 1400]);
+  const translate = useTransform(scrollYProgress, [0, 1], [0,  isMobile ? 1100 : 1000]);
   const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -103,10 +98,8 @@ export const MacbookScroll = ({
         </div>
         <Trackpad />
         <div className="absolute inset-x-0 bottom-0 mx-auto h-2 w-20 rounded-tl-3xl rounded-tr-3xl bg-gradient-to-t from-[#272729] to-[#050505]" />
-        {showGradient && (
-          <div className="absolute inset-x-0 bottom-0 z-50 h-40 w-full bg-gradient-to-t from-white via-white to-transparent dark:from-black dark:via-black"></div>
-        )}
-        {badge && <div className="absolute bottom-4 left-4">{badge}</div>}
+        
+         
       </div>
     </div>
   );
@@ -567,7 +560,7 @@ export const KBtn = ({
       >
         <div
           className={cn(
-            "flex w-full flex-col items-center justify-center !text-[1px] text-neutral-200",
+            "flex w-full flex-col items-center justify-center max-md:text-[6px] text-[5px] text-neutral-200",
             childrenClassName,
             backlit && "text-white",
           )}
@@ -586,7 +579,7 @@ export const SpeakerGrid = () => {
       style={{
         backgroundImage:
           "radial-gradient(circle, #08080A 0.5px, transparent 0.5px)",
-        backgroundSize: "3px 3px",
+          backgroundSize: "3px 3px",
       }}
     ></div>
   );

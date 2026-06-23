@@ -40,7 +40,7 @@ export default function Home() {
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="Mac In air"
             className="relative w-24 h-24 object-contain drop-shadow-2xl"
           />
