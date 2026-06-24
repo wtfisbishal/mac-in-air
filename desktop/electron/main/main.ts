@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, net } from 'electron';
+import { app, BrowserWindow, protocol, net, session, desktopCapturer } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { pathToFileURL } from 'url';
@@ -68,6 +68,23 @@ app.whenReady().then(() => {
   console.log(
     'PowerSaveBlocker started:',
     powerSaveBlocker.isStarted(blockerId)
+  );
+
+  // ── System audio loopback via the modern Electron display-media API ──────────
+  // This handler intercepts navigator.mediaDevices.getDisplayMedia() calls from
+  // the renderer and grants access to the first screen source + system audio.
+  // 'loopback' = capture what is currently playing through the Mac's speakers.
+  session.defaultSession.setDisplayMediaRequestHandler(
+    async (_request, callback) => {
+      try {
+        const sources = await desktopCapturer.getSources({ types: ['screen'] });
+        callback({ video: sources[0], audio: 'loopback' });
+      } catch (err) {
+        console.error('[Main] setDisplayMediaRequestHandler error:', err);
+        callback({});
+      }
+    },
+    { useSystemPicker: false }
   );
 
   setupIpc();

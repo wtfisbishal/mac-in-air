@@ -1,16 +1,13 @@
 
     .mac-keyboard-wrapper .hg-theme-default {
-        background: #d1d5db;
-        border-radius: 14px;
-        padding: 12px 14px 14px;
-        box-shadow:
-            0 1px 0 #a0a5ad,
-            0 4px 16px rgba(0,0,0,0.35),
-            inset 0 1px 0 rgba(255,255,255,0.5);
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-        width: 100%;
-        max-width: 1200px;
-        user-select: none;
+        
+    background: #eeeeee;
+    border-radius: 20px;
+    /* width: 100%; */
+     width: 1200px;
+    padding: 12px 14px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, SF Pro Text, Helvetica Neue, sans-serif;
+    box-shadow: 0px 1px 4px #9ca3af1f, -1px 3px 4px #00000021;
     }
 
 
@@ -25,15 +22,15 @@
     .mac-keyboard-wrapper .hg-button {
         background: #f3f4f6;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         box-shadow:
             0 1px 0 #9ca3af,
             0 2px 4px rgba(0,0,0,0.18);
         color: #1f2937;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 500;
-        height: 40px;
-        min-width: 36px;
+        height: 62px;
+        width: 62px;
         padding: 0 6px;
         display: flex;
         align-items: center;
@@ -66,7 +63,7 @@
 
 
     .mac-keyboard-wrapper .hg-button[data-skbtn="{bksp}"]      { flex: 1.6; }
-    .mac-keyboard-wrapper .hg-button[data-skbtn="{tab}"]        { flex: 1.5; }
+    .mac-keyboard-wrapper .hg-button[data-skbtn="{tab}"]        { flex: 1.5;  font-size: 12px; }
     .mac-keyboard-wrapper .hg-button[data-skbtn="\\\\"]          { flex: 1.2; }
     .mac-keyboard-wrapper .hg-button[data-skbtn="{capslock}"]   { flex: 1.8; }
     .mac-keyboard-wrapper .hg-button[data-skbtn="{enter}"]      { flex: 1.8; }

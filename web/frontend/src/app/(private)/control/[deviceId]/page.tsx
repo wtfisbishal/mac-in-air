@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   MonitorOff, Keyboard, MousePointer2, Power,
-  Moon, Lock, ArrowLeft,Maximize2, Minimize2,
-  Link as Link2, ShieldAlert,X, Loader
+  Moon, Lock, ArrowLeft, Maximize2, Minimize2,
+  Link as Link2, ShieldAlert, X, Loader
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -20,11 +20,11 @@ import NormalKeyboard from '../_components/NormalKeyboard';
 import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
- 
+
 interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
- 
+
 export default function ControlPage({ params }: PageProps) {
   const { deviceId } = use(params);
   const router = useRouter();
@@ -169,7 +169,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
+      <div className={` flex w-full relative flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
 
@@ -207,7 +207,7 @@ export default function ControlPage({ params }: PageProps) {
         )}
 
         {/*   Main area */}
-        <div className={`flex max-md:flex-col gap-4 flex-1 min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' :' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
@@ -274,11 +274,11 @@ export default function ControlPage({ params }: PageProps) {
               <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} mouseCapture={mouseCapture} />
             </div> 
 
-            {kbCapture && (
+            {/* {kbCapture && (
               <div className="animate-fade-up overflow-x-auto delay-4 min-h-[300px] w-full   pb-4  max-md:hidden flex justify-center">
                 <NormalKeyboard />
               </div>
-            )}
+            )} */}
           </div>
 
           {/*  Side panel */}
@@ -407,11 +407,11 @@ export default function ControlPage({ params }: PageProps) {
           )
         }
 
-           {kbCapture && (
-              <div className="animate-fade-up hidden -mt-34 max-md:flex overflow-x-auto delay-4 min-h-[300px]  w-full  px-0   justify-start pb-4  ">
-                <NormalKeyboard />
-              </div>
-            )} 
+        {kbCapture && (
+          <div className=" items-start center absolute max-md:bg-gradient-to-t  from-[#1C0B53] to-[#503993]  bottom-10 rounded-2xl animate-fade-up  flex overflow-x-auto   min-h-[350px] left-2 max-md:left-0 w-full  max-md: pb-4 p-4  justify-start   ">
+            <NormalKeyboard />
+          </div>
+        )}
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>

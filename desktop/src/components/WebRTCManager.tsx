@@ -17,18 +17,47 @@ export default function WebRTCManager() {
         // Stop any existing session
         stopWebRTC();
 
-        // Get the screen media stream natively via Chromium
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: sourceId,
-              minFrameRate: 15,
-              maxFrameRate: 30,
-            }
-          } as any
-        });
+        // ── Capture screen + system audio ──────────────────────────────────
+        // The main process registers a setDisplayMediaRequestHandler that:
+        //   1. Picks the first screen source for video
+        //   2. Provides 'loopback' system audio (macOS CoreAudio tap)
+        //
+        // getDisplayMedia() is intercepted by that handler so we don't need
+        // to pass the chromeMediaSource / sourceId manually here.
+        // We still try getUserMedia as a fallback in case getDisplayMedia fails.
+        let stream: MediaStream;
+        try {
+          stream = await navigator.mediaDevices.getDisplayMedia({
+            audio: true,   // system loopback audio — provided by the main-process handler
+            video: {
+              frameRate: { ideal: 30, max: 30 },
+            } as any,
+          });
+
+          const audioTracks = stream.getAudioTracks();
+          const videoTracks = stream.getVideoTracks();
+          console.log(
+            `[WebRTCManager] getDisplayMedia OK — video: ${videoTracks.length}, audio: ${audioTracks.length}`,
+            audioTracks.map(t => t.label)
+          );
+        } catch (displayMediaErr) {
+          // Fallback: video-only via getUserMedia with the desktop source id
+          console.warn(
+            '[WebRTCManager] getDisplayMedia failed, falling back to getUserMedia (video only):',
+            displayMediaErr
+          );
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                chromeMediaSourceId: sourceId,
+                minFrameRate: 15,
+                maxFrameRate: 30,
+              },
+            } as any,
+          });
+        }
 
         localStreamRef.current = stream;
 
@@ -41,7 +70,7 @@ export default function WebRTCManager() {
 
         peerConnectionRef.current = pc;
 
-        // Add tracks
+        // Add all tracks (video + audio if available)
         stream.getTracks().forEach(track => {
           pc.addTrack(track, stream);
         });

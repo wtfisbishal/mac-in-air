@@ -1,6 +1,6 @@
 'use client';
 import { getSocket } from "@/lib/socket";
-import { MonitorOff } from "lucide-react";
+import { MonitorOff, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function ScreenCanvas({
@@ -17,6 +17,9 @@ export default function ScreenCanvas({
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const [hasFrame, setHasFrame] = useState(false);
   const [dimLabel, setDimLabel] = useState('');
+  const [hasAudio, setHasAudio] = useState(false);
+  // Start muted — browsers block autoplay with audio until the user interacts
+  const [isMuted, setIsMuted] = useState(true);
   const screenSize = useRef({ w: 1920, h: 1080 }); // actual Mac screen size from frames
 
   useEffect(() => {
@@ -42,22 +45,27 @@ export default function ScreenCanvas({
     pcRef.current = pc;
 
     pc.ontrack = (event) => {
-
       if (videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
         setHasFrame(true);
 
-        const track = event.streams[0].getVideoTracks()[0];
-        if (track) {
-          const settings = track.getSettings();
+        const videoTrack = event.streams[0].getVideoTracks()[0];
+        if (videoTrack) {
+          const settings = videoTrack.getSettings();
           if (settings.width && settings.height) {
             screenSize.current = { w: settings.width, h: settings.height };
             setDimLabel(`${settings.width} × ${settings.height}`);
           }
         }
+
+        // Detect if an audio track is present in the incoming stream
+        const audioTracks = event.streams[0].getAudioTracks();
+        if (audioTracks.length > 0) {
+          console.log('[ScreenCanvas] Audio track received:', audioTracks[0].label);
+          setHasAudio(true);
+        }
       }
     };
-
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
@@ -109,6 +117,17 @@ export default function ScreenCanvas({
     };
   }, [deviceId, pairToken]);
 
+  // Sync muted state imperatively to the <video> element.
+  // We can't use the `muted` JSX prop for this because React ignores
+  // runtime changes to it — we must set the DOM property directly.
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const toggleMute = () => setIsMuted(prev => !prev);
+
   // Scale mouse coordinates from canvas display size to actual screen size
   const toScreenCoords = (e: React.MouseEvent<HTMLDivElement>) => {
     const wrap = wrapRef.current;
@@ -125,7 +144,7 @@ export default function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className="relative w-full bg-black min-h-[600px]   flex items-center justify-center   pb-5 rounded-3xl overflow-hidden"
+      className="relative w-full bg-black min-h-[600px] flex items-center justify-center pb-5 rounded-3xl overflow-hidden"
       style={{ aspectRatio: '16/9', cursor: 'none' }}
       onMouseMove={e => onMouseEvent('mouse-move', toScreenCoords(e))}
       onClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left' })}
@@ -133,23 +152,56 @@ export default function ScreenCanvas({
       onDoubleClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left', doubleClick: true })}
       onWheel={e => onMouseEvent('mouse-scroll', { x: Math.round(e.deltaX), y: Math.round(e.deltaY) })}
     >
+      {/*
+        Video element — starts muted (required by browser autoplay policy).
+        Mute state is controlled imperatively via the useEffect above,
+        not via the `muted` JSX prop which React freezes after first render.
+      */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="w-full h-full object-contain   pointer-events-none"
+        className="w-full h-full object-contain pointer-events-none"
       />
 
-
+      {/* No-stream placeholder */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         {!hasFrame && (
           <div className="text-center">
             <MonitorOff size={48} className="text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm font-medium">Start screen streamming</p>
+            <p className="text-slate-500 text-sm font-medium">Start screen streaming</p>
           </div>
         )}
       </div>
+
+      {/*
+        Audio toggle button — only rendered when the desktop sent an audio track.
+        Requires a real user click so browsers allow unmuting past the autoplay policy.
+      */}
+      {hasFrame && hasAudio && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // don't fire mouse-click on the canvas
+            toggleMute();
+          }}
+          style={{ cursor: 'pointer' }}
+          className="pointer-events-auto absolute bottom-10 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-black/80 transition-all"
+          title={isMuted ? 'Unmute audio' : 'Mute audio'}
+        >
+          {isMuted ? (
+            <>
+              <VolumeX size={13} className="text-slate-400" />
+              <span>Muted</span>
+            </>
+          ) : (
+            <>
+              <Volume2 size={13} className="text-emerald-400" />
+              <span className="text-emerald-400">Audio On</span>
+            </>
+          )}
+        </button>
+      )}
 
       {/* Resolution badge */}
       {hasFrame && dimLabel && (

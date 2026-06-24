@@ -178,9 +178,9 @@ export default function NormalKeyboard() {
 
     return (
         <div
-            className="w-full   max-md:w-[1000px] h-full "
+            className="w-  max-md:w-[1000px] h-full "
             tabIndex={-1}
-            style={{ outline: "none" }}
+             
         >
             <VirtualKeyboard keyboardRef={keyboardRef} />
  
