@@ -200,7 +200,6 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     const desktopSocket = io.sockets.sockets.get(device.socketId);
     if (desktopSocket) {
       desktopSocket?.emit('webrtc-offer', { ...data, fromSocketId: socket.id });
-
     }
   }); 
 

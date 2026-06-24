@@ -28,7 +28,7 @@ export interface CommandResult {
 
 export interface ElectronAPI {
   ping: () => string;
-  getDesktopSources: () => Promise<DesktopSource[]>;
+  // getDesktopSources: () => Promise<DesktopSource[]>;
   getMediaAccessStatus: () => Promise<string>;
   checkAccessibility: () => Promise<boolean>;
   requestAccessibility: () => Promise<boolean>;

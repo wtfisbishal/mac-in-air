@@ -24,7 +24,6 @@ export class SocketService {
 
   private reconnectWatchdog: ReturnType<typeof setInterval> | null = null;
 
-
   public get isConnected(): boolean {
     return this._isConnected;
   }
@@ -33,8 +32,8 @@ export class SocketService {
     if (url) this.backendUrl = url;
 
     this.socket = io(this.backendUrl, {
-      // Start with polling (works everywhere incl. Render), then upgrade to WS
-      transports: ['websocket','polling'],
+      // Start with polling (works everywhere including Render), then upgrade to WS
+      transports: ['websocket', 'polling'],
       // Reconnection — retry forever so the desktop auto-recovers from Render sleep
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -59,10 +58,7 @@ export class SocketService {
           arch: process.arch,
           user: require('os').userInfo().username,
         },
-        () => {
-          // device-online acknowledged — safe to request pairing code
-          // this.requestPairingCode();
-        }
+        () => {}
       );
     };
 
@@ -79,7 +75,7 @@ export class SocketService {
 
     this.socket.on('connect', () => {
       this._isConnected = true;
-      this.pairingCode = null; // reset so reconnects always fetch a fresh code
+      this.pairingCode = null; // reset to get always a fresh code
       logInfo('SocketService', 'Connected to backend', { id: this.socket?.id });
       announceDevice();
       startKeepAlive();
@@ -94,7 +90,7 @@ export class SocketService {
       );
     });
 
-   
+
     this.socket.on('disconnect', (reason) => {
       this._isConnected = false;
 
@@ -106,7 +102,7 @@ export class SocketService {
         }, 1000);
       }
 
-       logInfo('SocketService', 'Screen share stopped by disconnecting ',  );
+      logInfo('SocketService', 'Screen share stopped by disconnecting ',);
       screenService.stopScreenShare();
     });
 
@@ -130,8 +126,7 @@ export class SocketService {
     this.socket.on('command', async (payload: CommandPayload, callback?: (result: any) => void) => {
       logInfo('SocketService', 'Received command', payload);
       const result = await commandService.handleCommand(payload);
-      // logInfo('SocketService', 'Command result', result);
-
+       
       // Send result back to backend
       if (callback) {
         callback(result);
@@ -181,7 +176,7 @@ export class SocketService {
     this.socket.on('screen-share-stop', (data) => {
       logInfo('SocketService', 'Screen share stopped', { sessionId: data.sessionId });
       screenService.stopScreenShare();
-      
+
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
     });
@@ -196,7 +191,7 @@ export class SocketService {
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'answer', ...data });
     });
-//After Offer/Answer exchange, peers still need to discover network paths.
+    //After Offer/Answer exchange, peers still need to discover network paths.
     this.socket.on('webrtc-ice-candidate', (data) => {
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'ice-candidate', ...data });
@@ -204,16 +199,16 @@ export class SocketService {
   }
 
   private startReconnectWatchdog() {
-  if (this.reconnectWatchdog) return;
+    if (this.reconnectWatchdog) return;
 
-  this.reconnectWatchdog = setInterval(() => {
-    if (this.socket && !this.socket.connected) {
-      console.log('[SocketService] forcing reconnect');
-      this.socket.connect();
-    }
-  }, 30000);
-}
- 
+    this.reconnectWatchdog = setInterval(() => {
+      if (this.socket && !this.socket.connected) {
+        console.log('[SocketService] forcing reconnect');
+        this.socket.connect();
+      }
+    }, 30000);
+  }
+
   public async getPairingCode(): Promise<string | null> {
     // If we already have a code cached, return it immediately
     if (this.pairingCode) {
@@ -260,7 +255,7 @@ export class SocketService {
   }
 
   public async refreshPairingCode(): Promise<string | null> {
- 
+
     if (!this.socket) return null;
 
     if (!this.socket.connected) {
@@ -308,7 +303,7 @@ export class SocketService {
       this.stopKeepAlive();
       this.socket.disconnect();
       this._isConnected = false;
-      
+
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
     }

@@ -1,20 +1,22 @@
 import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron';
 import * as path from 'path';
  
+
 let tray: Tray | null = null;
 
 export function createTray() {
-  const iconPath = path.join(app.getAppPath(), 'assets/icons/logo.webp');
- 
+  // Define possible paths for the icon to support both development and packaged apps
+  const iconPath = path.join(app.getAppPath(), 'assets/icons/logo.png');
+
   try {
     const icon = nativeImage.createFromPath(iconPath).resize({ width: 19, height: 19 });
-    tray = new Tray(icon); 
-    
+    tray = new Tray(icon);
+   
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: 'MAC in AIR', 
+        label: 'MAC in AIR',
         enabled: false,
-        icon: icon
+        // icon: icon
       },
       // { 
       //   label: `${ conntected ?'Conntected to server':'Disconntected '}`, 
@@ -22,16 +24,16 @@ export function createTray() {
       //   enabled: false,
       //  },
       { type: 'separator' },
-      { 
-        label: 'Open Mac in Air', 
-        click: () => { 
+      {
+        label: 'Open Mac in Air',
+        click: () => {
           const mainWindow = BrowserWindow.getAllWindows()[0];
           if (mainWindow) {
             mainWindow.show();
             mainWindow.focus();
           }
         },
-       }, 
+      },
       { type: 'separator' },
       {
         label: 'Open at Login',
@@ -52,15 +54,15 @@ export function createTray() {
         }
       },
       { type: 'separator' },
-      { 
-        label: 'Restart app', 
+      {
+        label: 'Restart app',
         click: () => { app.relaunch(); app.exit(0); },
-       },
-      { 
-        label: 'Quit', 
+      },
+      {
+        label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
         click: () => { app.quit(); },
-       }
+      }
     ]);
 
     tray.setToolTip('MAC in AIR');

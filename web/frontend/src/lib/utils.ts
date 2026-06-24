@@ -3,7 +3,8 @@
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useEffect } from "react";
-
+import { Terminal, Globe ,NotepadText,} from 'lucide-react';
+import { Action } from "@/types";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -72,3 +73,10 @@ export function useScrollReveal() {
     return () => obs.disconnect();
   }, []);
 }
+ 
+
+export const ACTIONS: Action[] = [
+  { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
+  { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
+  { label: 'Notes', icon: NotepadText, type: 'OPEN_APP', payload: { app: 'Notes' } },
+];

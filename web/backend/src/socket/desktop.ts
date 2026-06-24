@@ -195,19 +195,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         io.to(device.id).emit('device-disconnected', { deviceId: device.id });
         wsConnectionsActive.dec({ role: 'desktop' });
       }
-
-      // Notify paired frontends that their session ended
-      
-      // const frontendSocketIds = roomManager.getSocketsForDevice(device.id);
-      // for (const fid of frontendSocketIds) {
-      //   const frontendSocket = io.sockets.sockets.get(fid);
-      //   if (frontendSocket) {
-      //     frontendSocket.emit('device-disconnected', { deviceId: device.id });
-
-      //     wsConnectionsActive.dec({ role: 'desktop' });
-      //   }
-      //   roomManager.leave(fid);
-      // }
+ 
 
     }, 30000);
   });

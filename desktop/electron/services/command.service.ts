@@ -79,9 +79,9 @@ export class CommandService {
           return { success: false, message: 'Missing key' };
 
         //  Screen commands  
-        case 'SCREENSHOT':
-          const sources = await screenService.getScreenSources();
-          return { success: true, message: 'Screenshot captured', data: sources };
+        // case 'SCREENSHOT':
+        //   const sources = await screenService.getScreenSources();
+        //   return { success: true, message: 'Screenshot captured', data: sources };
 
         //  File commands  
         case 'FILE_READ':

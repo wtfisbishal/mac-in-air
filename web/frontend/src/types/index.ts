@@ -25,5 +25,14 @@ export interface ScreenFrame {
   width: number;
   height: number;
 }
+ 
+
+export interface Action {
+  label: string;
+  icon: React.ElementType;
+  type: string;
+  payload?: Record<string, unknown>;
+  variant?: 'default' | 'danger';
+}
 
 export type ToastKind = 'success' | 'error' | 'info';

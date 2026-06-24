@@ -10,33 +10,35 @@ export interface ScreenShareSession {
 
 export class ScreenService {
   private activeSession: ScreenShareSession | null = null;
-  
-  public async getScreenSources() {
-    try {
-      const sources = await desktopCapturer.getSources({ types: ['screen'] });
-      return sources.map((source) => ({
-        id: source.id,
-        name: source.name,
-        thumbnail: source.thumbnail.toDataURL(),
-      }));
-    } catch (error) {
-      console.error('Failed to get screen sources', error);
-      return [];
-    }
-  }
- 
-   //Start screen sharing session
-  public async startScreenShare(
-    sessionId: string,
-    options?: { frameRate?: number; quality?: number }
-  ) {
+
+  // public async getScreenSources() {
+  //   try {
+  //     const sources = await desktopCapturer.getSources({ types: ['screen'] });
+  //     return sources.map((source) => ({
+  //       id: source.id,
+  //       name: source.name,
+  //       thumbnail: source.thumbnail.toDataURL(),
+  //     }));
+  //   } catch (error) {
+  //     console.error('Failed to get screen sources', error);
+  //     return [];
+  //   }
+  // }
+
+  //Start screen sharing session
+  public async startScreenShare(sessionId: string, options?: { frameRate?: number; quality?: number }) {
     if (this.activeSession) {
       logWarn('ScreenService', 'Screen share already active');
+
+      // this.activeSession.isActive = false;
+      // const { BrowserWindow } = require('electron');
+      // BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
+
       return false;
     }
 
     const frameRate = options?.frameRate ?? 30;
-    const quality   = options?.quality   ?? 1.0;
+    const quality = options?.quality ?? 1.0;
 
     this.activeSession = { sessionId, isActive: true, frameRate, quality };
     logInfo('ScreenService', 'Starting WebRTC screen share', { sessionId, frameRate, quality });
@@ -46,10 +48,10 @@ export class ScreenService {
       if (sources.length === 0) throw new Error('No screen sources found');
 
       const sourceId = sources[0].id;
-      
+
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('start-webrtc', { sourceId, sessionId });
-      
+
       return true;
     } catch (error) {
       logError('ScreenService', 'Failed to start WebRTC screen share', error);
@@ -58,7 +60,7 @@ export class ScreenService {
     }
   }
 
-   // Stop screen sharing session
+  // Stop screen sharing session
   public stopScreenShare() {
     if (!this.activeSession) {
       logWarn('ScreenService', 'No active screen share session');
@@ -69,7 +71,7 @@ export class ScreenService {
 
     logInfo('ScreenService', 'Stopped WebRTC screen share', { sessionId: this.activeSession.sessionId });
     this.activeSession = null;
-    
+
     const { BrowserWindow } = require('electron');
     BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
   }

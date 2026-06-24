@@ -12,9 +12,9 @@ export function setupIpc() {
   logInfo('IPC', 'Setting up IPC handlers');
 
   //   Screen 
-  ipcMain.handle('get-desktop-sources', async () => {
-    return await screenService.getScreenSources();
-  });
+  // ipcMain.handle('get-desktop-sources', async () => {
+  //   return await screenService.getScreenSources();
+  // });
 
   //  Permissions 
   ipcMain.handle('get-media-access-status', () => {
