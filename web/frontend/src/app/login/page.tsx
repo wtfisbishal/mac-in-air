@@ -8,6 +8,7 @@ import { apiLogin, apiRegister } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,9 +43,8 @@ export default function LoginPage() {
 
           <div className="flex flex-col items-center mb-8 animate-fade-up">
 
-            <img src="/logo.webp" height={120} width={120} className=' object-fit' alt="" />
-
-            <h1 className="text-5xl  font-black tracking-tight leading-none mt-4">MAC in AIR</h1>
+         
+            <h1 className="text-5xl  font-black tracking-tight leading-none mt-4 text-transparent bg-clip-text logo-text ">MAC in AIR</h1>
 
             <p className="text-slate-400 text-sm mt-1">Control your Mac from anywhere</p>
           </div>
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 className="btn glass-button-primary !rounded-full w-full mt-2"
               >
                 {mutation.isPending
-                  ? <><Loader size={16} className="animate-spin" /> {mode === 'login' ? 'Signing in…' : 'Creating account…'}</>
+                  ? <><Loader size={20} className="animate-spin" /> {mode === 'login' ? 'Signing in…' : 'Creating account…'}</>
                   : mode === 'login' ? 'Sign In ' : 'Create new Account'
                 }
               </button>

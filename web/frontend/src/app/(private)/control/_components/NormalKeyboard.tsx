@@ -101,22 +101,39 @@ const DISPLAY_MAP: Record<string, string> = {
 const DEDUP_MS = 40;
 const lastEmitAt = new Map<string, number>();
 
-function emitKey(key: string, modifiers: string[]) {
+ 
+function emitKey(key: string, modifiers: string[], dataChannel: RTCDataChannel | null | undefined) {
     const dedupKey = key + "|" + modifiers.sort().join("+");
     const now = Date.now();
     if (now - (lastEmitAt.get(dedupKey) ?? 0) < DEDUP_MS) return;
     lastEmitAt.set(dedupKey, now);
 
-    const socket = getSocket();
     const isPlain = key.length === 1 && !NON_TYPE_KEYS.has(key) && modifiers.length === 0;
-    if (isPlain) {
-        socket.emit("keyboard-type", { text: key });
-    } else {
-        socket.emit("keyboard-shortcut", { key, modifier: modifiers });
+
+    // ── WebRTC data channel path (preferred — peer-to-peer, low latency) ──
+    if (dataChannel && dataChannel.readyState === 'open') {
+        if (isPlain) {
+            dataChannel.send(JSON.stringify({ type: 'KEYBOARD_TYPE', payload: { text: key } }));
+        } else {
+            dataChannel.send(JSON.stringify({ type: 'KEYBOARD_SHORTCUT', payload: { key, modifier: modifiers } }));
+        }
+        return;
     }
+
+    // ── Socket.IO fallback (commented out — now replaced by WebRTC data channel) ──
+    // const socket = getSocket();
+    // if (isPlain) {
+    //     socket.emit("keyboard-type", { text: key });
+    // } else {
+    //     socket.emit("keyboard-shortcut", { key, modifier: modifiers });
+    // }
+}
+
+interface NormalKeyboardProps {
+    dataChannel?: RTCDataChannel | null;
 }
  
-export default function NormalKeyboard() {
+export default function NormalKeyboard({ dataChannel }: NormalKeyboardProps) {
     const keyboardRef = useRef<any>(null);
 
     useEffect(() => {
@@ -146,7 +163,7 @@ export default function NormalKeyboard() {
  
             if (!robotKey) return;
 
-            emitKey(robotKey, modifiers);
+            emitKey(robotKey, modifiers, dataChannel);
             highlightModifiers(e);
         };
 
@@ -174,17 +191,11 @@ export default function NormalKeyboard() {
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup",   onKeyUp);
         };
-    }, []);
+    }, [dataChannel]); // re-bind when data channel reference changes
 
     return (
-        <div
-            className="w-  max-md:w-[1000px] h-full "
-            tabIndex={-1}
-             
-        >
-            <VirtualKeyboard keyboardRef={keyboardRef} />
- 
-             
+        <div className="w-  max-md:w-[1000px] h-full "tabIndex={-1}>
+            <VirtualKeyboard keyboardRef={keyboardRef} dataChannel={dataChannel} />            
         </div>
     );
 }
@@ -192,9 +203,10 @@ export default function NormalKeyboard() {
  
 interface VirtualKeyboardProps {
     keyboardRef: React.MutableRefObject<any>;
+    dataChannel?: RTCDataChannel | null;
 }
 
-function VirtualKeyboard({ keyboardRef }: VirtualKeyboardProps) {
+function VirtualKeyboard({ keyboardRef, dataChannel }: VirtualKeyboardProps) {
     const [layout, setLayout] = useState<"default" | "shift">("default");
     const stickyMods = useRef<Set<string>>(new Set());
 
@@ -215,7 +227,7 @@ function VirtualKeyboard({ keyboardRef }: VirtualKeyboardProps) {
 
         // If shift is a sticky modifier and we're pressing a shift-variant key
         // (e.g. ">"), pass the base key + shift modifier so the remote receives it correctly
-        emitKey(key, modifiers);
+        emitKey(key, modifiers, dataChannel);
 
         stickyMods.current.clear();
         Object.values(VMOD_MAP).forEach(({ vkeys }) =>

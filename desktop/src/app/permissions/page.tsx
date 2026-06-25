@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PermissionCard } from '@/components/PermissionCard';
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 export default function PermissionsPage() {
   const [permissions, setPermissions] = useState<any>(null);
 
@@ -42,17 +42,16 @@ export default function PermissionsPage() {
           status={permissions?.screenRecording || 'unknown'}
         />
 
-        <motion.div  initial={{ y: 30, opacity: 0 }}
+        <motion.div initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{
             delay: 0.1,
             duration: 0.6,
           }}
-          className={`p-4  rounded-2xl flex items-center justify-between transition-colors ${
-            permissions?.accessibility
+          className={`p-4  rounded-2xl flex items-center justify-between transition-colors ${permissions?.accessibility
               ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900]'
               : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A] '
-          }`}
+            }`}
         >
           <div>
             <h3 className="font-semibold text-lg">Accessibility</h3>
@@ -76,22 +75,21 @@ export default function PermissionsPage() {
           </div>
         </motion.div>
 
-        <motion.div  initial={{ y: 30, opacity: 0 }}
+        <motion.div initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{
             delay: 0.1,
             duration: 0.6,
           }}
-          className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${
-            permissions?.automation
+          className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${permissions?.automation
               ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900] '
               : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A]'
-          }`}
+            }`}
         >
           <div>
             <h3 className="font-semibold text-lg">Automation</h3>
             <p className="text-sm text-gray-200">
-              Required to launch apps and control system settings 
+              Required to launch apps and control system settings
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -109,9 +107,9 @@ export default function PermissionsPage() {
         </p>
       </div>
 
-          <div className=" pb-7 ">
-      <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.webp" alt="" />
-          </div>
+      <div className=" pb-7 ">
+        {/* <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.webp" alt="" /> */}
+      </div>
     </div>
   );
 }

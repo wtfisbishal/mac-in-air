@@ -7,6 +7,7 @@ import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
  
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -54,7 +55,7 @@ export default function SettingsPage() {
             <Link href="/home" className="flex flex-col items-center gap-3 group">
 
               <div className='  '>
-                <img src="/logo.webp" height={90} width={90} className='drop-shadow-[#f6f6f63b] drop-shadow-2xl  object-fit' alt="" />
+                <Image loading='lazy' src="/logo.webp" height={90} width={90} className='drop-shadow-[#f6f6f63b] drop-shadow-2xl  object-fit' alt="" />
 
               </div>
               <div className="leading-none">

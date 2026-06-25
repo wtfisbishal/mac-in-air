@@ -6,7 +6,8 @@ import Link from 'next/link';
 import {
   MonitorOff, Keyboard, MousePointer2, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
-  Link as Link2, ShieldAlert, X, Loader
+  Link as Link2, ShieldAlert, X, Loader,
+  LayoutGrid
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -43,6 +44,7 @@ export default function ControlPage({ params }: PageProps) {
 
   }, [deviceId]);
 
+  const [humburgerOpen, setHamburgerOpen] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [kbCapture, setKbCapture] = useState(false);
   const [mouseCapture, setMouseCapture] = useState(false);
@@ -50,8 +52,23 @@ export default function ControlPage({ params }: PageProps) {
   const [warning, setWarning] = useState<string | null>(null);
   const { fullscreen, setFullscreen } = useFullscreen();
   // joystick needs to know the actual Mac screen size for cursor clamping
-  const [screenSize, setScreenSize] = useState({ w: 1920, h: 1080 });
+  const [screenSize, setScreenSize] = useState({ w: device?.display?.width ?? 1920, h: device?.display?.height ?? 1080 });
 
+  // ── WebRTC data channel for peer-to-peer mouse & keyboard control ──────────
+  // Populated by ScreenCanvas once the desktop opens the 'control' data channel.
+  const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
+  const dataChannelRef = useRef<RTCDataChannel | null>(null);
+
+  const handleDataChannel = useCallback((dc: RTCDataChannel | null) => {
+    dataChannelRef.current = dc;
+    setDataChannel(dc);
+    if (dc) {
+      console.log('[ControlPage] Control data channel is OPEN — using WebRTC for mouse/keyboard');
+    } else {
+      console.log('[ControlPage] Control data channel CLOSED');
+    }
+  }, []);
+ 
   // for stop streaming on unmount -- --- - 
   const streamingRef = useRef(streaming);
   const sessionIdRef = useRef(sessionId);
@@ -73,7 +90,7 @@ export default function ControlPage({ params }: PageProps) {
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
 
-  // ── Send any event to desktop agent via socket  
+  //  Send system/app commands to desktop agent via socket (unchanged)  
   const emit = useCallback((type: string, payload?: Record<string, unknown>) => {
     const socket = getSocket();
     socket.emit('command', { type, payload }, (result: { success: boolean; message: string }) => {
@@ -81,15 +98,29 @@ export default function ControlPage({ params }: PageProps) {
     });
   }, [toast]);
 
-  //   Mouse events  
+  //   Mouse events — send over WebRTC data channel (peer-to-peer)  
+  // Falls back gracefully to a no-op if the data channel is not yet open.
   const handleMouseEvent = useCallback((type: string, data: Record<string, unknown>) => {
     if (!mouseCapture) return;
-    const socket = getSocket();
-    socket.emit(type, data); // fire-and-forget for low latency
+    const dc = dataChannelRef.current;
+
+    //   WebRTC data channel path  
+    if (dc && dc.readyState === 'open') {
+      const commandType =
+        type === 'mouse-move' ? 'MOUSE_MOVE' :
+          type === 'mouse-click' ? 'MOUSE_CLICK' :
+            type === 'mouse-scroll' ? 'MOUSE_SCROLL' : null;
+
+      if (commandType) {
+        dc.send(JSON.stringify({ type: commandType, payload: data }));
+        return;
+      }
+    }
+ 
   }, [mouseCapture]);
 
 
-  //   Screen share start/stop  
+  //   Screen share start/stop (still uses socket for signalling)  
   const toggleStream = () => {
     const socket = getSocket();
     if (!streaming) {
@@ -130,20 +161,20 @@ export default function ControlPage({ params }: PageProps) {
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
-        <Loader className="animate-spin" size={32} />
+        <Loader className="animate-spin" size={20} />
       </div>
     </AppLayout>
   );
 
   if (!pairToken) return (
     <AppLayout>
-      <div className="w-full flex items-center justify-center">
+      <div className="w-full flex items-center-safe justify-center">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
             <ShieldAlert size={32} className="text-red-400" />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
-          <p className="text-slate-400 text-sm mb-6">
+          <p className="text-slate-400 text-sm max-md:w-[90%] mx-auto mb-6">
             You must pair this device before you can control it.
             Pairing tokens expire after 30 min  or when you close the tab.
           </p>
@@ -157,8 +188,8 @@ export default function ControlPage({ params }: PageProps) {
   );
 
   if (!device) return (
-    <AppLayout>
-      <div className="min-h-screen  w-full flex items-center justify-center">
+     <AppLayout>
+      <div className="w-full flex items-center-safe justify-center">
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">Device not found</p>
@@ -172,7 +203,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={` flex w-full relative flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
+      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
 
@@ -214,7 +245,7 @@ export default function ControlPage({ params }: PageProps) {
           {/* Screen */}
           <div
             ref={controlAreaRef}
-            className={`flex-1 flex flex-col min-h-screen items-center gap-3 min-w-0 ${fullscreen ? 'p-3' : ''}`}
+            className={`flex-1 flex flex-col min-h-screen/ items-center gap-3 min-w-0 ${fullscreen ? 'p-3' : ''}`}
             tabIndex={-1}
             style={{ outline: 'none' }}
           >
@@ -250,7 +281,6 @@ export default function ControlPage({ params }: PageProps) {
                 <Keyboard size={12} />
                 Keyboard {kbCapture ? 'ON' : 'OFF'}
               </button>
-
               <div className="w-px h-4   bg-white/[0.06]" />
 
               {ACTIONS.map(a => (
@@ -266,14 +296,22 @@ export default function ControlPage({ params }: PageProps) {
 
               {/* Fullscreen exit */}
               {fullscreen && (
-                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ml-auto">
+                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ">
                   <Minimize2 size={12} /> Exit
                 </button>
               )}
+
+                {  (
+                <button onClick={() => { setHamburgerOpen(!humburgerOpen); }} className={`${ !humburgerOpen ? 'bg-[#ffffff0d] text-[#94a3b8] ' : ' bg-[#6366f126] text-[#a5b4fc] '} bg-[#ffffff0d] px-3 py-2 rounded-full  hidden max-md:flex `}>
+                  <LayoutGrid size={20} />
+                </button>
+              )}
+
+              
             </div>
 
             {/* Canvas */}
-            <div className="flex-1 w-full min-h-[550px] max-md:h-fit rounded-3xl overflow-hidden relative animate-fade-up delay-2">
+            <div className="flex-1 w-full max-md:h-fit rounded-2xl overflow-hidden relative animate-fade-up delay-2">
               <ScreenCanvas
                 deviceId={deviceId}
                 pairToken={pairToken}
@@ -281,19 +319,14 @@ export default function ControlPage({ params }: PageProps) {
                 mouseCapture={mouseCapture}
                 displaySize={device.display}
                 onScreenSize={(w, h) => setScreenSize({ w, h })}
+                onDataChannel={handleDataChannel}
               />
             </div>
-
-            {/* {kbCapture && (
-              <div className="animate-fade-up overflow-x-auto delay-4 min-h-[300px] w-full   pb-4  max-md:hidden flex justify-center">
-                <NormalKeyboard />
-              </div>
-            )} */}
           </div>
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className="w-[220px] flex-shrink-0 flex max-md:hidden pb-20 max-md:w-full flex-col gap-3 animate-fade-up delay-2">
+            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ?'absolute' : 'hidden'} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
               <Link
@@ -301,7 +334,7 @@ export default function ControlPage({ params }: PageProps) {
 
                 className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
-                <Image src={'/apps.webp'} height={35} width={35} alt='apps' />
+                <Image src={'/apps.webp'} loading='lazy' height={35} width={35} alt='apps' />
                 <div>
                   <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher  </p>
                   <p className=' text-sm'>(⌥ + space)</p>
@@ -315,17 +348,20 @@ export default function ControlPage({ params }: PageProps) {
                     { label: 'Copy', key: 'c', mod: 'command' },
                     { label: 'Paste', key: 'v', mod: 'command' },
                     { label: 'Select All', key: 'a', mod: 'command' },
-                    { label: 'Undo', key: 'z', mod: 'command' },
-                    { label: 'Find', key: 'f', mod: 'command' },
-                    { label: 'Next Desktop', key: 'right', mod: 'control' },
-                    { label: 'Prev Desktop', key: 'left', mod: 'control' },
+                    { label: 'Undo', key: 'z', mod: 'command' }, 
                     { label: 'Spotlight', key: 'space', mod: 'command' },
                   ].map(s => (
                     <button
                       key={s.label}
                       onClick={() => {
-                        const socket = getSocket();
-                        socket.emit('keyboard-shortcut', { key: s.key, modifier: s.mod });
+                        const dc = dataChannelRef.current;
+                        // ── WebRTC data channel path (preferred) ──
+                        if (dc && dc.readyState === 'open') {
+                          dc.send(JSON.stringify({
+                            type: 'KEYBOARD_SHORTCUT',
+                            payload: { key: s.key, modifier: s.mod },
+                          }));
+                        }
                         toast(`Sent: ${s.label}`, 'info');
                       }}
                       className="w-full flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
@@ -337,12 +373,13 @@ export default function ControlPage({ params }: PageProps) {
               </div>
 
               {/* Virtual Joystick */}
-              <div className="glass-panel-dark rounded-3xl p-4 flex flex-col items-center">
+              <div className="glass-panel-dark max-md:hidden  rounded-3xl p-4 flex flex-col items-center">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-4 self-start">Joystick</p>
                 <VirtualJoystick
                   screenW={screenSize.w}
                   screenH={screenSize.h}
                   enabled={mouseCapture}
+                  dataChannel={dataChannel}
                 />
                 {!mouseCapture && (
                   <p className="text-[10px] text-slate-600 mt-3 text-center">
@@ -434,7 +471,7 @@ export default function ControlPage({ params }: PageProps) {
 
         {kbCapture && (
           <div className=" items-start center absolute max-md:bg-gradient-to-t  from-[#1C0B53] to-[#503993]  bottom-10 rounded-2xl animate-fade-up  flex overflow-x-auto   min-h-[350px] left-2 max-md:left-0 w-full  max-md: pb-4 p-4  justify-start   ">
-            <NormalKeyboard />
+            <NormalKeyboard dataChannel={dataChannel} />
           </div>
         )}
         {mouseCapture && (
@@ -443,6 +480,7 @@ export default function ControlPage({ params }: PageProps) {
               screenW={screenSize.w}
               screenH={screenSize.h}
               enabled={mouseCapture}
+              dataChannel={dataChannel}
             />
           </div>
         )}
@@ -451,3 +489,4 @@ export default function ControlPage({ params }: PageProps) {
     </AppLayout>
   );
 }
+ 

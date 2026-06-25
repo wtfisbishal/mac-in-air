@@ -84,45 +84,6 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
     }
   );
 
-  // Desktop agent sends a raw screen frame; relay to all paired frontends.
-  socket.on('screen-frame',
-    (data: { sessionId: string; frame: Buffer | string; width: number; height: number }) => {
-
-      try {
-        if (!data?.frame) {
-          serverErrorsTotal.inc({ type: 'invalid_screen_frame', });
-          loggerError('Received screen-frame event with missing frame data', {
-            deviceId: deviceManager.getDeviceBySocketId(socket.id)?.id,
-          });
-          return;
-        }
-        // Track frame payload size
-        const frameSize = data.frame instanceof Buffer
-          ? data.frame.byteLength
-          : Buffer.byteLength(data.frame as string, 'base64');
-
-        console.log("{desktop} /FPS ", frameSize);
-
-        wsFrameBytesHistogram.observe(frameSize);
-
-        // Find which device this socket belongs to
-        const device = deviceManager.getDeviceBySocketId(socket.id);
-        if (!device) return;
-
-        socket.volatile.to(device.id).emit('screen-frame', data);
-
-      }
-      catch (err) {
-        console.error('[Desktop] screen-frame failed:', err);
-        serverErrorsTotal.inc({ type: 'screen_frame_error', });
-        loggerError('Error relaying screen-frame to frontends', {
-          error: err instanceof Error ? err.message : String(err),
-          deviceId: deviceManager.getDeviceBySocketId(socket.id)?.id,
-        });
-      }
-    }
-  );
-
   // Desktop agent confirms screen share has started.
   socket.on('screen-share-started', (data: { sessionId: string; success: boolean }) => {
 

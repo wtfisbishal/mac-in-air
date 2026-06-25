@@ -179,14 +179,14 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
         {loading && (
           <div className="flex flex-col h-full items-center justify-center py-20 gap-3">
-            <Loader className="animate-spin  " size={28} />
+            <Loader className="animate-spin  " size={20} />
             <p className="text-slate-500 text-sm">Scanning applications…</p>
           </div>
         )}
 
         {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Image src={'/apps.webp'} className=' saturate-0 ' height={65} width={65} alt='apps' />
+            <Image src={'/apps.webp'} loading='lazy' className=' saturate-0 ' height={65} width={65} alt='apps' />
             <p className="text-slate-400 text-sm font-medium">
               {search ? `No apps matching "${search}"` : ' No apps found '}
             </p>
@@ -210,7 +210,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
                     <AppIcon name={app.name} icon={app.icon} />
                     {openAppMutation.isPending && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
-                        <Loader size={16} className="animate-spin text-white" />
+                        <Loader size={20} className="animate-spin text-white" />
                       </div>
                     )}
                   </div>

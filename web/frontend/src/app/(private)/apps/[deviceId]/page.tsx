@@ -30,7 +30,7 @@ export default function AppsPage({ params }: PageProps) {
   if (deviceLoading) return (
     <AppLayout>
       <div className="min-h-screen w-full flex items-center justify-center">
-        <Loader className="animate-spin  " size={32} />
+        <Loader className="animate-spin  " size={20} />
       </div>
     </AppLayout>
   );

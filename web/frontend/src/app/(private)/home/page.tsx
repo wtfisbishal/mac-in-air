@@ -97,7 +97,7 @@ export default function DashboardPage() {
         <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
 
           <div>
-            <h1 className="text-6xl font-bold text-white mb-5 tracking-tight">MACS</h1>
+            <h1 className="text-6xl logo-text text-transparent bg-clip-text font-bold mb-5 tracking-tight">MACS</h1>
           </div>
 
           <div className="flex items-center max-md:gap-6 max-md:w-full   gap-3">

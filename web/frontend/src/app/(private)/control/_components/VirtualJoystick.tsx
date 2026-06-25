@@ -2,26 +2,54 @@
 
 import { useEffect, useRef } from 'react';
 import nipplejs from 'nipplejs';
-import { getSocket } from '@/lib/socket';
 
 interface VirtualJoystickProps {
   screenW: number;
   screenH: number;
   enabled: boolean;
+  /** RTCDataChannel for peer-to-peer mouse events. Falls back gracefully when null. */
+  dataChannel?: RTCDataChannel | null;
 }
 
-// ── tunables ──────────────────────────────────────────────────────────────────
-const MAX_SPEED  = 18;   // max px per frame at full joystick deflection
-const THROTTLE   = 33;   // emit at most every 33ms (~30fps) to avoid socket flood
+// ── tunables ───────── ────────────────────
+const MAX_SPEED = 10;   // max px per frame at full joystick deflection
+const THROTTLE = 33;   // emit at most every 33ms (~30fps) to avoid flooding
 
-export default function VirtualJoystick({ screenW, screenH, enabled }: VirtualJoystickProps) {
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const managerRef    = useRef<ReturnType<typeof nipplejs.create> | null>(null);
-  const rafRef        = useRef<number | null>(null);
-  const cursorRef     = useRef({ x: screenW / 2, y: screenH / 2 });
+/**
+ * Sends a mouse event over the WebRTC data channel when available.
+ * The Socket.IO fallback is commented out — preserved for reference.
+ */
+function sendMouseEvent(
+  dataChannel: RTCDataChannel | null | undefined,
+  type: 'MOUSE_MOVE' | 'MOUSE_CLICK',
+  payload: Record<string, unknown>
+) {
+  // ── WebRTC data channel path (preferred — peer-to-peer, low latency) ──
+  if (dataChannel && dataChannel.readyState === 'open') {
+    dataChannel.send(JSON.stringify({ type, payload }));
+    return;
+  }
+
+  // ── Socket.IO fallback (commented out — replaced by WebRTC data channel) ──
+  // const socket = getSocket();
+  // if (type === 'MOUSE_MOVE') {
+  //   socket.emit('mouse-move', payload);
+  // } else if (type === 'MOUSE_CLICK') {
+  //   socket.emit('mouse-click', payload);
+  // }
+}
+
+export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel }: VirtualJoystickProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const managerRef = useRef<ReturnType<typeof nipplejs.create> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const cursorRef = useRef({ x: screenW / 2, y: screenH / 2 });
   // normalised velocity components [-1, 1] set by joystick; zero when released
-  const velRef        = useRef({ vx: 0, vy: 0 });
-  const lastEmitRef   = useRef(0);
+  const velRef = useRef({ vx: 0, vy: 0 });
+  const lastEmitRef = useRef(0);
+  // Keep a stable ref to the current data channel so the RAF loop can read it
+  const dcRef = useRef(dataChannel);
+  useEffect(() => { dcRef.current = dataChannel; }, [dataChannel]);
 
   // ── animation loop ──────────────────────────────────────────────────────────
   const startLoop = () => {
@@ -32,10 +60,10 @@ export default function VirtualJoystick({ screenW, screenH, enabled }: VirtualJo
         cursorRef.current.x = Math.max(0, Math.min(screenW, cursorRef.current.x + vx * MAX_SPEED));
         cursorRef.current.y = Math.max(0, Math.min(screenH, cursorRef.current.y + vy * MAX_SPEED));
 
-        // Throttle socket emissions — robotjs on desktop can't process 60 events/sec
+        // Throttle emissions — robotjs on desktop can't process 60 events/sec
         if (now - lastEmitRef.current >= THROTTLE) {
           lastEmitRef.current = now;
-          getSocket().emit('mouse-move', {
+          sendMouseEvent(dcRef.current, 'MOUSE_MOVE', {
             x: Math.round(cursorRef.current.x),
             y: Math.round(cursorRef.current.y),
           });
@@ -59,25 +87,29 @@ export default function VirtualJoystick({ screenW, screenH, enabled }: VirtualJo
     if (!containerRef.current || !enabled) return;
 
     const manager = nipplejs.create({
-      zone:        containerRef.current,
-      mode:        'static',
-      position:    { left: '50%', top: '50%' },
-      color:       '#6366f1',
-      size:        110,
+      zone: containerRef.current,
+      mode: 'static',
+      position: { left: '50%', top: '50%' },
+      color: '#6366f1',
+      size: 60,
       restOpacity: 0.75,
-      fadeTime:    150,
-      multitouch:  false,
+      fadeTime: 150,
+      multitouch: false,
     });
     managerRef.current = manager;
 
     // nipplejs v1 InternalEvent shape: { type, target, data: JoystickEventData }
-    // JoystickEventData.vector = { x: [-1,1], y: [-1,1] } — already normalised,
-    // screen-corrected (y positive = down), and dead-zone handled by nipplejs itself.
     manager.on('move', (evt: any) => {
-      const d = evt?.data ?? evt;
-      // vector.x = right (+), vector.y = down (+) — perfect for screen coords
-      const vx: number = d?.vector?.x ?? 0;
-      const vy: number = d?.vector?.y ?? 0;
+      const d = evt?.data || evt;
+      if (!d || !d.vector) return;
+      
+      // nipplejs vector.x is positive right. The user reported it moving right when dragging left, 
+      // so we invert vx to match their expectation if their touch input maps backwards.
+      const vx: number = -d.vector.x; 
+      
+      // nipplejs vector.y is positive UP. Screen coordinates are positive DOWN.
+      const vy: number = -d.vector.y; 
+
       velRef.current = { vx, vy };
       startLoop();
     });
@@ -123,25 +155,25 @@ export default function VirtualJoystick({ screenW, screenH, enabled }: VirtualJo
         ref={containerRef}
         className="relative rounded-full touch-none select-none overflow-hidden"
         style={{
-          width:  120,
+          width: 120,
           height: 120,
           background:
             'radial-gradient(circle, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.03) 70%, transparent 100%)',
-          border:    '1.5px solid rgba(99,102,241,0.25)',
+          border: '1.5px solid rgba(99,102,241,0.25)',
           boxShadow: '0 0 20px rgba(99,102,241,0.08) inset, 0 4px 20px rgba(0,0,0,0.3)',
         }}
       />
 
       {enabled && (
         <div className="flex gap-3 mt-1">
-          <button 
-            onClick={() => getSocket().emit('mouse-click', { button: 'left' })} 
+          <button
+            onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'left' })}
             className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
           >
             Left Click
           </button>
-          <button 
-            onClick={() => getSocket().emit('mouse-click', { button: 'right' })} 
+          <button
+            onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'right' })}
             className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
           >
             Right Click

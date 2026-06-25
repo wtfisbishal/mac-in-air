@@ -5,6 +5,8 @@ import { useEffect, useRef } from 'react';
 export default function WebRTCManager() {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  // Data channel for peer-to-peer mouse & keyboard control
+  const controlChannelRef = useRef<RTCDataChannel | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.electronAPI) return;
@@ -17,7 +19,7 @@ export default function WebRTCManager() {
         // Stop any existing session
         stopWebRTC();
 
-        // ── Capture screen + system audio ──────────────────────────────────
+        //   Capture screen + system audio  
         // The main process registers a setDisplayMediaRequestHandler that:
         //   1. Picks the first screen source for video
         //   2. Provides 'loopback' system audio (macOS CoreAudio tap)
@@ -70,7 +72,42 @@ export default function WebRTCManager() {
 
         peerConnectionRef.current = pc;
 
-        // Add all tracks (video + audio if available)
+        //   Control Data Channel (mouse & keyboard)  
+        // The desktop (offerer) creates the channel; the frontend (answerer)
+        // receives it via pc.ondatachannel.
+        const controlChannel = pc.createDataChannel('control', {
+          ordered: false,       // unordered for lower latency on control events
+          maxRetransmits: 0,    // fire-and-forget — stale mouse positions are useless
+        });
+        controlChannelRef.current = controlChannel;
+
+        controlChannel.onopen = () => {
+          console.log('[WebRTCManager] Control data channel OPEN');
+        };
+
+        controlChannel.onclose = () => {
+          console.log('[WebRTCManager] Control data channel CLOSED');
+          controlChannelRef.current = null;
+        };
+
+        controlChannel.onerror = (err) => {
+          console.error('[WebRTCManager] Control data channel ERROR', err);
+        };
+
+        // Receive mouse/keyboard commands from the frontend browser and
+        // execute them directly via the preload-exposed API.
+        controlChannel.onmessage = async (event) => {
+          try {
+            const command = JSON.parse(event.data as string);
+            // command shape: { type: string; payload?: Record<string, unknown> }
+            // Matches the existing CommandPayload consumed by commandService
+            await window.electronAPI.executeCommand(command);
+          } catch (err) {
+            console.error('[WebRTCManager] Failed to handle control message', err);
+          }
+        };
+        
+        // Add all mouse/keyboard tracks (video + audio if available)
         stream.getTracks().forEach(track => {
           pc.addTrack(track, stream);
         });
@@ -138,6 +175,11 @@ export default function WebRTCManager() {
   }, []);
 
   const stopWebRTC = () => {
+    // Close control channel first
+    if (controlChannelRef.current) {
+      controlChannelRef.current.close();
+      controlChannelRef.current = null;
+    }
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(t => t.stop());
       localStreamRef.current = null;

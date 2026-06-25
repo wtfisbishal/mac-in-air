@@ -9,7 +9,8 @@ export default function ScreenCanvas({
   onMouseEvent,
   mouseCapture = false,
   onScreenSize,
-  displaySize
+  displaySize,
+  onDataChannel,
 }: {
   deviceId: string;
   pairToken: string;
@@ -17,11 +18,17 @@ export default function ScreenCanvas({
   mouseCapture?: boolean;
   /** Called whenever the real Mac screen dimensions become known */
   onScreenSize?: (w: number, h: number) => void;
-  displaySize:{
-    width:number,
-    height:number,
-    scaleFactor:number
-  }
+  displaySize: {
+    width: number,
+    height: number,
+    scaleFactor: number
+  };
+  /**
+   * Called with the RTCDataChannel for peer-to-peer control events
+   * (mouse & keyboard) as soon as it opens, or null when it closes.
+   * The parent should use this channel instead of Socket.IO for control input.
+   */
+  onDataChannel?: (dc: RTCDataChannel | null) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -29,11 +36,9 @@ export default function ScreenCanvas({
   const [hasFrame, setHasFrame] = useState(false);
   const [dimLabel, setDimLabel] = useState('');
   const [hasAudio, setHasAudio] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-
-  // const screenSize = useRef({ w: 1920, h: 1080 });  
-  const screenSize = useRef({ w: displaySize?.width ?? 1920, h: displaySize.height ?? 1080 }); // actual Mac screen size from frames
-
+  const [isMuted, setIsMuted] = useState(true); 
+  const screenSize = useRef({ w: displaySize?.width ?? 1920, h: displaySize?.height ?? 1080 });  
+ 
   useEffect(() => {
     const socket = getSocket();
 
@@ -49,12 +54,43 @@ export default function ScreenCanvas({
     };
 
     joinDevice();
-    socket.on('connect', joinDevice);
+    
 
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
     });
     pcRef.current = pc;
+
+    // ── Receive the 'control' data channel opened by the desktop (offerer) ──
+    // The desktop creates the data channel, so we receive it here as the answerer.
+    pc.ondatachannel = (event) => {
+      const dc = event.channel;
+      console.log('[ScreenCanvas] Data channel received:', dc.label);
+
+      if (dc.label !== 'control') return;
+
+      dc.onopen = () => {
+        console.log('[ScreenCanvas] Control data channel OPEN — switching to WebRTC control');
+        onDataChannel?.(dc);
+      };
+
+      dc.onclose = () => {
+        console.log('[ScreenCanvas] Control data channel CLOSED — falling back to socket');
+        onDataChannel?.(null);
+      };
+
+      dc.onerror = (err) => {
+        console.error('[ScreenCanvas] Control data channel ERROR', err);
+        onDataChannel?.(null);
+      };
+
+      // The frontend only sends on this channel; messages from desktop are
+      // unexpected but we log them for debugging.
+      dc.onmessage = (e) => {
+        console.debug('[ScreenCanvas] Unexpected message from desktop DC:', e.data);
+      };
+    };
+    // ────────────────────────────────────────────────────────────────────────
 
     pc.ontrack = (event) => {
       if (videoRef.current) {
@@ -82,7 +118,6 @@ export default function ScreenCanvas({
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
-        // console.log("ice candidate are " ,event.candidate)
         // Use toJSON() so sdpMid / sdpMLineIndex survive JSON serialization over socket
         socket.emit('webrtc-ice-candidate', {
           candidate: event.candidate.toJSON(),
@@ -119,7 +154,8 @@ export default function ScreenCanvas({
         console.error('[WebRTC] Error adding ICE candidate', err);
       }
     };
-
+    
+    socket.on('connect', joinDevice);
     socket.on('webrtc-offer', handleOffer);
     socket.on('webrtc-ice-candidate', handleIceCandidate);
 
@@ -127,13 +163,12 @@ export default function ScreenCanvas({
       socket.off('connect', joinDevice);
       socket.off('webrtc-offer', handleOffer);
       socket.off('webrtc-ice-candidate', handleIceCandidate);
+      onDataChannel?.(null); // notify parent that channel is gone
       pc.close();
     };
   }, [deviceId, pairToken]);
 
-  // Sync muted state imperatively to the <video> element.
-  // We can't use the `muted` JSX prop for this because React ignores
-  // runtime changes to it — we must set the DOM property directly.
+ 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isMuted;
@@ -158,19 +193,15 @@ export default function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className="relative w-full bg-black min-h-[600px] flex items-center justify-center pb-5 rounded-3xl overflow-hidden"
-      style={{ aspectRatio: '16/9', cursor: 'none' }}
+      className={`relative w-full bg-black  flex items-center justify-center rounded-3xl overflow-hidden `}
+      style={{ aspectRatio: displaySize?.width && displaySize?.height ? `${displaySize.width}/${displaySize.height}` : '16/9', cursor: 'none' }}
       onMouseMove={e => onMouseEvent('mouse-move', toScreenCoords(e))}
       onClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left' })}
       onContextMenu={e => { e.preventDefault(); onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'right' }); }}
       onDoubleClick={e => onMouseEvent('mouse-click', { ...toScreenCoords(e), button: 'left', doubleClick: true })}
       onWheel={e => onMouseEvent('mouse-scroll', { x: Math.round(e.deltaX), y: Math.round(e.deltaY) })}
     >
-      {/*
-        Video element — starts muted (required by browser autoplay policy).
-        Mute state is controlled imperatively via the useEffect above,
-        not via the `muted` JSX prop which React freezes after first render.
-      */}
+      
       <video
         ref={videoRef}
         autoPlay
@@ -180,7 +211,7 @@ export default function ScreenCanvas({
       />
 
       {/* No-stream placeholder */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div className="pointer-events-none h-full absolute inset-0 flex items-center justify-center">
         {!hasFrame && (
           <div className="text-center">
             <MonitorOff size={48} className="text-slate-600 mx-auto mb-3" />
@@ -189,10 +220,7 @@ export default function ScreenCanvas({
         )}
       </div>
 
-      {/*
-        Audio toggle button — only rendered when the desktop sent an audio track.
-        Requires a real user click so browsers allow unmuting past the autoplay policy.
-      */}
+       
       {hasFrame && hasAudio && (
         <button
           onClick={(e) => {

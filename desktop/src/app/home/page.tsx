@@ -104,7 +104,7 @@ export default function DashboardPage() {
         )}
       </div> */}
 
-      {/* <Link className='glass-button' href='/'>home</Link> */}
+      <Link className='glass-button' href='/'>home</Link>
 
 
       {deviceInfo && (

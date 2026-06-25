@@ -123,13 +123,11 @@ export default function PairPage() {
         <div className="animate-spotlight h-fit mt-20 max-md:mt-40 w-full flex items-center justify-center p-6">
           <div className="text-center flex flex-col items-center  animate-fade-up ">
 
-            
-
             <h2 className="text-2xl font-bold text-indigo-500 mb-2">Connecting to </h2>
             <p className="text-slate-400 text-sm mb-4">
               {
-                name ?
-                  <h2 className=' text-3xl mt-5 flex flex-col '> {userName}'s 
+                name && name !== "undefined" ?
+                  <h2 className=' text-3xl mt-5 flex flex-col '> {userName}'s
                     <span className="text-white text-7xl max-md:text-5xl font-extrabold">
                       {name}
                     </span>
@@ -192,7 +190,7 @@ export default function PairPage() {
                 className="flex items-center justify-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer w-full"
               >
                 {mutation.isPending
-                  ? <><Loader size={15} className="animate-spin" /> Connecting…</>
+                  ? <><Loader size={20} className="animate-spin" /> Connecting…</>
                   : <>Connect Device <ArrowRight size={15} /></>
                 }
               </button>

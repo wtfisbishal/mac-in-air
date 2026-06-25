@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { Loader } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, ready } = useAuth();
@@ -14,7 +15,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (!ready) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+      {/* <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" /> */}
+      <Loader className="animate-spin" size={20} />
     </div>
   );
 
@@ -22,7 +24,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen  mx-auto !w-full">
-      
         {children}
     </div>
   );

@@ -107,30 +107,36 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     }
   });
 
-  // Mouse Move
-  socket.on('mouse-move', (data: { x: number; y: number }) => {
-    relayToDesktop(io, socket, { type: 'MOUSE_MOVE', payload: data });
-  });
+  // ── Mouse & Keyboard socket relay handlers are commented out ──────────────
+  // These events are now sent peer-to-peer over the WebRTC 'control' DataChannel
+  // (desktop creates it in WebRTCManager.tsx; frontend sends through ScreenCanvas).
+  // Un-comment the blocks below ONLY if you need a Socket.IO graceful fallback.
 
-  // Mouse Click
-  socket.on('mouse-click', (data: { button?: string; doubleClick?: boolean }) => {
-    relayToDesktop(io, socket, { type: 'MOUSE_CLICK', payload: data });
-  });
+  // // Mouse Move
+  // socket.on('mouse-move', (data: { x: number; y: number }) => {
+  //   relayToDesktop(io, socket, { type: 'MOUSE_MOVE', payload: data });
+  // });
 
-  // Mouse Scroll
-  socket.on('mouse-scroll', (data: { x: number; y: number }) => {
-    relayToDesktop(io, socket, { type: 'MOUSE_SCROLL', payload: data });
-  });
+  // // Mouse Click
+  // socket.on('mouse-click', (data: { button?: string; doubleClick?: boolean }) => {
+  //   relayToDesktop(io, socket, { type: 'MOUSE_CLICK', payload: data });
+  // });
 
-  // Keyboard Type
-  socket.on('keyboard-type', (data: { text: string }) => {
-    relayToDesktop(io, socket, { type: 'KEYBOARD_TYPE', payload: data });
-  });
+  // // Mouse Scroll
+  // socket.on('mouse-scroll', (data: { x: number; y: number }) => {
+  //   relayToDesktop(io, socket, { type: 'MOUSE_SCROLL', payload: data });
+  // });
 
-  // Keyboard Shortcut
-  socket.on('keyboard-shortcut', (data: { key: string; modifier?: string | string[] }) => {
-    relayToDesktop(io, socket, { type: 'KEYBOARD_SHORTCUT', payload: data });
-  });
+  // // Keyboard Type
+  // socket.on('keyboard-type', (data: { text: string }) => {
+  //   relayToDesktop(io, socket, { type: 'KEYBOARD_TYPE', payload: data });
+  // });
+
+  // // Keyboard Shortcut
+  // socket.on('keyboard-shortcut', (data: { key: string; modifier?: string | string[] }) => {
+  //   relayToDesktop(io, socket, { type: 'KEYBOARD_SHORTCUT', payload: data });
+  // });
+  // ─────────────────────────────────────────────────────────────────────────────
 
   // Open App
   socket.on('open-app', (data: { app: string }, callback?: (res: unknown) => void) => {
@@ -142,11 +148,7 @@ export function setupFrontendHandlers(io: SocketServer, socket: Socket): void {
     relayToDesktop(io, socket, { type: data.action }, callback);
   });
 
-  // Screenshot
-  socket.on('request-screenshot', (callback?: (res: unknown) => void) => {
-    relayToDesktop(io, socket, { type: 'SCREENSHOT' }, callback);
-  });
-
+   
   // Screen Share Start
   socket.on('screen-share-start', (data: { sessionId: string; frameRate?: number; quality?: number }) => {
 

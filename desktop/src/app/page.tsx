@@ -22,41 +22,24 @@ export default function Home() {
     <motion.div
       animate={{ opacity: exiting ? 0 : 1 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="relative flex min-h-screen items-center justify-center  overflow-hidden"
+      className="relative flex min-h-full pt-40 flex   items-center justify-center  overflow-hidden"
     >
       {/* subtle center glow */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.06)_0%,_transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 " />
 
       <div className="relative z-10 flex flex-col items-center">
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="relative"
-        >
-          <motion.div
-            className="absolute inset-0 rounded-full bg-white/20 blur-2xl"
-            animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.1, 0.9] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <img
-            src="/logo.webp"
-            alt="Mac In air"
-            className="relative w-24 h-24 object-contain drop-shadow-2xl"
-          />
-        </motion.div>
-
+        
         <motion.h1
-          className="mt-6 text-3xl font-semibold tracking-tight text-white"
+          className="logo bg-clip-text text-transparent text-7xl font-semibold tracking-tight"
           initial={{ y: 16, opacity: 0, filter: 'blur(6px)' }}
           animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
           transition={{ delay: 0.35, duration: 0.6, ease: 'easeOut' }}
         >
-          Mac In AIR
+          Mac in AIR
         </motion.h1>
 
         <motion.p
-          className="mt-2 text-sm text-zinc-500"
+          className="mt-2  text-sm text-zinc-500"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}

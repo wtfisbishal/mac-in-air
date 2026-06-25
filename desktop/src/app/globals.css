@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -37,14 +38,17 @@
 html,
 body {
   height: 100%;
-  font-family: var(--font-inter); 
   color: var(--text-primary); 
   overflow-x: hidden; 
   user-select: none;    
-    background-color: #111119;
+  background-color: #111119;
+  font-family: "Montserrat", sans-serif;
+
 
 }
- 
+.logo{
+     background-image: linear-gradient(294deg, #2D3BF6  -28%, #ffffff 105%);
+}
  
  
 .glass-panel {

@@ -39,7 +39,7 @@ export function DeviceCard({
   freeMemory,
   uptime,
   isConnected,
-  display
+   
 }: DeviceCardProps) {
   return (
     <motion.div initial={{ y: 30, opacity: 0, filter: 'blur(6px)' }}
@@ -80,12 +80,7 @@ export function DeviceCard({
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
         </div>
 
-        <div className="p-3 rounded-2xl glass-panel-dark">
-          <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Display</p>
-          <p className="text-sm font-medium">
-            {display.width} {display.height}
-          </p>
-        </div>
+       
       </div>
     </motion.div>
   );

@@ -78,5 +78,5 @@ export function useScrollReveal() {
 export const ACTIONS: Action[] = [
   { label: 'Terminal', icon: Terminal, type: 'OPEN_APP', payload: { app: 'Terminal' } },
   { label: 'Browser', icon: Globe, type: 'OPEN_APP', payload: { app: 'Safari' } },
-  { label: 'Notes', icon: NotepadText, type: 'OPEN_APP', payload: { app: 'Notes' } },
+  // { label: 'Notes', icon: NotepadText, type: 'OPEN_APP', payload: { app: 'Notes' } },
 ];
