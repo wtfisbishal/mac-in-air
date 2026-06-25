@@ -5,6 +5,7 @@ import { screenService } from './screen.service';
 import { logInfo, logError, logWarn } from '../utils/logger';
 import { machineIdSync } from 'node-machine-id';
 import { BACKEND_URL } from '../utils';
+import { screen } from 'electron';
 
 export interface WebClient {
   socketId: string;
@@ -48,6 +49,9 @@ export class SocketService {
     this.startReconnectWatchdog();
 
     // helpers
+    const display = screen.getPrimaryDisplay();
+
+
     const announceDevice = () => {
       this.socket?.emit(
         'device-online',
@@ -57,8 +61,13 @@ export class SocketService {
           platform: process.platform,
           arch: process.arch,
           user: require('os').userInfo().username,
+          display: {
+            width: display.size.width,
+            height: display.size.height,
+            scaleFactor: display.scaleFactor
+          }
         },
-        () => {}
+        () => { }
       );
     };
 
@@ -126,7 +135,7 @@ export class SocketService {
     this.socket.on('command', async (payload: CommandPayload, callback?: (result: any) => void) => {
       logInfo('SocketService', 'Received command', payload);
       const result = await commandService.handleCommand(payload);
-       
+
       // Send result back to backend
       if (callback) {
         callback(result);

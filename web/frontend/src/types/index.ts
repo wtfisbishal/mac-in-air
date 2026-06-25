@@ -5,7 +5,12 @@ export interface Device {
   arch: string;
   isOnline: boolean;
   connectedAt: number;
-  user:string
+  user:string,
+  display:{
+    width:number,
+    height:number,
+    scaleFactor:number
+  }
 }
 
 export interface AuthUser {

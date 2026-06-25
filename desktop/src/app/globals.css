@@ -41,6 +41,8 @@ body {
   color: var(--text-primary); 
   overflow-x: hidden; 
   user-select: none;    
+    background-color: #111119;
+
 }
  
  

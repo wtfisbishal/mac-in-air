@@ -9,7 +9,13 @@ interface DeviceCardProps {
   freeMemory: number;
   uptime: number;
   isConnected: boolean;
-  user: string
+  user: string,
+  display: {
+    width: number,
+    height: number,
+    scaleFactor: number
+  }
+
 }
 
 function formatBytes(bytes: number): string {
@@ -33,10 +39,11 @@ export function DeviceCard({
   freeMemory,
   uptime,
   isConnected,
+  display
 }: DeviceCardProps) {
   return (
-    <motion.div initial={{ y: 30, opacity: 0 ,filter: 'blur(6px)'}}
-      animate={{ y: 0, opacity: 1 ,filter: 'blur(0px)'}}
+    <motion.div initial={{ y: 30, opacity: 0, filter: 'blur(6px)' }}
+      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
 
       transition={{
         delay: 0.1,
@@ -71,6 +78,13 @@ export function DeviceCard({
         <div className="p-3 rounded-2xl glass-panel-dark">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Uptime</p>
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
+        </div>
+
+        <div className="p-3 rounded-2xl glass-panel-dark">
+          <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Display</p>
+          <p className="text-sm font-medium">
+            {display.width} {display.height}
+          </p>
         </div>
       </div>
     </motion.div>

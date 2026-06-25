@@ -13,9 +13,17 @@ import { loggerError } from '../logger';
 export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
   socket.on('device-online', (data:
-    { deviceId: string; name: string; platform: string; arch: string, user: string }, ack?: () => void) => {
+    {
+      deviceId: string; name: string; platform: string; arch: string, user: string,
 
-    const { deviceId, name, platform, arch, user } = data;
+      display: {
+        width: number,
+        height: number,
+        scaleFactor: number
+      }
+    }, ack?: () => void) => {
+
+    const { deviceId, name, platform, arch, user, display } = data;
 
     if (!deviceId) {
       console.warn('[Desktop] device-online missing deviceId');
@@ -28,7 +36,8 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
       platform: platform || 'unknown',
       arch: arch || 'unknown',
       socketId: socket.id,
-      user: user || ''
+      user: user || '',
+      display: display || ''
     });
 
     // Join the device's own room so we can target it by deviceId
@@ -92,7 +101,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
           ? data.frame.byteLength
           : Buffer.byteLength(data.frame as string, 'base64');
 
-          console.log("{desktop} /FPS ",frameSize);
+        console.log("{desktop} /FPS ", frameSize);
 
         wsFrameBytesHistogram.observe(frameSize);
 
@@ -110,7 +119,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
           error: err instanceof Error ? err.message : String(err),
           deviceId: deviceManager.getDeviceBySocketId(socket.id)?.id,
         });
-      } 
+      }
     }
   );
 
@@ -120,7 +129,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
     socket.to(device.id).emit('screen-share-started', data);
- 
+
   });
 
   // Desktop agent emits command result (non-callback style).
@@ -151,7 +160,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
     if (!device) return;
 
     socket.to(device.id).emit('webrtc-answer', data);
- 
+
   });
 
   socket.on('webrtc-ice-candidate', (data: any) => {
@@ -180,8 +189,8 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
 
   socket.on('disconnect', (reason) => {
     console.log(`[Desktop] Disconnected: ${socket.id} (reason: ${reason})`);
-    
-    wsDisconnectionsTotal.inc({role: 'desktop',reason,});
+
+    wsDisconnectionsTotal.inc({ role: 'desktop', reason, });
 
     const device = deviceManager.getDeviceBySocketId(socket.id);
     if (!device) return;
@@ -195,7 +204,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
         io.to(device.id).emit('device-disconnected', { deviceId: device.id });
         wsConnectionsActive.dec({ role: 'desktop' });
       }
- 
+
 
     }, 30000);
   });

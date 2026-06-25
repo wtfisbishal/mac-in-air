@@ -14,6 +14,13 @@ interface DeviceInfo {
   totalMemory: number;
   freeMemory: number;
   uptime: number;
+
+  display: {
+    width: number,
+    height: number,
+    scaleFactor: number
+  }
+
 }
 
 // interface WebClient {
@@ -44,12 +51,12 @@ export default function DashboardPage() {
 
   }, []);
 
-   
+
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6 h-fit  ">
 
-       
+
       {/* <div className="rounded-xl border border-white/[0.06] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
@@ -97,14 +104,14 @@ export default function DashboardPage() {
         )}
       </div> */}
 
- {/* <Link className='glass-button' href='/'>home</Link> */}
+      {/* <Link className='glass-button' href='/'>home</Link> */}
 
 
       {deviceInfo && (
         <DeviceCard {...deviceInfo} isConnected={isConnected} />
       )}
 
-       <PairingStatusWidget /> 
+      <PairingStatusWidget />
     </div>
   );
 }

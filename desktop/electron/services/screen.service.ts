@@ -28,12 +28,7 @@ export class ScreenService {
   //Start screen sharing session
   public async startScreenShare(sessionId: string, options?: { frameRate?: number; quality?: number }) {
     if (this.activeSession) {
-      logWarn('ScreenService', 'Screen share already active');
-
-      // this.activeSession.isActive = false;
-      // const { BrowserWindow } = require('electron');
-      // BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
-
+      logWarn('ScreenService', 'Screen share already active'); 
       return false;
     }
 
@@ -83,6 +78,9 @@ export class ScreenService {
   isActive(): boolean {
     return this.activeSession?.isActive ?? false;
   }
+
+  
+
 }
 
 export const screenService = new ScreenService();

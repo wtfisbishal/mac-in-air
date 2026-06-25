@@ -10,7 +10,12 @@ class DeviceManager {
     arch: string;
     socketId: string;
     user: string;
-    
+    display: {
+      width: number,
+      height: number,
+      scaleFactor: number
+    }
+
   }): Device {
     const existing = this.devices.get(deviceId);
 
@@ -20,7 +25,12 @@ class DeviceManager {
       platform: data.platform,
       arch: data.arch,
       isOnline: true,
-      user:data.user,
+      user: data.user,
+      display: {
+        width: data.display.width,
+        height: data.display.height,
+        scaleFactor: data.display.scaleFactor
+      },
       socketId: data.socketId,
       connectedAt: existing?.connectedAt ?? Date.now(),
       pairedRooms: existing?.pairedRooms ?? new Set(),
@@ -31,7 +41,7 @@ class DeviceManager {
     return device;
   }
 
-  
+
   markOffline(socketId: string): Device | null {
     for (const [, device] of this.devices) {
       if (device.socketId === socketId) {
@@ -42,13 +52,13 @@ class DeviceManager {
     }
     return null;
   }
- 
+
   getDevice(deviceId: string): Device | undefined {
     return this.devices.get(deviceId);
   }
 
 
-   // Get device by socket ID (for disconnect handling).
+  // Get device by socket ID (for disconnect handling).
 
   getDeviceBySocketId(socketId: string): Device | undefined {
     for (const [, device] of this.devices) {
@@ -69,7 +79,7 @@ class DeviceManager {
 
   // Safe serializable list for API responses.
   listForApi(): Omit<Device, 'pairedRooms' | 'socketId'>[] {
-    return Array.from(this.devices.values()).map(({ id, name,user, platform, arch, isOnline, connectedAt }) => ({
+    return Array.from(this.devices.values()).map(({ id, name, user, platform, arch, isOnline, connectedAt, display }) => ({
       id,
       name,
       platform,
@@ -77,10 +87,11 @@ class DeviceManager {
       user,
       isOnline,
       connectedAt,
+      display
     }));
   }
 
-  
+
   //  Add a paired frontend to a device.
 
   addPairedRoom(deviceId: string, frontendSocketId: string): void {

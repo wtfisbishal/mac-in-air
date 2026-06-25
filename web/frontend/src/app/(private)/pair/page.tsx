@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Loader, CheckCircle, ArrowRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { pairDevice } from '@/lib/api';
@@ -20,6 +20,14 @@ export default function PairPage() {
   const [digits, setDigits] = useState<string[]>(Array(LEN).fill(''));
   const [paired, setPaired] = useState<{ name: string; id: string } | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+
+  const path = useSearchParams();
+
+  const name = path?.get('d');
+  const userName = path?.get('u');
+
+  console.log(name, userName)
 
   const mutation = useMutation({
     mutationFn: async ({ code }: { code: string }) => {
@@ -82,11 +90,11 @@ export default function PairPage() {
     if (code.length !== LEN) { toast('Enter all 6 digits', 'error'); return; }
     mutation.mutate({ code });
   };
- 
+
   if (paired) {
     return (
       <AppLayout>
-        <div className="animate-spotlight h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
+        <div className="animate-spotlight h-fit mt-20 max-md:mt-40 w-full flex items-center justify-center p-6">
           <div className="text-center flex flex-col items-center  animate-fade-up ">
 
             <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
@@ -94,8 +102,8 @@ export default function PairPage() {
             </div>
 
             <h2 className="text-2xl font-bold text-emerald-500 mb-2">Connected to !</h2>
-            <p className="text-slate-400 text-sm mb-6">
-              <span className="text-white text-7xl max-md:text-5xl font-extrabold">{paired.name}</span>  
+            <p className="text-slate-400 text-sm mb-4">
+              <span className="text-white text-7xl max-md:text-5xl font-extrabold">{paired.name}</span>
             </p>
             <button
               onClick={() => router.push(`/control/${paired.id}`)}
@@ -112,18 +120,27 @@ export default function PairPage() {
   if (mutation.isPending) {
     return (
       <AppLayout>
-        <div className="animate-spotlight h-fit mt-20 max-md:mt-52 w-full flex items-center justify-center p-6">
+        <div className="animate-spotlight h-fit mt-20 max-md:mt-40 w-full flex items-center justify-center p-6">
           <div className="text-center flex flex-col items-center  animate-fade-up ">
 
-            <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
-              <CheckCircle size={36} className="text-emerald-400" />
-            </div>
-
-            <h2 className="text-2xl font-bold text-emerald-500 mb-2">Connecting to !</h2>
-            <p className="text-slate-400 text-sm mb-6">
-              <span className="text-white text-7xl max-md:text-5xl font-extrabold">MacBook</span>  
-            </p>
             
+
+            <h2 className="text-2xl font-bold text-indigo-500 mb-2">Connecting to </h2>
+            <p className="text-slate-400 text-sm mb-4">
+              {
+                name ?
+                  <h2 className=' text-3xl mt-5 flex flex-col '> {userName}'s 
+                    <span className="text-white text-7xl max-md:text-5xl font-extrabold">
+                      {name}
+                    </span>
+                  </h2>
+                  :
+                  <span className="text-white text-7xl max-md:text-5xl font-extrabold"> Mac</span>
+
+              }
+
+            </p>
+
           </div>
         </div>
       </AppLayout>
@@ -145,7 +162,7 @@ export default function PairPage() {
             </p>
           </div>
 
-          <form onSubmit={submit}>
+          <form className=' max-md:w-full' onSubmit={submit}>
             <div className="bg-gradient-to-t from-[#1C0B53] to-[#503993] rounded-3xl w-[500px] max-md:w-[98%] max-md:px-5 p-7 mb-4">
               <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest text-center mb-5">
                 Pairing Code

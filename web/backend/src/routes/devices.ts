@@ -20,8 +20,8 @@ router.get('/:id', requireAuth, (req: Request, res: Response): void => {
     return;
   }
 
-  const { id, name, platform, arch, isOnline,user , connectedAt } = device;
-  res.json({ id, name, platform, arch, isOnline,user, connectedAt });
+  const { id, name, platform, arch, isOnline,user , display , connectedAt } = device;
+  res.json({ id, name, platform, arch, isOnline,user,display, connectedAt });
 });
 
 // POST /devices/:id/commands — relay a command to the device

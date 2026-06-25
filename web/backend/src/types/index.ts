@@ -1,21 +1,26 @@
- 
+
 export interface Device {
-  id: string;           
+  id: string;
   name: string;
-  platform: string;     
-  arch: string;         
+  platform: string;
+  arch: string;
   isOnline: boolean;
-  user:string ,
-  socketId: string;      
-  connectedAt: number;  
-  pairedRooms: Set<string>; 
+  user: string,
+  socketId: string;
+  connectedAt: number;
+  pairedRooms: Set<string>;
+  display: {
+    width: number,
+    height: number,
+    scaleFactor: number
+  }
 }
 
 export interface PairingEntry {
   code: string;
   deviceId: string;
-  socketId: string;  
-  createdAt: number;  
+  socketId: string;
+  createdAt: number;
   expiresAt: number;
 }
 

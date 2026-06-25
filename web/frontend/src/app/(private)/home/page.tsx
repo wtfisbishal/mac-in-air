@@ -14,7 +14,7 @@ import type { Device } from '@/types';
 function DeviceCard({ device }: { device: Device }) {
   const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
 
-  return (
+   return (
     <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel-card rounded-3xl p-5 transition-all   group
       ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
     >
@@ -61,7 +61,7 @@ function DeviceCard({ device }: { device: Device }) {
           href={`/control/${device.id}`}
           className={`btn !rounded-full glass-button-primary flex-1 text-xs py-2 ${device.isOnline ? 'glass-button-primary' : 'glass-button opacity-40 pointer-events-none'}`}
         >
-          <Zap size={13} /> Control
+            Control
         </Link>
 
       </div>
@@ -97,8 +97,7 @@ export default function DashboardPage() {
         <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
 
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Home</h1>
-            <p className="text-slate-400 w-full text-xs mt-1">Monitor and control your remote devices</p>
+            <h1 className="text-6xl font-bold text-white mb-5 tracking-tight">MACS</h1>
           </div>
 
           <div className="flex items-center max-md:gap-6 max-md:w-full   gap-3">

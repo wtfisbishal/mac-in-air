@@ -7,10 +7,21 @@ export default function ScreenCanvas({
   deviceId,
   pairToken,
   onMouseEvent,
+  mouseCapture = false,
+  onScreenSize,
+  displaySize
 }: {
   deviceId: string;
   pairToken: string;
   onMouseEvent: (type: string, data: Record<string, unknown>) => void;
+  mouseCapture?: boolean;
+  /** Called whenever the real Mac screen dimensions become known */
+  onScreenSize?: (w: number, h: number) => void;
+  displaySize:{
+    width:number,
+    height:number,
+    scaleFactor:number
+  }
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -18,9 +29,10 @@ export default function ScreenCanvas({
   const [hasFrame, setHasFrame] = useState(false);
   const [dimLabel, setDimLabel] = useState('');
   const [hasAudio, setHasAudio] = useState(false);
-  // Start muted — browsers block autoplay with audio until the user interacts
   const [isMuted, setIsMuted] = useState(true);
-  const screenSize = useRef({ w: 1920, h: 1080 }); // actual Mac screen size from frames
+
+  // const screenSize = useRef({ w: 1920, h: 1080 });  
+  const screenSize = useRef({ w: displaySize?.width ?? 1920, h: displaySize.height ?? 1080 }); // actual Mac screen size from frames
 
   useEffect(() => {
     const socket = getSocket();
@@ -55,6 +67,7 @@ export default function ScreenCanvas({
           if (settings.width && settings.height) {
             screenSize.current = { w: settings.width, h: settings.height };
             setDimLabel(`${settings.width} × ${settings.height}`);
+            onScreenSize?.(settings.width, settings.height);
           }
         }
 
@@ -69,6 +82,7 @@ export default function ScreenCanvas({
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
+        // console.log("ice candidate are " ,event.candidate)
         // Use toJSON() so sdpMid / sdpMLineIndex survive JSON serialization over socket
         socket.emit('webrtc-ice-candidate', {
           candidate: event.candidate.toJSON(),
@@ -186,7 +200,7 @@ export default function ScreenCanvas({
             toggleMute();
           }}
           style={{ cursor: 'pointer' }}
-          className="pointer-events-auto absolute bottom-10 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-black/80 transition-all"
+          className="pointer-events-auto absolute top-5 right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-panel-card b  text-xs text-slate-300 hover:text-white  transition-all"
           title={isMuted ? 'Unmute audio' : 'Mute audio'}
         >
           {isMuted ? (

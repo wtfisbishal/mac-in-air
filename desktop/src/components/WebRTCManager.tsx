@@ -91,6 +91,11 @@ export default function WebRTCManager() {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
 
+        // { //ex..
+        //   "type": "offer",
+        //   "sdp": "v=0 ..."
+        // }
+
         // Send offer to backend via Main Process
         window.electronAPI.sendWebRTCSignaling({
           type: 'offer',

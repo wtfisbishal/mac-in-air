@@ -20,6 +20,7 @@ import NormalKeyboard from '../_components/NormalKeyboard';
 import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
+import VirtualJoystick from '../_components/VirtualJoystick';
 
 interface PageProps {
   params: Promise<{ deviceId: string }>;
@@ -48,6 +49,8 @@ export default function ControlPage({ params }: PageProps) {
   const [sessionId, setSessionId] = useState('');
   const [warning, setWarning] = useState<string | null>(null);
   const { fullscreen, setFullscreen } = useFullscreen();
+  // joystick needs to know the actual Mac screen size for cursor clamping
+  const [screenSize, setScreenSize] = useState({ w: 1920, h: 1080 });
 
   // for stop streaming on unmount -- --- - 
   const streamingRef = useRef(streaming);
@@ -144,7 +147,7 @@ export default function ControlPage({ params }: PageProps) {
             You must pair this device before you can control it.
             Pairing tokens expire after 30 min  or when you close the tab.
           </p>
-          <Link href="/pair" className="btn !rounded-full glass-button-primary">
+          <Link href={`/pair/?d=${device?.name}&&u=${device?.user}`} className="btn !rounded-full glass-button-primary">
             <Link2 size={20} />
             Pair Device
           </Link>
@@ -207,7 +210,7 @@ export default function ControlPage({ params }: PageProps) {
         )}
 
         {/*   Main area */}
-        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' :' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
@@ -271,8 +274,15 @@ export default function ControlPage({ params }: PageProps) {
 
             {/* Canvas */}
             <div className="flex-1 w-full min-h-[550px] max-md:h-fit rounded-3xl overflow-hidden relative animate-fade-up delay-2">
-              <ScreenCanvas deviceId={deviceId} pairToken={pairToken} onMouseEvent={handleMouseEvent} mouseCapture={mouseCapture} />
-            </div> 
+              <ScreenCanvas
+                deviceId={deviceId}
+                pairToken={pairToken}
+                onMouseEvent={handleMouseEvent}
+                mouseCapture={mouseCapture}
+                displaySize={device.display}
+                onScreenSize={(w, h) => setScreenSize({ w, h })}
+              />
+            </div>
 
             {/* {kbCapture && (
               <div className="animate-fade-up overflow-x-auto delay-4 min-h-[300px] w-full   pb-4  max-md:hidden flex justify-center">
@@ -324,6 +334,21 @@ export default function ControlPage({ params }: PageProps) {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Virtual Joystick */}
+              <div className="glass-panel-dark rounded-3xl p-4 flex flex-col items-center">
+                <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-4 self-start">Joystick</p>
+                <VirtualJoystick
+                  screenW={screenSize.w}
+                  screenH={screenSize.h}
+                  enabled={mouseCapture}
+                />
+                {!mouseCapture && (
+                  <p className="text-[10px] text-slate-600 mt-3 text-center">
+                    Enable Mouse to use joystick
+                  </p>
+                )}
               </div>
 
               {/* System actions */}
@@ -410,6 +435,15 @@ export default function ControlPage({ params }: PageProps) {
         {kbCapture && (
           <div className=" items-start center absolute max-md:bg-gradient-to-t  from-[#1C0B53] to-[#503993]  bottom-10 rounded-2xl animate-fade-up  flex overflow-x-auto   min-h-[350px] left-2 max-md:left-0 w-full  max-md: pb-4 p-4  justify-start   ">
             <NormalKeyboard />
+          </div>
+        )}
+        {mouseCapture && (
+          <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
+            <VirtualJoystick
+              screenW={screenSize.w}
+              screenH={screenSize.h}
+              enabled={mouseCapture}
+            />
           </div>
         )}
       </div>
