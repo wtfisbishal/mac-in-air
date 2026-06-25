@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
+import { useState, useRef, Suspense, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Loader, CheckCircle, ArrowRight } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,7 +13,7 @@ import type { Device } from '@/types';
 
 const LEN = 6;
 
-export default function PairPage() {
+function PairPageContent() {
   const router = useRouter();
   const { toasts, toast, dismiss } = useToast();
   const qc = useQueryClient();
@@ -26,9 +26,7 @@ export default function PairPage() {
 
   const name = path?.get('d');
   const userName = path?.get('u');
-
-  console.log(name, userName)
-
+ 
   const mutation = useMutation({
     mutationFn: async ({ code }: { code: string }) => {
       const socket = getSocket();
@@ -221,5 +219,19 @@ export default function PairPage() {
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
+  );
+}
+
+export default function PairPage() {
+  return (
+    <Suspense fallback={
+      <AppLayout>
+        <div className="min-h-screen w-full flex items-center justify-center">
+          <Loader className="animate-spin text-slate-500" size={32} />
+        </div>
+      </AppLayout>
+    }>
+      <PairPageContent />
+    </Suspense>
   );
 }

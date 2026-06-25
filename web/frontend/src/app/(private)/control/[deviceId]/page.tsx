@@ -326,7 +326,7 @@ export default function ControlPage({ params }: PageProps) {
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ?'absolute' : 'hidden'} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
+            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ?' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
               <Link

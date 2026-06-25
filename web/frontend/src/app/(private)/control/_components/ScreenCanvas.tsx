@@ -48,7 +48,7 @@ export default function ScreenCanvas({
           if (res?.success === false) {
             sessionStorage.removeItem(`rmac_pair_${deviceId}`)
           }
-          console.log('join-device response', res);
+          // console.log('join-device response', res);
         }
       );
     };
@@ -110,7 +110,7 @@ export default function ScreenCanvas({
         // Detect if an audio track is present in the incoming stream
         const audioTracks = event.streams[0].getAudioTracks();
         if (audioTracks.length > 0) {
-          console.log('[ScreenCanvas] Audio track received:', audioTracks[0].label);
+          // console.log('[ScreenCanvas] Audio track received:', audioTracks[0].label);
           setHasAudio(true);
         }
       }
