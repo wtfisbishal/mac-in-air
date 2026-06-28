@@ -63,6 +63,21 @@ export class CommandService {
           }
           return { success: false, message: 'Missing scroll values' };
 
+        case 'MOUSE_DOWN':
+          await mouseService.toggleMouse('down', command.payload?.button);
+          return { success: true, message: 'Mouse down' };
+
+        case 'MOUSE_UP':
+          await mouseService.toggleMouse('up', command.payload?.button);
+          return { success: true, message: 'Mouse up' };
+
+        case 'MOUSE_DRAG':
+          if (command.payload?.x != null && command.payload?.y != null) {
+            await mouseService.dragMouse(command.payload.x, command.payload.y);
+            return { success: true, message: 'Mouse dragged' };
+          }
+          return { success: false, message: 'Missing coordinates' };
+
         //  Keyboard commands 
         case 'KEYBOARD_TYPE':
           if (command.payload?.text) {

@@ -328,14 +328,14 @@ export default function Home() {
               <p className="text-[10px] text-gray-400">macOS 13 Ventura or later</p>
             </div>
 
-            <div className=" w-[60%] max-md:w-[95%] border-black shadow-[black] shadow-2xl outline-2 outline-[#ffffff7b] rounded-[22px] border-[12px] overflow-hidden 
+            <div className=" w-[60%] max-md:w-[95%] border-black shadow-[black] shadow-2xl outline-2 outline-[#ffffff82] rounded-[22px] border-[12px] overflow-hidden 
              transition-all duration-500 hover:-rotate-1 hover:scale-105 border h-[400px] max-md:h-[300px] hover:-right-8   -right-12 -bottom-8 absolute ">
 
-              <div className=" h-[23px] w-[100px] flex items-center justify-center bg-black absolute -top-1 left-[45%] z-10 rounded-lg -2xl">
+              <div className=" h-[23px] w-[100px] flex items-center justify-center bg-black absolute -top-1.5 left-[45%] z-10 rounded-lg -2xl">
                 <div className=" h-1 w-1 bg-green-500 ml-10 rounded-full"></div>
               </div>
               <Image
-                src="/desk.webp"
+                src="/desk.png"
                 alt="Desktop"
                 fill
                 className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "
@@ -348,7 +348,7 @@ export default function Home() {
         <div className="w-full h-[30vh] max-md:h-[10vh] relative overflow-hidden">
 
           <h1 className=" last-text bg-clip-text text-transparent text-[170px] max-md:text-6xl max-md:-bottom-[20%] absolute -bottom-[30%] w-full text-center  font-extrabold  tracking-wide">
-            MAC in AIR ✈️
+            MAC in AIR 
           </h1>
         </div>
 

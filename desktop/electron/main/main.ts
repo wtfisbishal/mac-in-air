@@ -32,6 +32,7 @@ function createWindow() {
   visualEffectState: 'active',
 
   webPreferences: {
+    devTools:false,
     preload: path.join(__dirname, '../preload.js'),
     contextIsolation: true, 
   },

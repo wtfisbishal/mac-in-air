@@ -34,15 +34,13 @@ export default function PairingStatusWidget() {
 
   return (
     <Link href="/pairing">
-      <div className="p-4 rounded-xl my-4 bg-gradient-to-b from-[#FFB600] to-[#C98500] transition-colors cursor-pointer">
+      <div className="p-4 rounded-xl my-4 glass-panel -dark bg-gradient-to-  from-[#FFB600] to-[#C98500] transition-colors cursor-pointer">
         <div className="flex items-start gap-3">
           <div className="text-xl">🔗</div>
           <div className="flex-1">
-            <h3 className="font-semibold text-yellow-100 text">Pairing Required</h3>
-            <p className="text-yellow-200 /70 text-xs mt-1">
-              Share your pairing code to connect this device to the web dashboard
-            </p>
-            <p className="text-yellow-300 /60 text-xs mt-2">
+            <h3 className="font-semibold text-indigo-100 text">Pairing Required</h3>
+         
+            <p className="text-indigo-300 /60 text-xs mt-2">
               Click here to view your pairing code →
             </p>
           </div>

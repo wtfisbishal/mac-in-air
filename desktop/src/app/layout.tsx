@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import TitleBar from "@/components/titleBar";
 import WebRTCManager from "@/components/WebRTCManager";
 import UpdateBanner from "@/components/UpdateBanner";
-
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+ 
 
 export const metadata: Metadata = {
   title: "MAC in AIR",
@@ -23,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} relative backdrop-blur-3xl bg-[#00000032]   font-sans`}>
+      <body className={` relative backdrop-blur-3xl bg-[#00000032]   font-sans`}>
 
          
         <TitleBar />

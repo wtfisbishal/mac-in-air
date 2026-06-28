@@ -22,7 +22,6 @@ import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
 import VirtualJoystick from '../_components/VirtualJoystick';
-
 interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
@@ -33,7 +32,6 @@ export default function ControlPage({ params }: PageProps) {
   const { data: device, isLoading } = useDevice(deviceId);
   const { toasts, toast, dismiss } = useToast();
 
-  //   Authorization: require a pairToken stored during the pairing flow  
   const [pairToken, setPairToken] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -68,7 +66,7 @@ export default function ControlPage({ params }: PageProps) {
       console.log('[ControlPage] Control data channel CLOSED');
     }
   }, []);
- 
+
   // for stop streaming on unmount -- --- - 
   const streamingRef = useRef(streaming);
   const sessionIdRef = useRef(sessionId);
@@ -98,7 +96,7 @@ export default function ControlPage({ params }: PageProps) {
     });
   }, [toast]);
 
-  //   Mouse events — send over WebRTC data channel (peer-to-peer)  
+  //   Mouse events — send over WebRTC data channel (p2p)  
   // Falls back gracefully to a no-op if the data channel is not yet open.
   const handleMouseEvent = useCallback((type: string, data: Record<string, unknown>) => {
     if (!mouseCapture) return;
@@ -107,16 +105,20 @@ export default function ControlPage({ params }: PageProps) {
     //   WebRTC data channel path  
     if (dc && dc.readyState === 'open') {
       const commandType =
-        type === 'mouse-move' ? 'MOUSE_MOVE' :
-          type === 'mouse-click' ? 'MOUSE_CLICK' :
-            type === 'mouse-scroll' ? 'MOUSE_SCROLL' : null;
+        type === 'mouse-move'          ? 'MOUSE_MOVE' :
+        type === 'mouse-move-relative' ? 'MOUSE_MOVE_RELATIVE' :
+        type === 'mouse-click'         ? 'MOUSE_CLICK' :
+        type === 'mouse-scroll'        ? 'MOUSE_SCROLL' :
+        type === 'mouse-down'          ? 'MOUSE_DOWN' :
+        type === 'mouse-up'            ? 'MOUSE_UP' :
+        type === 'mouse-drag'          ? 'MOUSE_DRAG' : null;
 
       if (commandType) {
         dc.send(JSON.stringify({ type: commandType, payload: data }));
         return;
       }
     }
- 
+
   }, [mouseCapture]);
 
 
@@ -188,7 +190,7 @@ export default function ControlPage({ params }: PageProps) {
   );
 
   if (!device) return (
-     <AppLayout>
+    <AppLayout>
       <div className="w-full flex items-center-safe justify-center">
         <div className="text-center">
           <MonitorOff size={40} className="text-slate-600 mx-auto mb-3" />
@@ -203,7 +205,7 @@ export default function ControlPage({ params }: PageProps) {
 
   return (
     <AppLayout>
-      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : ' -mt-14 max-md:-mt-0 p-5'}`}>
+      <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : '   p-5'}`}>
 
         {visiblePanel && <div className='fixed w-full h-full top-0 z-[100] left-0 flex items-center justify-center bg-[#0000005f]  backdrop-blur-[4px] '>
 
@@ -217,7 +219,7 @@ export default function ControlPage({ params }: PageProps) {
 
         {/* Top bar */}
         {!fullscreen && (
-          <div className="flex items-center   max-md:-mt-1 justify-between mb-4 animate-fade-up">
+          <div className="flex items-center max-md:flex-col max-md:gap-5 max-md:items-start max-md:-mt-1 justify- mb-4 animate-fade-up">
             <div className="flex items-center gap-3">
               <button onClick={() => router.push('/home')} className="btn  !rounded-3xl  glass-panel-dark  p-2">
                 <ArrowLeft size={16} />
@@ -234,23 +236,8 @@ export default function ControlPage({ params }: PageProps) {
               </span>
             </div>
 
-            <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl  p-2">
-              <Maximize2 size={15} />
-            </button>
-          </div>
-        )}
-
-        {/*   Main area */}
-        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
-          {/* Screen */}
-          <div
-            ref={controlAreaRef}
-            className={`flex-1 flex flex-col min-h-screen/ items-center gap-3 min-w-0 ${fullscreen ? 'p-3' : ''}`}
-            tabIndex={-1}
-            style={{ outline: 'none' }}
-          >
-            {/* Toolbar */}
-            <div className="animate-spotlight glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap animate-fade-up delay-1">
+            {/* Tool bars */}
+            <div className="animate-spotlight glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap ">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
@@ -294,24 +281,43 @@ export default function ControlPage({ params }: PageProps) {
                 </button>
               ))}
 
-              {/* Fullscreen exit */}
-              {fullscreen && (
-                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ">
-                  <Minimize2 size={12} /> Exit
-                </button>
-              )}
-
-                {  (
-                <button onClick={() => { setHamburgerOpen(!humburgerOpen); }} className={`${ !humburgerOpen ? 'bg-[#ffffff0d] text-[#94a3b8] ' : ' bg-[#6366f126] text-[#a5b4fc] '} bg-[#ffffff0d] px-3 py-2 rounded-full  hidden max-md:flex `}>
+              {(
+                <button onClick={() => { setHamburgerOpen(!humburgerOpen); }} className={`${!humburgerOpen ? 'bg-[#ffffff0d] text-[#94a3b8] ' : ' bg-[#6366f126] text-[#a5b4fc] '} bg-[#ffffff0d] px-3 py-2 rounded-full  hidden max-md:flex `}>
                   <LayoutGrid size={20} />
                 </button>
               )}
 
-              
+              {fullscreen ?
+                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ">
+                  <Minimize2 size={12} /> Exit
+                </button>
+                : <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl  p-2">
+                  <Maximize2 size={15} />
+                </button>}
+
+
             </div>
 
+
+          </div>
+        )}
+
+        {/*   Main area */}
+        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+          {/* Screen */}
+          <div
+            ref={controlAreaRef}
+            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh] relative items-center gap-3 min-w-0   `}
+            tabIndex={-1}
+            style={{ outline: 'none' }}
+          >
             {/* Canvas */}
-            <div className="flex-1 w-full max-md:h-fit rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className=" w-full h-screen  items-end flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+              {fullscreen && (
+                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn glass-panel-dark">
+                  <Minimize2 size={12} /> Exit
+                </button>
+              )}
               <ScreenCanvas
                 deviceId={deviceId}
                 pairToken={pairToken}
@@ -326,7 +332,7 @@ export default function ControlPage({ params }: PageProps) {
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ?' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
+            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
               <Link
@@ -348,7 +354,7 @@ export default function ControlPage({ params }: PageProps) {
                     { label: 'Copy', key: 'c', mod: 'command' },
                     { label: 'Paste', key: 'v', mod: 'command' },
                     { label: 'Select All', key: 'a', mod: 'command' },
-                    { label: 'Undo', key: 'z', mod: 'command' }, 
+                    { label: 'Undo', key: 'z', mod: 'command' },
                     { label: 'Spotlight', key: 'space', mod: 'command' },
                   ].map(s => (
                     <button
@@ -489,4 +495,3 @@ export default function ControlPage({ params }: PageProps) {
     </AppLayout>
   );
 }
- 

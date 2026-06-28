@@ -27,6 +27,7 @@
     "mac screen sharing"
   ],
   "dependencies": {
+    "dotenv": "^17.4.2",
     "electron-serve": "^2.1.1",
     "electron-updater": "^6.8.9",
     "framer-motion": "^12.40.0",
