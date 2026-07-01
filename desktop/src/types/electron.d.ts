@@ -32,6 +32,7 @@ export interface ElectronAPI {
   getMediaAccessStatus: () => Promise<string>;
   checkAccessibility: () => Promise<boolean>;
   requestAccessibility: () => Promise<boolean>;
+  requestRecoading: () => Promise<boolean>;
   checkAutomation: () => Promise<boolean>;
   getAllPermissions: () => Promise<PermissionsStatus>;
   executeCommand: (command: { type: string; payload?: any }) => Promise<CommandResult>;
@@ -50,6 +51,7 @@ export interface ElectronAPI {
   onUpdateDownloaded:? (callback: (info: { version: string }) => void) => void;
   onUpdateError:? (callback: (err: { message: string }) => void) => void;
   installUpdate:? () => void;
+
 }
 
 declare global {

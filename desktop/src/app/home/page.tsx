@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { DeviceCard } from '@/components/DeviceCard';
 import PairingStatusWidget from '@/components/PairingStatusWidget';
 import Link from 'next/link';
+import PermissionsPage from '../permissions/page';
+import PairingCodeCard from '@/components/PairingCodeCard';
 
 interface DeviceInfo {
   hostname: string;
@@ -20,14 +22,7 @@ interface DeviceInfo {
     height: number,
     scaleFactor: number
   }
-
 }
-
-// interface WebClient {
-//   socketId: string;
-//   connectedAt: number;
-// }
-
 export default function DashboardPage() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -104,14 +99,18 @@ export default function DashboardPage() {
         )}
       </div> */}
 
-      {/* <Link className='glass-button' href='/'>home</Link> */}
+      {/* <Link className= ' p-3  glass-button' href='/'>home</Link> */}
 
 
       {deviceInfo && (
         <DeviceCard {...deviceInfo} isConnected={isConnected} />
       )}
 
-      <PairingStatusWidget />
+      {/* <PairingStatusWidget /> */}
+
+      <PermissionsPage />
+
+       <PairingCodeCard /> 
     </div>
   );
 }

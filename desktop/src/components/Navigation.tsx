@@ -14,8 +14,8 @@ const Navigation = () => {
 
     const navItems = [
         { href: '/home', title: 'Home' },
-        { href: '/permissions', title: 'Permissions' },
-        { href: '/pairing', title: 'pairing' },
+        // { href: '/permissions', title: 'Permissions' },
+        { href: '/pairing', title: 'Pairing' },
     ]
 
     useEffect(() => {
@@ -40,9 +40,9 @@ const Navigation = () => {
     }
     return (
         <div className='fixed top-0 z-[100] w-full titlebar  flex items-center justify-center gap-5 h-[80px] pointer-events-none'>
-            <div className='pointer-events-auto backdrop-blur-[12px] glass-panel-dark relative flex items-center p-2 rounded-full'>
+            <div className='pointer-events-auto backdrop-blur-[12px] lass-panel-dark relative flex items-center  rounded-full'>
 
-                {pillStyle.opacity === 1 && (
+                {/* {pillStyle.opacity === 1 && (
                     <div
                         className="absolute  h-[calc(100%-14px)] top-2 backdrop-blur-3xl rounded-full bg-[#ffffff1b] transition-all duration-500 ease-in-out -z-10"
                         style={{
@@ -69,7 +69,7 @@ const Navigation = () => {
                             </p>
                         </Link>
                     )
-                })}
+                })} */}
             </div>
 
          

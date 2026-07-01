@@ -36,7 +36,7 @@ export class ScreenService {
     const quality = options?.quality ?? 1.0;
 
     this.activeSession = { sessionId, isActive: true, frameRate, quality };
-    logInfo('ScreenService', 'Starting WebRTC screen share', { sessionId, frameRate, quality });
+    // logInfo('ScreenService', 'Starting WebRTC screen share', { sessionId, frameRate, quality });
 
     try {
       const sources = await desktopCapturer.getSources({ types: ['screen'] });
@@ -45,6 +45,7 @@ export class ScreenService {
       const sourceId = sources[0].id;
 
       const { BrowserWindow } = require('electron');
+      // Forward the sourceId to the renderer process (where Chromium getUserMedia lives)
       BrowserWindow.getAllWindows()[0]?.webContents.send('start-webrtc', { sourceId, sessionId });
 
       return true;

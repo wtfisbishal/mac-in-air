@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import {motion} from 'framer-motion';
+import { useRouter } from 'next/navigation';
 interface PairingCodeCardProps {
   onRefresh?: () => void;
   isLoading?: boolean;
@@ -11,6 +12,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
   const [copySuccess, setCopySuccess] = useState(false);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCode = async () => {
@@ -77,17 +79,18 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
 
   if (loading) {
     return (
-      <div className="bg-gray-800/50 border flex flex-col h-[220px] items-center justify-center  border-gray-700 rounded-xl p-6 animate-pulse">
+      // <div className=" glass-panel border flex flex-col h-[220px] items-center justify-center  border-gray-700 rounded-xl p-6 animate-pulse">
 
-        <div className=' mt-3'>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <span key={index} className='bg-gray-700 font-extrabold ml-2 text-transparent font-mono !text-5xl px-6 rounded-4xl p-5'>
-              {index}
-            </span>
-          ))}
-        </div> 
+      //   <div className=' mt-3'>
+      //     {Array.from({ length: 6 }).map((_, index) => (
+      //       <span key={index} className='glass-panel-dark font-extrabold ml-2 text-transparent font-mono !text-5xl px-6 rounded-4xl p-5'>
+      //         {index}
+      //       </span>
+      //     ))}
+      //   </div> 
          
-      </div>
+      // </div>
+      null
     );
   }
 
@@ -95,6 +98,10 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
     return (
       <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
         <p className="text-red-400">{error}</p>
+        <button 
+
+        className=' mt-5 mx-auto flex-1 glass-button disabled:bg-gray-600 disabled:opacity-50 text-white font-semibold py-2 px-4 !rounded-full '
+        onClick={()=>{router.refresh()}}>Refresh</button>
       </div>
     );
   }
@@ -114,7 +121,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
         <div
           className="
            bg-gradient-to-t from-[#1C0B53] to-[#503993]
-            rounded-xl p-6 w-[560px]  h-fit flex flex-col gap-3
+            rounded-xl p-6 w-full   h-fit flex flex-col gap-3
             text-center cursor-pointer
           "
           onClick={copyToClipboard}
@@ -135,13 +142,13 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
         </div>
 
         {copySuccess && (
-          <div className="absolute w-[560px]  text-3xl inset-0 rounded-xl bg-indigo-200/20 flex items-center justify-center text-green-400 font-semibold animate-pulse">
+          <div className="absolute w-full  text-3xl inset-0 rounded-xl bg-indigo-200/20 flex items-center justify-center text-green-400 font-semibold animate-pulse">
 
           </div>
         )}
       </div>
 
-      <div className="flex gap-2 !mt-4 w-[560px] ">
+      <div className="flex gap-2 !mt-4 w-full ">
         <button
           onClick={copyToClipboard}
           disabled={isLoading || loading}
@@ -166,7 +173,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
         </button>
       </div>
 
-      <div className="text-xs w-[560px]  text-gray-400 text-center">
+      <div className="text-xs w-full  text-gray-400 text-center">
         Code expires in 30 minutes
       </div>
     </motion.div>

@@ -1,24 +1,21 @@
 
 import { ipcMain } from 'electron';
-import { screenService } from '../services/screen.service';
-import { commandService, CommandPayload } from '../services/command.service';
+ import { commandService, CommandPayload } from '../services/command.service';
 import { socketService } from '../services/socket.service';
 import { checkScreenRecordingPermission } from '../permissions/screen-recording';
 import { checkAccessibilityPermission } from '../permissions/accessibility';
 import { checkAutomationPermission } from '../permissions/automation';
-import { logInfo } from '../utils/logger';
-
+ 
 export function setupIpc() {
-  logInfo('IPC', 'Setting up IPC handlers');
-
-  //   Screen 
-  // ipcMain.handle('get-desktop-sources', async () => {
-  //   return await screenService.getScreenSources();
-  // });
-
+  
   //  Permissions 
   ipcMain.handle('get-media-access-status', () => {
     return checkScreenRecordingPermission();
+  });
+
+  ipcMain.handle('request-media-access', async () => {
+    const { shell  } = require('electron');
+    return  await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
   });
 
   ipcMain.handle('check-accessibility', () => {

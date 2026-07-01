@@ -44,6 +44,9 @@ export class CommandService {
         case 'SLEEP':
           return await appService.sleep();
 
+        case 'MISSION_CONTROL':
+          return await appService.missionControl();
+
         //  Mouse commands 
         case 'MOUSE_MOVE':
           if (command.payload?.x != null && command.payload?.y != null) {

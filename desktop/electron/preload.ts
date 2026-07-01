@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getMediaAccessStatus: () => ipcRenderer.invoke('get-media-access-status'),
   checkAccessibility: () => ipcRenderer.invoke('check-accessibility'),
   requestAccessibility: () => ipcRenderer.invoke('request-accessibility'),
+  requestRecoading:()=>ipcRenderer.invoke('request-media-access'),
   checkAutomation: () => ipcRenderer.invoke('check-automation'),
   getAllPermissions: () => ipcRenderer.invoke('get-all-permissions'),
 

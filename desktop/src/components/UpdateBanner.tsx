@@ -50,23 +50,23 @@ export default function UpdateBanner() {
   return (
     <>
       <AnimatePresence>
-        {visible && (
+        { visible && (
           <motion.div
             key="update-banner"
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-5 right-5 z-[200] w-72 rounded-2xl border border-white/10 bg-[#0d0d0d]/90 backdrop-blur-2xl shadow-2xl overflow-hidden"
+            className="fixed bottom-5 right-5 z-[200] w-72 rounded-full border border-white/10 bg-[#0d0d0d]/90 backdrop-blur-2xl shadow-2xl overflow-hidden"
           >
             {/* top accent line */}
             <div
               className={`h-[2px] w-full ${
                 update.status === 'error'
-                  ? 'bg-red-500/70'
+                  ? 'bg-red-500/50'
                   : update.status === 'downloaded'
-                  ? 'bg-emerald-400/80'
-                  : 'bg-indigo-500/70'
+                  ? 'bg-emerald-400/50'
+                  : 'bg-indigo-500/50'
               }`}
             />
 

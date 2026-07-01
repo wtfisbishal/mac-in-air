@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, Suspense, type KeyboardEvent, type ClipboardEvent, type FormEvent } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Loader, CheckCircle, ArrowRight } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Loader, CheckCircle, ArrowRight, Power } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { pairDevice } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
@@ -105,9 +105,9 @@ function PairPageContent() {
             </p>
             <button
               onClick={() => router.push(`/control/${paired.id}`)}
-              className="  flex items-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer "
+              className="  flex items-center gap-3 glass-button-primary rounded-full  p-3 text-[30px] font-semibold cursor-pointer "
             >
-              Open Control Room <ArrowRight size={15} />
+              <Power size={60} />
             </button>
           </div>
         </div>
@@ -150,9 +150,9 @@ function PairPageContent() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className=" text-5xl drop-shadow-xl drop-shadow-[#ffffff4f]  flex items-center justify-center mx-auto mb-4">
-              🔗
+              🔗 
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Pair a Device</h1>
+            <h1 className="text-2xl font-bold text-white mb-2">Pair Device</h1>
             <p className="text-slate-400 text-sm leading-relaxed">
               Open the Desktop App on your Mac, find the 6-digit pairing code, and enter it below.
             </p>

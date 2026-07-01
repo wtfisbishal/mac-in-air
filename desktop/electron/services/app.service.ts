@@ -137,6 +137,18 @@ export class AppService {
       return { success: false, message: `Failed to sleep: ${error.message}` };
     }
   }
+
+  public async missionControl(): Promise<{ success: boolean; message: string }> {
+    try {
+      // osascript is the most reliable way to trigger Mission Control on macOS.
+      // robot.keyTap('up', ['control']) does NOT work because macOS requires a
+      // low-level CGEvent media key, not a normal key press.
+      await execAsync(`osascript -e 'tell application "Mission Control" to launch'`);
+      return { success: true, message: 'Mission Control opened' };
+    } catch (error: any) {
+      return { success: false, message: `Failed to open Mission Control: ${error.message}` };
+    }
+  }
 }
 
 export const appService = new AppService();

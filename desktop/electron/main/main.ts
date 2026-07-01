@@ -46,6 +46,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+ 
   protocol.handle('app', (request) => {
     const urlObj = new URL(request.url);
     let pathname = decodeURIComponent(urlObj.pathname);
@@ -70,11 +71,7 @@ app.whenReady().then(() => {
     'PowerSaveBlocker started:',
     powerSaveBlocker.isStarted(blockerId)
   );
-
-  // ── System audio loopback via the modern Electron display-media API ──────────
-  // This handler intercepts navigator.mediaDevices.getDisplayMedia() calls from
-  // the renderer and grants access to the first screen source + system audio.
-  // 'loopback' = capture what is currently playing through the Mac's speakers.
+ 
   session.defaultSession.setDisplayMediaRequestHandler(
     async (_request, callback) => {
       try {
@@ -99,6 +96,7 @@ app.whenReady().then(() => {
   if (mainWindow) {
     setupUpdater(mainWindow);
   }
+ 
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

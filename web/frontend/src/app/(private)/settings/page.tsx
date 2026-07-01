@@ -47,16 +47,12 @@ export default function SettingsPage() {
               Sign out
             </button>
           </div>
-
-          
-
-
+ 
           <div className="px-5 pt-6 !pb-5">
             <Link href="/home" className="flex flex-col items-center gap-3 group">
 
               <div className='  '>
                 <Image loading='lazy' src="/logo.webp" height={90} width={90} className='drop-shadow-[#f6f6f63b] drop-shadow-2xl  object-fit' alt="" />
-
               </div>
               <div className="leading-none">
                 <p className="text-xl font-bold text-white tracking-tight">MAC in AIR</p>

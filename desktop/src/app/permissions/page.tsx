@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PermissionCard } from '@/components/PermissionCard';
 import { motion } from 'framer-motion'
 export default function PermissionsPage() {
   const [permissions, setPermissions] = useState<any>(null);
@@ -9,6 +8,8 @@ export default function PermissionsPage() {
   const loadPermissions = async () => {
     if (typeof window !== 'undefined' && window.electronAPI) {
       const perms = await window.electronAPI.getAllPermissions();
+
+      console.log(perms)
       setPermissions(perms);
     }
   };
@@ -25,9 +26,20 @@ export default function PermissionsPage() {
       await loadPermissions();
     }
   };
+  const requestRec = async () => {
+    if (window.electronAPI) {
+      await window.electronAPI.requestRecoading();
+      await loadPermissions();
+
+    }
+  };
+
+  if( permissions?.screenRecording === 'granted' && permissions?.accessibility   && permissions?.automation  ) {
+    return null;
+  }
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl mx-auto">
+    <div className="  space-y-6   mx-auto">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Permissions</h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -36,11 +48,33 @@ export default function PermissionsPage() {
       </div>
 
       <div className="space-y-3">
-        <PermissionCard
-          title="Screen Recording"
-          description="Required to capture your screen for live streaming and screenshots"
-          status={permissions?.screenRecording || 'unknown'}
-        />
+        
+        <motion.div initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.6,
+          }} className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${permissions?.screenRecording === 'granted' ? 
+          ' border border-[#12e5037a] bg-[#05490066] ' 
+          : '  bg-red-500/10 border border-red-500/30 '}`}>
+          <div>
+            <h3 className="font-semibold text-lg">Screen Recording</h3>
+            <p className="text-sm text-gray-200">Required to capture your screen for live streaming and screenshots</p>
+          </div>
+          <div className="flex items-center gap-2">
+             { permissions?.screenRecording !== 'granted' && (
+              <button
+                onClick={requestRec}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
+              >
+                Request
+              </button>
+            )}
+
+            <span className="text-sm capitalize font-medium">{permissions?.screenRecording}</span>
+            <div className={`w-3 h-3 rounded-full ${permissions?.screenRecording === 'granted' ? 'bg-green-500' : 'bg-red-500'}`} />
+          </div>
+        </motion.div>
 
         <motion.div initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -49,8 +83,8 @@ export default function PermissionsPage() {
             duration: 0.6,
           }}
           className={`p-4  rounded-2xl flex items-center justify-between transition-colors ${permissions?.accessibility
-              ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900]'
-              : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A] '
+            ? ' border border-[#12e5037a] bg-[#05490066] '
+            : '   bg-red-500/10 border border-red-500/30 '
             }`}
         >
           <div>
@@ -82,8 +116,8 @@ export default function PermissionsPage() {
             duration: 0.6,
           }}
           className={`p-4   rounded-2xl flex items-center justify-between transition-colors ${permissions?.automation
-              ? ' bg-gradient-to-b from-[#12e503bf] to-[#054900] '
-              : ' bg-gradient-to-t  from-[#8F101B] to-[#DF303A]'
+            ? '   border border-[#12e5037a] bg-[#05490066] '
+            : '   bg-red-500/10 border border-red-500/30 '
             }`}
         >
           <div>
@@ -107,9 +141,7 @@ export default function PermissionsPage() {
         </p>
       </div>
 
-      <div className=" pb-7 ">
-        {/* <img className='w-32 h-32 mx-auto drop-shadow-[#0000007a] drop-shadow-2xl ' src="/logo.webp" alt="" /> */}
-      </div>
+      
     </div>
   );
 }

@@ -18,6 +18,7 @@ import Image from 'next/image';
 import AppsIcons from '../../apps/_components/AppsIcons';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import NormalKeyboard from '../_components/NormalKeyboard';
+import MacKeybar from '../_components/MacKeybar';
 import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
@@ -105,13 +106,13 @@ export default function ControlPage({ params }: PageProps) {
     //   WebRTC data channel path  
     if (dc && dc.readyState === 'open') {
       const commandType =
-        type === 'mouse-move'          ? 'MOUSE_MOVE' :
-        type === 'mouse-move-relative' ? 'MOUSE_MOVE_RELATIVE' :
-        type === 'mouse-click'         ? 'MOUSE_CLICK' :
-        type === 'mouse-scroll'        ? 'MOUSE_SCROLL' :
-        type === 'mouse-down'          ? 'MOUSE_DOWN' :
-        type === 'mouse-up'            ? 'MOUSE_UP' :
-        type === 'mouse-drag'          ? 'MOUSE_DRAG' : null;
+        type === 'mouse-move' ? 'MOUSE_MOVE' :
+          type === 'mouse-move-relative' ? 'MOUSE_MOVE_RELATIVE' :
+            type === 'mouse-click' ? 'MOUSE_CLICK' :
+              type === 'mouse-scroll' ? 'MOUSE_SCROLL' :
+                type === 'mouse-down' ? 'MOUSE_DOWN' :
+                  type === 'mouse-up' ? 'MOUSE_UP' :
+                    type === 'mouse-drag' ? 'MOUSE_DRAG' : null;
 
       if (commandType) {
         dc.send(JSON.stringify({ type: commandType, payload: data }));
@@ -160,6 +161,25 @@ export default function ControlPage({ params }: PageProps) {
     };
   }, []);
 
+  const fullScreenRef = useRef<HTMLDivElement>(null);
+
+  const toggleFullscreen = async () => {
+    if (!fullScreenRef.current) return;
+
+    try {
+      // Check if there is already an active element in full screen
+      if (!document.fullscreenElement) {
+        // Request fullscreen on your container element
+        await fullScreenRef.current.requestFullscreen();
+      } else {
+        // Exit full screen mode
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error("Fullscreen request failed:", error);
+    }
+  };
+
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
@@ -167,6 +187,8 @@ export default function ControlPage({ params }: PageProps) {
       </div>
     </AppLayout>
   );
+
+
 
   if (!pairToken) return (
     <AppLayout>
@@ -225,7 +247,7 @@ export default function ControlPage({ params }: PageProps) {
                 <ArrowLeft size={16} />
               </button>
               <div>
-                <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight capitalize"> {device?.user}'s {device.name}</h1>
+                <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight capitalize"> Bishal's {device.name}</h1>
                 <p className="text-xs text-slate-500">{device.platform} · {device.arch}</p>
               </div>
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full
@@ -291,7 +313,7 @@ export default function ControlPage({ params }: PageProps) {
                 <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ">
                   <Minimize2 size={12} /> Exit
                 </button>
-                : <button onClick={() => { setFullscreen(true) }} className="btn glass-panel-dark !rounded-3xl  p-2">
+                : <button onClick={() => { setFullscreen(true); toggleFullscreen() }} className="btn glass-panel-dark !rounded-3xl  p-2">
                   <Maximize2 size={15} />
                 </button>}
 
@@ -303,18 +325,20 @@ export default function ControlPage({ params }: PageProps) {
         )}
 
         {/*   Main area */}
-        <div className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[380px] max-md:pb-[280px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+        <div
+          ref={fullScreenRef}
+          className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[230px] max-md:pb-[0px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
-            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh] relative items-center gap-3 min-w-0   `}
+            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh]  relative items-start justify-start gap-3 min-w-0   `}
             tabIndex={-1}
             style={{ outline: 'none' }}
           >
             {/* Canvas */}
-            <div className=" w-full h-screen  items-end flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className=" w-full h-screen  max-md:h-[50vh]  items-end flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
               {fullscreen && (
-                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn glass-panel-dark">
+                <button onClick={() => { setFullscreen(false); toggleFullscreen() }} className="ctrl-btn glass-panel-dark">
                   <Minimize2 size={12} /> Exit
                 </button>
               )}
@@ -328,11 +352,17 @@ export default function ControlPage({ params }: PageProps) {
                 onDataChannel={handleDataChannel}
               />
             </div>
+
+            {kbCapture && (
+              <div className="  bottom-10 left-2 max-md:left-0 w-full animate-fade-up flex flex-col gap-3 ">
+                <MacKeybar dataChannel={dataChannel} onCommand={(type) => emit(type)} />
+              </div>
+            )}
           </div>
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className={` w-[220px] flex-shrink-0 flex backdrop-blur-3xl bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
+            <div className={` w-[220px] flex-shrink-0 flex max-md:backdrop-blur-3xl max-md:bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
               <Link
@@ -356,17 +386,22 @@ export default function ControlPage({ params }: PageProps) {
                     { label: 'Select All', key: 'a', mod: 'command' },
                     { label: 'Undo', key: 'z', mod: 'command' },
                     { label: 'Spotlight', key: 'space', mod: 'command' },
+                    { label: 'Mission Control', command: 'MISSION_CONTROL' },
                   ].map(s => (
                     <button
                       key={s.label}
                       onClick={() => {
-                        const dc = dataChannelRef.current;
-                        // ── WebRTC data channel path (preferred) ──
-                        if (dc && dc.readyState === 'open') {
-                          dc.send(JSON.stringify({
-                            type: 'KEYBOARD_SHORTCUT',
-                            payload: { key: s.key, modifier: s.mod },
-                          }));
+                        if ('command' in s && s.command) {
+                          // System-level actions go through socket (robotjs can't do these)
+                          emit(s.command);
+                        } else {
+                          const dc = dataChannelRef.current;
+                          if (dc && dc.readyState === 'open') {
+                            dc.send(JSON.stringify({
+                              type: 'KEYBOARD_SHORTCUT',
+                              payload: { key: s.key, modifier: s.mod },
+                            }));
+                          }
                         }
                         toast(`Sent: ${s.label}`, 'info');
                       }}
@@ -475,11 +510,7 @@ export default function ControlPage({ params }: PageProps) {
           )
         }
 
-        {kbCapture && (
-          <div className=" items-start center absolute max-md:bg-gradient-to-t  from-[#1C0B53] to-[#503993]  bottom-10 rounded-2xl animate-fade-up  flex overflow-x-auto   min-h-[350px] left-2 max-md:left-0 w-full  max-md: pb-4 p-4  justify-start   ">
-            <NormalKeyboard dataChannel={dataChannel} />
-          </div>
-        )}
+
         {mouseCapture && (
           <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
             <VirtualJoystick

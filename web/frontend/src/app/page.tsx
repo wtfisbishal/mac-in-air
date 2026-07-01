@@ -234,7 +234,7 @@ export default function Home() {
 
             <div className="text-4xl font-bold text-[#8b5cf6] tracking-tight"style={{ letterSpacing: "-0.025em" }}>
               <h2> Go live instantly.{" "}</h2>
-              <p className="text- text-[#2a2a4a] font-light"> Just one click away.</p>
+              <p className="text- text-[#2a2a4a] font-light"> Secure peer-to-peer connection </p>
             </div>
 
             <p className="text-[15px] text-gray-500 mt-3 max-w-md mx-auto">
@@ -335,9 +335,9 @@ export default function Home() {
                 <div className=" h-1 w-1 bg-green-500 ml-10 rounded-full"></div>
               </div>
               <Image
-                src="/desk.png"
+                src="/desk.webp"
                 alt="Desktop"
-                fill
+                fill loading="lazy"
                 className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "
               />
             </div>

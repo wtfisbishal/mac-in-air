@@ -11,15 +11,15 @@ interface ToastProps {
 }
 
 const cfg = {
-  success: { icon: CheckCircle, bg: 'bg-emerald-500/10 border-emerald-500/20', text: 'text-emerald-300' },
-  error:   { icon: XCircle,     bg: 'bg-red-500/10 border-red-500/20',         text: 'text-red-300'     },
-  info:    { icon: Info,        bg: 'bg-indigo-500/10 border-indigo-500/20',    text: 'text-indigo-300'  },
+  success: { icon: CheckCircle, bg: 'bg-emerald-500/5 border-emerald-500/10', text: 'text-emerald-300' },
+  error:   { icon: XCircle,     bg: 'bg-red-500/5 border-red-500/10',         text: 'text-red-300'     },
+  info:    { icon: Info,        bg: 'bg-indigo-500/5 border-indigo-500/10',    text: 'text-indigo-300'  },
 } as const;
 
 export function ToastItem({ id, message, kind, onDismiss }: ToastProps) {
   const { icon: Icon, bg, text } = cfg[kind];
   return (
-    <div className={`animate-slide-in flex items-center gap-3 px-4 py-3 rounded-2xl border backdrop-blur-lg min-w-[280px] max-w-[360px] shadow-2xl ${bg}`}>
+    <div className={`animate-slide-in flex items-center gap-3 px-4 py-3 rounded-full border backdrop-blur-xl min-w-[280px] max-w-[360px] shadow-2xl ${bg}`}>
       <Icon size={16} className={text} />
       <p className={`flex-1 text-sm font-medium ${text}`}>{message}</p>
       <button onClick={() => onDismiss(id)} className="text-slate-500 hover:text-slate-300 transition-colors">

@@ -30,7 +30,7 @@ export default function WebRTCManager() {
         let stream: MediaStream;
         try {
           stream = await navigator.mediaDevices.getDisplayMedia({
-            audio: true,   // system loopback audio — provided by the main-process handler
+            audio: true,
             video: {
               frameRate: { ideal: 30, max: 30 },
             } as any,
@@ -38,16 +38,11 @@ export default function WebRTCManager() {
 
           const audioTracks = stream.getAudioTracks();
           const videoTracks = stream.getVideoTracks();
-          console.log(
-            `[WebRTCManager] getDisplayMedia OK — video: ${videoTracks.length}, audio: ${audioTracks.length}`,
-            audioTracks.map(t => t.label)
-          );
+          console.log(`[WebRTCManager] getDisplayMedia OK — video: ${videoTracks.length}, audio: ${audioTracks.length}`,audioTracks.map(t => t.label));
+
         } catch (displayMediaErr) {
-          // Fallback: video-only via getUserMedia with the desktop source id
-          console.warn(
-            '[WebRTCManager] getDisplayMedia failed, falling back to getUserMedia (video only):',
-            displayMediaErr
-          );
+          console.warn('[WebRTCManager] getDisplayMedia failed, falling back to getUserMedia (video only):', displayMediaErr);
+
           stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
             video: {
@@ -106,13 +101,13 @@ export default function WebRTCManager() {
             console.error('[WebRTCManager] Failed to handle control message', err);
           }
         };
-        
-        // Add all mouse/keyboard tracks (video + audio if available)
+
+        // Add all mouse/keyboard tracks (video + audio // if available)
         stream.getTracks().forEach(track => {
           pc.addTrack(track, stream);
         });
 
-        // Handle ICE candidates
+        // Handle network path ICE candidates events
         pc.onicecandidate = (event) => {
           if (event.candidate) {
             // Use toJSON() to serialize to a plain object so that sdpMid and
