@@ -3,16 +3,17 @@ import { requireAuth } from '../middleware/auth';
 import { deviceManager } from '../managers/devices';
 import { getIo } from '../socket';
 import { CommandPayload } from '../types';
+import { deviceReadRateLimiter, deviceCommandRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
 // GET /devices — list all known devices
-router.get('/', requireAuth, (_req: Request, res: Response): void => {
+router.get('/', requireAuth, deviceReadRateLimiter, (_req: Request, res: Response): void => {
   res.json(deviceManager.listForApi());
 });
 
 // GET /devices/:id — get a single device
-router.get('/:id', requireAuth, (req: Request, res: Response): void => {
+router.get('/:id', requireAuth, deviceReadRateLimiter, (req: Request, res: Response): void => {
   const device = deviceManager.getDevice(req.params.id);
 
   if (!device) {
@@ -25,7 +26,7 @@ router.get('/:id', requireAuth, (req: Request, res: Response): void => {
 });
 
 // POST /devices/:id/commands — relay a command to the device
-router.post('/:id/commands', requireAuth, (req: Request, res: Response): void => {
+router.post('/:id/commands', requireAuth, deviceCommandRateLimiter, (req: Request, res: Response): void => {
   const { id } = req.params;
   const command: CommandPayload = req.body;
 

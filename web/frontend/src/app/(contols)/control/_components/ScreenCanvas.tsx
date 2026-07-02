@@ -7,7 +7,7 @@ export default function ScreenCanvas({
   deviceId,
   pairToken,
   onMouseEvent,
-  mouseCapture = false,
+  mouseCapture ,
   onScreenSize,
   displaySize,
   onDataChannel,
@@ -382,8 +382,8 @@ export default function ScreenCanvas({
       )}
 
       {/* Mobile Touch Controls */}
-      {hasFrame && (
-        <div className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 px-2 py-1.5 rounded-full glass-panel-card b   z-50">
+      {hasFrame && mouseCapture && (
+        <div className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center  px-1 py-1.5 rounded-full glass-panel-card  z-50">
           <button
             onClick={(e) => { e.stopPropagation(); setTouchMode('move'); }}
             className={`p-2 rounded-full transition-colors ${touchMode === 'move' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}

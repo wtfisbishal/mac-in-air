@@ -5,10 +5,11 @@ import { deviceManager } from '../managers/devices';
 import { roomManager } from '../managers/rooms';
 import { pairTokenManager } from '../managers/pairTokens';
 import { getIo } from '../socket';
+import { pairRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
  
-router.post('/', (req: Request, res: Response): void => {
+router.post('/', pairRateLimiter, (req: Request, res: Response): void => {
   const { code, frontendSocketId } = req.body;
 
   if (!code) {

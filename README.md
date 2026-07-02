@@ -10,7 +10,7 @@ Seamlessly control and monitor your Mac experience through a dedicated desktop a
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=flat&logo=socket.io&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
 ![npm](https://img.shields.io/badge/npm-CB3837?style=flat&logo=npm&logoColor=white)
-![.env](https://img.shields.io/badge/.env-FAE100?style=flat&logo=dot-env&logoColor=black)
+![electron](https://img.shields.io/badge/electron-06B6D4?style=flat&logo=electron&logoColor=white)
 
 Mac In Air provides a unique way to interact with your Mac, combining a robust desktop application with a user-friendly web frontend. It empowers users with remote input capabilities, including a virtual Mac keyboard and joystick control, all facilitated by real-time communication.
 

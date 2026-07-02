@@ -7,7 +7,8 @@ import {
   MonitorOff, Keyboard, MousePointer2, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
   Link as Link2, ShieldAlert, X, Loader,
-  LayoutGrid
+  LayoutGrid,
+  Mouse
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -247,7 +248,7 @@ export default function ControlPage({ params }: PageProps) {
                 <ArrowLeft size={16} />
               </button>
               <div>
-                <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight capitalize"> Bishal's {device.name}</h1>
+                <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight capitalize"> {device?.user}'s {device.name}</h1>
                 <p className="text-xs text-slate-500">{device.platform} · {device.arch}</p>
               </div>
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full
@@ -259,7 +260,7 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {/* Tool bars */}
-            <div className="animate-spotlight glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap ">
+            <div className="animate-spotlight ml-32 max-md:ml-0 glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap ">
               {/* Stream toggle */}
               <button
                 onClick={toggleStream}
@@ -277,8 +278,8 @@ export default function ControlPage({ params }: PageProps) {
                 className={` !rounded-full  ctrl-btn ${mouseCapture ? 'active' : ''}`}
 
               >
-                <MousePointer2 size={12} />
-                Mouse {mouseCapture ? 'ON' : 'OFF'}
+                <Mouse size={20} />
+               {/* {mouseCapture ? 'ON' : 'OFF'} */}
               </button>
 
               {/* Keyboard toggle */}
@@ -287,8 +288,8 @@ export default function ControlPage({ params }: PageProps) {
                 className={`ctrl-btn ${kbCapture ? 'active' : ''}`}
                 title="Toggle keyboard capture — captures all keystrokes"
               >
-                <Keyboard size={12} />
-                Keyboard {kbCapture ? 'ON' : 'OFF'}
+                <Keyboard size={20} />
+                {/* Keyboard {kbCapture ? 'ON' : 'OFF'} */}
               </button>
               <div className="w-px h-4   bg-white/[0.06]" />
 
@@ -298,8 +299,8 @@ export default function ControlPage({ params }: PageProps) {
                   onClick={() => runAction(a)}
                   className={`ctrl-btn  ${a.variant === 'danger' ? 'danger' : ''}`}
                 >
-                  <a.icon size={12} />
-                  {a.label}
+                  <a.icon size={20} />
+                  {/* {a.label} */}
                 </button>
               ))}
 
@@ -377,9 +378,9 @@ export default function ControlPage({ params }: PageProps) {
                 </div>
               </Link>
               {/*  shortcuts   */}
-              <div className="glass-panel-dark rounded-3xl p-4">
+              <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 max-md:flex gap-1 flex-wrap">
                   {[
                     { label: 'Copy', key: 'c', mod: 'command' },
                     { label: 'Paste', key: 'v', mod: 'command' },
@@ -405,7 +406,7 @@ export default function ControlPage({ params }: PageProps) {
                         }
                         toast(`Sent: ${s.label}`, 'info');
                       }}
-                      className="w-full flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
+                      className="w-full max-md:w-fit max-md:border border-[#ffffff66] flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
                     >
                       <span className="text-xs text-slate-400   group-hover:text-slate-200">{s.label}</span>
                     </button>
@@ -430,11 +431,11 @@ export default function ControlPage({ params }: PageProps) {
               </div>
 
               {/* System actions */}
-              <div className="glass-panel-dark rounded-3xl p-4">
+              <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">System</p>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 max-md:flex flex-wrap gap-2">
                   {[
-                    { label: 'Lock Screen', type: 'LOCK_SCREEN', icon: Lock },
+                    { label: 'Lock', type: 'LOCK_SCREEN', icon: Lock },
                     { label: 'Sleep', type: 'SLEEP', icon: Moon },
                     { label: 'Restart', type: 'RESTART', icon: Power },
                     { label: 'Shutdown', type: 'SHUTDOWN', icon: Power },
@@ -442,7 +443,7 @@ export default function ControlPage({ params }: PageProps) {
                     <button
                       key={a.type}
                       onClick={() => { setWarning(a.type) }}
-                      className={`w-full  flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
+                      className={`w-full max-md:w-fit max-md:border border-[#ffffff66] max-md:rounded-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
                         ${['RESTART', 'SHUTDOWN'].includes(a.type)
                           ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'

@@ -1,11 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { userManager } from '../managers/users';
 import { signToken } from '../middleware/auth';
+import { loginRateLimiter, registerRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
 // POST /auth/register
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
+router.post('/register', registerRateLimiter, async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -32,7 +33,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 });
 
 // POST /auth/login
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
+router.post('/login', loginRateLimiter, async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {

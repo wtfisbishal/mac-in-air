@@ -2,8 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import "./key.css";
-
-// ─── Key-name translation (browser → robot-framework / pyautogui) ──────────────
+ 
 const BROWSER_TO_ROBOT: Record<string, string> = {
   ArrowLeft: 'left', ArrowRight: 'right',
   ArrowUp: 'up', ArrowDown: 'down',
@@ -57,11 +56,8 @@ function emitKey(
   }
 }
 
-// ─── Props  
-interface MacKeybarProps {
-  dataChannel?: RTCDataChannel | null;
-  /** Optional socket-level command emitter (same as page.tsx `emit`). Used for
-   *  system actions (Mission Control, etc.) that robotjs cannot trigger. */
+ interface MacKeybarProps {
+  dataChannel?: RTCDataChannel | null; 
   onCommand?: (type: string) => void;
 }
 
@@ -132,6 +128,26 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
   const [stickyMods, setStickyMods] = useState<Set<ModName>>(new Set());
   const [capsActive, setCapsActive] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  // Mobile soft-keyboard helpers
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [softKbOpen, setSoftKbOpen] = useState(false);
+
+  // Detect mobile once on mount
+  useEffect(() => {
+    setIsMobile(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
+  }, []);
+
+  // Auto-focus the hidden input on mobile so the soft keyboard pops up
+  useEffect(() => {
+    if (isMobile) {
+      // Small timeout lets the element mount and animate in first
+      const id = setTimeout(() => {
+        hiddenInputRef.current?.focus();
+      }, 120);
+      return () => clearTimeout(id);
+    }
+  }, [isMobile]);
 
   const stickyModsRef = useRef<Set<ModName>>(new Set());
   stickyModsRef.current = stickyMods;
@@ -141,7 +157,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     setTimeout(() => setPressedKeys(p => { const n = new Set(p); n.delete(key); return n; }), 150);
   }, []);
 
-  // ── Physical keyboard listener ─────────────────────────────────────────────
+  // ── Physical keyboard listener  
   useEffect(() => {
     const held = new Set<string>();
 
@@ -191,7 +207,38 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     };
   }, [dataChannel, flash]);
 
-  // ── Button click handler ───────────────────────────────────────────────────
+  // ── Mobile input handler: forward native input events into emitKey ──
+  const handleMobileInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const text = input.value;
+    if (!text) return;
+    // Send each character typed by the soft keyboard
+    for (const ch of text) {
+      const robotKey = BROWSER_TO_ROBOT[ch] ?? (ch.length === 1 ? ch.toLowerCase() : null);
+      if (robotKey) {
+        flash(robotKey);
+        emitKey(robotKey, [...stickyModsRef.current], dataChannel ?? null);
+      }
+    }
+    setStickyMods(new Set());
+    // Clear the input so repeated chars register
+    input.value = '';
+  }, [dataChannel, flash]);
+
+  // Handle special keys (Backspace, Enter, etc.) from the soft keyboard
+  const handleMobileKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Let the onInput handler deal with printable characters;
+    // only intercept special keys here
+    const special = BROWSER_TO_ROBOT[e.key];
+    if (special && NON_TYPE_KEYS.has(special)) {
+      e.preventDefault();
+      flash(special);
+      emitKey(special, [...stickyModsRef.current], dataChannel ?? null);
+      setStickyMods(new Set());
+    }
+  }, [dataChannel, flash]);
+
+  // ── Button click handler  
   const handleKey = useCallback((keyDef: KeyDef) => {
     const { key } = keyDef;
 
@@ -268,50 +315,54 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
   );
 
   return (
-    <div className="  bg-[#eeeeee] rounded-3xl px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll " tabIndex={-1}>
-      {/* <div className="mkb-row mkb-fn">
-        {FN_ROW.map(renderKey)}
-      </div> */}
+    <div className="bg-[#eeeeee] rounded-3xl px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
 
-      {/* Nav row */}
-      {/* <div className="mkb-row">
-        {NAV_ROW.map(renderKey)}
-      </div> */}
+      {/* ── Hidden input — keeps mobile soft keyboard open ── */}
+      {isMobile && (
+        <>
+          <input
+            ref={hiddenInputRef}
+            inputMode="text"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            aria-hidden="true"
+            onFocus={() => setSoftKbOpen(true)}
+            onBlur={() => setSoftKbOpen(false)}
+            onInput={handleMobileInput}
+            onKeyDown={handleMobileKeyDown}
+            style={{
+              position: 'absolute',
+              width: 1,
+              height: 1,
+              opacity: 0,
+              pointerEvents: 'none',
+              top: 0,
+              left: 0,
+            }}
+          />
+          {/* Tap-to-type chip — shown when soft kb is closed */}
+          {!softKbOpen && (
+            <button
+              type="button"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                hiddenInputRef.current?.focus();
+              }}
+              className="self-center text-xs font-medium text-slate-500 bg-white/60 hover:bg-white/80 border border-slate-200 px-3 py-1 rounded-full transition-colors mb-1"
+            >
+              ⌨️ Tap to type
+            </button>
+          )}
+        </>
+      )}
 
-      {/* Modifiers + structural + arrows */}
-      <div className=" flex items-center gap-3">
-
-
+      <div className="flex items-center gap-3">
         {MOD_STICKY.map(renderKey)}
-
         {STRUCT_ROW.map(renderKey)}
-
         {NAV_ROW.map(renderKey)}
-
         {ARROW_KEYS.map(renderKey)}
-
-        {/* Arrow cluster */}
-        {/* <div className="mkb-arrows">
-          <button
-            type="button"
-            onPointerDown={(e) => { e.preventDefault(); handleKey(ARROW_KEYS[0]); }}
-            className={`mkb-key mkb-key--arrow ${isActive('up') ? 'mkb-key--active' : ''}`}
-            aria-label="Arrow Up"
-          >▲</button>
-          <div className="mkb-arrow-bottom">
-            {[ARROW_KEYS[2], ARROW_KEYS[1], ARROW_KEYS[3]].map((kd, i) => (
-              <button
-                key={i}
-                type="button"
-                onPointerDown={(e) => { e.preventDefault(); handleKey(kd); }}
-                className={`mkb-key mkb-key--arrow ${isActive(kd.key) ? 'mkb-key--active' : ''}`}
-                aria-label={`Arrow ${kd.key}`}
-              >
-                {kd.label}
-              </button>
-            ))}
-          </div>
-        </div> */}
       </div>
     </div>
   );
