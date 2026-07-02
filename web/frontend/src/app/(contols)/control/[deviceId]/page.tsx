@@ -262,35 +262,9 @@ export default function ControlPage({ params }: PageProps) {
             {/* Tool bars */}
             <div className="animate-spotlight ml-32 max-md:ml-0 glass-panel-dark max-md:rounded-3xl rounded-full max-md:justify-start justify-center w-fit px-3 py-2 flex items-center gap-2 max-md:gap-x-1 flex-wrap ">
               {/* Stream toggle */}
-              <button
-                onClick={toggleStream}
-                className={`ctrl-btn !rounded-full ${streaming ? 'active' : ''}`}
-              >
-                <span className={`w-2 h-2 rounded-full ${streaming ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-                {streaming ? 'Streaming' : 'Start Stream'}
-              </button>
 
-              <div className="w-px h-4 bg-white/[0.06]" />
+              <Controls toggleStream={toggleStream} streaming={streaming} setMouseCapture={setMouseCapture} mouseCapture={mouseCapture} setKbCapture={setKbCapture} kbCapture={kbCapture} />
 
-              {/* Mouse toggle */}
-              <button
-                onClick={() => setMouseCapture(p => !p)}
-                className={` !rounded-full  ctrl-btn ${mouseCapture ? 'active' : ''}`}
-
-              >
-                <Mouse size={20} />
-               {/* {mouseCapture ? 'ON' : 'OFF'} */}
-              </button>
-
-              {/* Keyboard toggle */}
-              <button
-                onClick={() => setKbCapture(p => !p)}
-                className={`ctrl-btn ${kbCapture ? 'active' : ''}`}
-                title="Toggle keyboard capture — captures all keystrokes"
-              >
-                <Keyboard size={20} />
-                {/* Keyboard {kbCapture ? 'ON' : 'OFF'} */}
-              </button>
               <div className="w-px h-4   bg-white/[0.06]" />
 
               {ACTIONS.map(a => (
@@ -300,7 +274,6 @@ export default function ControlPage({ params }: PageProps) {
                   className={`ctrl-btn  ${a.variant === 'danger' ? 'danger' : ''}`}
                 >
                   <a.icon size={20} />
-                  {/* {a.label} */}
                 </button>
               ))}
 
@@ -309,16 +282,9 @@ export default function ControlPage({ params }: PageProps) {
                   <LayoutGrid size={20} />
                 </button>
               )}
-
-              {fullscreen ?
-                <button onClick={() => { setFullscreen(false); }} className="ctrl-btn ">
-                  <Minimize2 size={12} /> Exit
-                </button>
-                : <button onClick={() => { setFullscreen(true); toggleFullscreen() }} className="btn glass-panel-dark !rounded-3xl  p-2">
-                  <Maximize2 size={15} />
-                </button>}
-
-
+              <button onClick={() => { setFullscreen(true); toggleFullscreen() }} className="btn glass-panel-dark !rounded-3xl  p-2">
+                <Maximize2 size={15} />
+              </button>
             </div>
 
 
@@ -337,11 +303,18 @@ export default function ControlPage({ params }: PageProps) {
             style={{ outline: 'none' }}
           >
             {/* Canvas */}
-            <div className=" w-full h-screen  max-md:h-[50vh]  items-end flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className=" w-full items-center flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
               {fullscreen && (
-                <button onClick={() => { setFullscreen(false); toggleFullscreen() }} className="ctrl-btn glass-panel-dark">
-                  <Minimize2 size={12} /> Exit
-                </button>
+                <div className="flex gap-2">
+
+                  <Controls toggleStream={toggleStream} streaming={streaming} setMouseCapture={setMouseCapture} mouseCapture={mouseCapture} setKbCapture={setKbCapture} kbCapture={kbCapture} />
+                  <button onClick={() => { setFullscreen(false); toggleFullscreen() }} className="ctrl-btn glass-panel-dark">
+                    <Minimize2 size={12} /> Exit
+                  </button>
+
+                  
+                </div>
+
               )}
               <ScreenCanvas
                 deviceId={deviceId}
@@ -355,7 +328,7 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {kbCapture && (
-              <div className="  bottom-10 left-2 max-md:left-0 w-full animate-fade-up flex flex-col gap-3 ">
+              <div className="  w-full animate-fade-up flex flex-col gap-3 ">
                 <MacKeybar dataChannel={dataChannel} onCommand={(type) => emit(type)} />
               </div>
             )}
@@ -526,4 +499,36 @@ export default function ControlPage({ params }: PageProps) {
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
   );
+}
+
+const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setKbCapture, kbCapture }: any) => {
+  return (
+    <>
+      <button
+        onClick={toggleStream}
+        className={`ctrl-btn !rounded-full ${streaming ? 'active' : ''}`}
+      >
+        <span className={`w-2 h-2 rounded-full ${streaming ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+        {streaming ? 'Streaming' : 'Start Stream'}
+      </button>
+
+      <div className="w-px h-4 bg-white/[0.06]" />
+
+      {/* Mouse */}
+      <button
+        onClick={() => setMouseCapture(p => !p)}
+        className={` !rounded-full  ctrl-btn ${mouseCapture ? 'active' : ''}`}
+      >
+        <Mouse size={20} />
+      </button>
+
+      {/* Keyboard */}
+      <button
+        onClick={() => setKbCapture(p => !p)} className={`ctrl-btn ${kbCapture ? 'active' : ''}`}
+       >
+        <Keyboard size={20} />
+      </button>
+
+    </>
+  )
 }

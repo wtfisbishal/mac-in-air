@@ -315,7 +315,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
   );
 
   return (
-    <div className="bg-[#eeeeee] rounded-3xl px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
+    <div className="bg-[#eeeeee] rounded-4xl  px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
 
       {/* ── Hidden input — keeps mobile soft keyboard open ── */}
       {isMobile && (
@@ -350,7 +350,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
                 e.preventDefault();
                 hiddenInputRef.current?.focus();
               }}
-              className="self-center text-xs font-medium text-slate-500 bg-white/60 hover:bg-white/80 border border-slate-200 px-3 py-1 rounded-full transition-colors mb-1"
+              className="self-center text-xs font-medium text-slate-500 bg-white/60 hover:bg-white/80 border border-slate-200 px-3   py-1 rounded-full transition-colors mb-1"
             >
               ⌨️ Tap to type
             </button>
@@ -358,7 +358,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
         </>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 ">
         {MOD_STICKY.map(renderKey)}
         {STRUCT_ROW.map(renderKey)}
         {NAV_ROW.map(renderKey)}

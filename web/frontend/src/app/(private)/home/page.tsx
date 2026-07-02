@@ -70,7 +70,7 @@ function DeviceCard({ device }: { device: Device }) {
 }
 
 export default function DashboardPage() {
-  const { data: devices, isLoading, isError, error, refetch } = useDevices();
+  const { data: devices, isLoading, isError , isRefetching ,  refetch } = useDevices();
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
   const qc = useQueryClient();
@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
   const online = devices?.filter(d => d.isOnline).length ?? 0;
   const total = devices?.length ?? 0;
-
+ 
   return (
     <AppLayout>
       <div className=" !p-7 max-md:w-full  w-[70%] mx-auto">
@@ -97,12 +97,13 @@ export default function DashboardPage() {
         <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
 
           <div>
-            <h1 className="text-6xl logo-text text-transparent bg-clip-text font-bold mb-5 tracking-tight">MACS</h1>
+            <h1 className="text-6xl   font-extrabold mb-5 tracking-tight">MACS</h1>
           </div>
 
           <div className="flex items-center max-md:gap-6 max-md:w-full   gap-3">
-            <button onClick={() => refetch()} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
-              <RefreshCw size={13} /> Refresh
+            <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
+              <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={13} /> {isLoading ? 'Refreshing...' : 'Refresh'}
+               
             </button>
             <Link href="/pair" className=" flex items-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer">
               <Link3 size={14} /> Pair Device
