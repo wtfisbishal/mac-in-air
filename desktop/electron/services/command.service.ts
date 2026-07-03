@@ -1,9 +1,11 @@
 
+//@ts-nocheck
 import { mouseService } from './mouse.service';
 import { keyboardService } from './keyboard.service';
 import { appService } from './app.service';
 import { screenService } from './screen.service';
 import { fileService } from './file.service';
+import { browserService } from './browser.service';
 import { logInfo, logError } from '../utils/logger';
 
 export interface CommandPayload {
@@ -101,7 +103,65 @@ export class CommandService {
         //   const sources = await screenService.getScreenSources();
         //   return { success: true, message: 'Screenshot captured', data: sources };
 
-        //  File commands  
+        // ── Browser automation (Playwright) ──────────────────────────────
+        case 'OPEN_URL':
+        case 'NAVIGATE': {
+          const url = command.payload?.url as string | undefined;
+          if (!url) return { success: false, message: 'Missing url' };
+          return await browserService.openUrl(url);
+        }
+
+        case 'CLICK': {
+          const sel = command.payload?.selector as string | undefined;
+          const cx  = command.payload?.x as number | undefined;
+          const cy  = command.payload?.y as number | undefined;
+          return await browserService.click(sel, cx, cy);
+        }
+
+        case 'TYPE_TEXT': {
+          const sel  = command.payload?.selector as string | undefined;
+          const text = command.payload?.text as string | undefined;
+          if (!sel || !text) return { success: false, message: 'Missing selector or text' };
+          return await browserService.typeText(sel, text);
+        }
+
+        case 'KEY_PRESS_BROWSER': {
+          const key = command.payload?.key as string | undefined;
+          if (!key) return { success: false, message: 'Missing key' };
+          return await browserService.keyPress(key);
+        }
+
+        case 'SCROLL': {
+          const dx = (command.payload?.x as number) ?? 0;
+          const dy = (command.payload?.y as number) ?? 300;
+          return await browserService.scroll(dx, dy);
+        }
+
+        case 'WAIT': {
+          const ms = (command.payload?.ms as number) ?? 1000;
+          return await browserService.wait(ms);
+        }
+
+        case 'BROWSER_SCREENSHOT':
+          return await browserService.screenshot();
+
+        case 'FETCH_DATA': {
+          // Expected payload: { selector }
+          const sel = command.payload?.selector as string | undefined;
+          if (!sel) return { success: false, message: 'Missing selector for fetch_data' };
+          return await browserService.fetchData(sel);
+        }
+
+        case 'BROWSER_EVAL': {
+          const script = command.payload?.script as string | undefined;
+          if (!script) return { success: false, message: 'Missing script' };
+          return await browserService.evaluate(script);
+        }
+
+        case 'BROWSER_CLOSE':
+          await browserService.close();
+          return { success: true, message: 'Browser closed' };
+
         case 'FILE_READ':
           if (command.payload?.path) {
             const content = await fileService.readFile(command.payload.path);
