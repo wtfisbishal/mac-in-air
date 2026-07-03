@@ -24,6 +24,7 @@ import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
 import VirtualJoystick from '../_components/VirtualJoystick';
+import AICommandPanel from '../_components/AICommandPanel';
 interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
@@ -350,6 +351,10 @@ export default function ControlPage({ params }: PageProps) {
                   <p className=' text-sm'>(⌥ + space)</p>
                 </div>
               </Link>
+
+              {/* AI Command Panel */}
+              <AICommandPanel deviceId={deviceId} />
+
               {/*  shortcuts   */}
               <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
