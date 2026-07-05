@@ -8,8 +8,9 @@ scrape_configs:
     static_configs:
       - targets: ['172.20.10.8:4000' ]
 
-  - job_name: 'backend-render'
+  - job_name: 'digital-ocean'
     metrics_path: '/metrics'
     scheme: https
     static_configs:
-      - targets: [ 'mac-in-wind.onrender.com']
+      - targets:
+          - backend:4000

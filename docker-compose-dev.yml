@@ -1,10 +1,34 @@
 name: macinwind-monitoring
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redisinsight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    restart: unless-stopped
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
   prom-server:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
 
   grafana:
@@ -27,7 +51,11 @@ services:
 
 volumes:
   grafana-data:
-  loki-data: 
+  loki-data:
+  redis-data:
+  redisinsight-data:
+  prometheus-data:
+
 
 
 # docker run -d -p 3005:3000 --name=grafana grafana/grafana-oss
