@@ -101,7 +101,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
         <button 
 
         className=' mt-5 mx-auto flex-1 glass-button disabled:bg-gray-600 disabled:opacity-50 text-white font-semibold py-2 px-4 !rounded-full '
-        onClick={()=>{router.refresh()}}>Refresh</button>
+        onClick={()=>{window.location.reload();}}>Refresh</button>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
 
           <div>{
             pairingCode.split('').map((i) => (
-              <span className=' bg-[#10062fab]  font-extrabold  ml-2 text-white font-mono !text-5xl px-6 rounded-4xl p-5 '>
+              <span className=' bg-[#10062fab] shadow-xl shadow-[#10062f7d] font-extrabold  ml-2 text-white font-mono !text-5xl px-6 rounded-4xl p-5 '>
                 {i}
               </span>
             ))
@@ -154,7 +154,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
           disabled={isLoading || loading}
           className="
             flex-1 glass-button-primary disabled:bg-gray-600 disabled:opacity-50
-            text-white font-semibold py-2 px-4 !rounded-full
+            text-white font-semibold py-3 px-4 !rounded-full
             
           "
         >
@@ -165,7 +165,7 @@ export default function PairingCodeCard({ onRefresh, isLoading = false }: Pairin
           disabled={isLoading || loading}
           className="
             flex-1 glass-button disabled:bg-gray-600 disabled:opacity-50
-            text-white font-semibold py-2 px-4 !rounded-full
+            text-white font-semibold py-3 px-4 !rounded-full
              
           "
         >

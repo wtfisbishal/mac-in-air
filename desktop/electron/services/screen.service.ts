@@ -10,21 +10,7 @@ export interface ScreenShareSession {
 
 export class ScreenService {
   private activeSession: ScreenShareSession | null = null;
-
-  // public async getScreenSources() {
-  //   try {
-  //     const sources = await desktopCapturer.getSources({ types: ['screen'] });
-  //     return sources.map((source) => ({
-  //       id: source.id,
-  //       name: source.name,
-  //       thumbnail: source.thumbnail.toDataURL(),
-  //     }));
-  //   } catch (error) {
-  //     console.error('Failed to get screen sources', error);
-  //     return [];
-  //   }
-  // }
-
+ 
   //Start screen sharing session
   public async startScreenShare(sessionId: string, options?: { frameRate?: number; quality?: number }) {
     if (this.activeSession) {
@@ -78,10 +64,7 @@ export class ScreenService {
 
   isActive(): boolean {
     return this.activeSession?.isActive ?? false;
-  }
-
-  
-
+  } 
 }
 
 export const screenService = new ScreenService();

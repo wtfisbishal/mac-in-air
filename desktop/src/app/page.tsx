@@ -30,7 +30,7 @@ export default function Home() {
       <div className="relative z-10 flex flex-col items-center">
         
         <motion.h1
-          className=" tracking-tighter text-7xl font-bold tracking-tight"
+          className=" tracking-tighter text-7xl text-[#ffffff88] font-bold tracking-tight"
           initial={{ y: 16, opacity: 0, filter: 'blur(6px)' }}
           animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
           transition={{ delay: 0.35, duration: 0.6, ease: 'easeOut' }}

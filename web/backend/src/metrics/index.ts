@@ -39,14 +39,7 @@ export const wsDisconnectionsTotal = new client.Counter({ //not work yes
   registers: [register],
 });
 
-// Histogram: bytes transferred per screen-frame event. 
-export const wsFrameBytesHistogram = new client.Histogram({
-  name: 'ws_screen_frame_bytes',
-  help: 'Size of screen-frame payloads in bytes',
-  buckets: [1024, 8192, 32768, 131072, 524288, 1048576, 4194304],
-  registers: [register],
-}); 
-
+ 
 // Counter: WebRTC signalling events relayed. 
 export const wsWebRtcEventsTotal = new client.Counter({
   name: 'ws_webrtc_events_total',

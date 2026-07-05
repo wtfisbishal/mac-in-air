@@ -66,16 +66,16 @@ export function DeviceCard({
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 rounded-2xl glass-panel-card ">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14] ">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">CPUs</p>
           <p className="text-sm font-medium">{cpus} cores</p>
         </div>
-        <div className="p-3 rounded-2xl glass-panel-card ">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14] ">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Memory</p>
           <p className="text-sm font-medium">{formatBytes(freeMemory)} free</p>
           <p className="text-[10px] text-gray-200">of {formatBytes(totalMemory)}</p>
         </div>
-        <div className="p-3 rounded-2xl glass-panel-card">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14]">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Uptime</p>
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
         </div>

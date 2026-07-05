@@ -2,9 +2,6 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   
-  // Screen
-  // getDesktopSources: () => ipcRenderer.invoke('get-desktop-sources'),
-
   // Permissions
   getMediaAccessStatus: () => ipcRenderer.invoke('get-media-access-status'),
   checkAccessibility: () => ipcRenderer.invoke('check-accessibility'),

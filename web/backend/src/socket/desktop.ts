@@ -1,8 +1,7 @@
 import { Server as SocketServer, Socket } from 'socket.io';
 import { deviceManager } from '../managers/devices';
 import { pairingManager } from '../managers/pairing';
-import {
-  wsFrameBytesHistogram,
+import { 
   wsWebRtcEventsTotal,
   wsConnectionsActive,
   serverErrorsTotal,

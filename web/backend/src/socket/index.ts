@@ -54,10 +54,6 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     //   WebSocket connection metrics  
     wsConnectionsActive.inc({ role });
 
-    // socket.on('keep-alive', () => {
-    //   // noop
-    // });
-
     console.log(`[Socket] ${isDesktop ? 'Desktop' : 'Frontend'} connected: ${socket.id}`);
     loggerInfo(`[Socket] ${isDesktop ? 'Desktop' : 'Frontend'} connected: ${socket.id}`, {
       deviceId: socket.handshake.query.deviceId,
