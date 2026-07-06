@@ -20,8 +20,8 @@ interface AuthRequest extends Request {
   };
 }
 
-/*
- * Fixed-window Redis rate limiter
+ 
+ /* Fixed-window Redis rate limiter
  * Algorithm (atomic via Lua):
  * 1. INCR key
  * 2. If first request → set EXPIRE
@@ -68,6 +68,11 @@ export function createRateLimiter(options: RateLimiterOptions) {
 
     try {
       const redis = getRedis();
+      
+      // If no redis connection is available (e.g. no REDIS_URL), skip rate limiting
+      if (!redis ) {
+        return next();
+      }
 
       // Better in production: preload script + use evalsha
       const result = (await (redis as any).eval(

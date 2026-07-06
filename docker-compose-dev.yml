@@ -1,4 +1,4 @@
-name: macinwind-monitoring
+name: macinwind-devlopment
 services:
   redis:
     image: redis:7-alpine

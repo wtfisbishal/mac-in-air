@@ -5,11 +5,17 @@ let redisClient: Redis | null = null;
 
 //Returns the singleton Redis client.
  
-export function getRedis(): Redis {
+export function getRedis(): Redis | null {
+  if (!process.env.REDIS_URL) {
+    return null;
+  }
+
   if (!redisClient) {
-    const url = process.env.REDIS_URL || 'redis://localhost:6379';
+    const url = process.env.REDIS_URL;
+    const password = process.env.REDIS_PASSWORD;
 
     redisClient = new Redis(url, {
+      password: password,
       // Retry strategy: back off up to 10 s, give up after 10 failed attempts.
       retryStrategy(times) {
         if (times > 10) return null; // stop retrying

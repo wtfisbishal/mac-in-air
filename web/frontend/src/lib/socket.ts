@@ -11,7 +11,9 @@ export function getSocket(): Socket {
       ? localStorage.getItem('rmac_token') ?? undefined
       : undefined;
 
-    socket = io(URL, {
+      const url = URL?.replace("/api",'')
+
+    socket = io(url, {
       // Must include 'polling' first so Socket.IO can complete the HTTP upgrade
       // handshake before promoting to WebSocket. Forcing websocket-only breaks
       // the initial connection because there is no HTTP handshake to piggyback on.

@@ -1,28 +1,4 @@
 services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    command: ["redis-server", "--appendonly", "yes"]
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-  redisinsight:
-    image: redis/redisinsight:latest
-    ports:
-      - "5540:5540"
-    restart: unless-stopped
-    volumes:
-      - redisinsight-data:/data
-    depends_on:
-      redis:
-        condition: service_healthy
-
   backend:
     build:
       context: ./web/backend
@@ -50,5 +26,4 @@ services:
       - backend
 
 volumes:
-  redis-data:
-  redisinsight-data:
+ 
