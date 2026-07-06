@@ -31,6 +31,8 @@ app.use(express.json());
 //   Prometheus HTTP instrumentation (must come before routes)  
 app.use(httpMetricsMiddleware);
 
+app.use('/metrics', metricsRouter);
+
 // Global rate limiter — 100 req / 1 min per IP (fail-open on Redis errors)
 app.use(globalRateLimiter);
 
@@ -41,7 +43,6 @@ app.use('/devices', devicesRouter);
 app.use('/pair', pairRouter);
 
 // Prometheus scrape endpoint 
-app.use('/metrics', metricsRouter);
 
  app.use((_req, res) => {
   res.status(404).json({ message: 'Route not found' });
