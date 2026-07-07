@@ -6,12 +6,9 @@ let redisClient: Redis | null = null;
 //Returns the singleton Redis client.
  
 export function getRedis(): Redis | null {
-  if (!process.env.REDIS_URL) {
-    return null;
-  }
-
+  
   if (!redisClient) {
-    const url = process.env.REDIS_URL;
+    const url = process.env.REDIS_URL || 'redis://localhost:6379';
     const password = process.env.REDIS_PASSWORD;
 
     redisClient = new Redis(url, {
