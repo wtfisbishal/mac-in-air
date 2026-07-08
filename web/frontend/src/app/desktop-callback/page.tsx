@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Loader2, MonitorSmartphone } from 'lucide-react';
+import Image from 'next/image';
 
 export default function DesktopCallbackPage() {
   const [status, setStatus] = useState<'redirecting' | 'done'>('redirecting');
@@ -31,18 +32,18 @@ export default function DesktopCallbackPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen  flex items-center justify-center p-6 font-sans">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-zinc-900/50 border border-white/10 p-8 rounded-3xl shadow-2xl backdrop-blur-xl text-center flex flex-col items-center"
+        className=" text-center flex flex-col items-center"
       >
-        <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 text-indigo-400">
-          <MonitorSmartphone size={32} />
-        </div>
+        {/* <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 text-indigo-400"> */}
+          <Image src={'/logo.webp'} height={150} width={150} alt='' />
+        {/* </div> */}
 
-        <h1 className="text-2xl font-bold text-white mb-3">
-          WIN in AIR
+        <h1 className="text-5xl font-bold text-white my-3">
+          MAC in AIR
         </h1>
 
         {status === 'redirecting' ? (
@@ -56,9 +57,8 @@ export default function DesktopCallbackPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center gap-4"
           >
-            <div className="flex items-center gap-2 text-emerald-400 font-medium">
-              <CheckCircle2 size={20} />
-              <span>Authentication successful</span>
+            <div className="flex items-center gap-2 text-emerald-400 text-3xl font-bold">
+              <span className=' bg-linear-to-br to-green-600 from-emerald-200 text-transparent bg-clip-text '>You have successfully authenticated.</span>
             </div>
             <p className="text-sm text-zinc-400 leading-relaxed mb-4">
               The desktop app should now be opening automatically. You can safely close this browser tab.
@@ -66,7 +66,7 @@ export default function DesktopCallbackPage() {
             
             <a
               href={deepLink}
-              className="px-6 py-2.5 bg-white/10 hover:bg-white/15 text-white rounded-xl text-sm font-medium transition-colors"
+              className="px-6 py-2.5 glass-button-primary  rounded-full  font-medium transition-colors"
             >
               Click here if the app didn't open
             </a>
