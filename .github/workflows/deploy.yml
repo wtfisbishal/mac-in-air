@@ -17,9 +17,16 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: |
+            web/backend/package-lock.json
+            web/frontend/package-lock.json
  
-      - name: Restore npm Cache and Install
-        working-directory: ./web
+      - name: Install Backend Dependencies
+        working-directory: ./web/backend
+        run: npm ci
+
+      - name: Install Frontend Dependencies
+        working-directory: ./web/frontend
         run: npm ci
 
       - name: Build Backend
@@ -37,6 +44,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
+          # passphrase: ${{ secrets.SSH_PASSPHRASE }}
           debug: true
           script: |
             set -ex
