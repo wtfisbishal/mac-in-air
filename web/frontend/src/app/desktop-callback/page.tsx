@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Loader2, MonitorSmartphone } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import Image from 'next/image';
 
 export default function DesktopCallbackPage() {
@@ -15,7 +15,7 @@ export default function DesktopCallbackPage() {
 
     // Grab all query parameters Google sent us (code, scope, authuser, etc)
     const searchParams = window.location.search;
-    
+
     // Construct the deep link to the desktop app
     const link = `macinair://callback${searchParams}`;
     setDeepLink(link);
@@ -39,7 +39,7 @@ export default function DesktopCallbackPage() {
         className=" text-center flex flex-col items-center"
       >
         {/* <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 text-indigo-400"> */}
-          <Image src={'/logo.webp'} height={150} width={150} alt='' />
+        <Image src={'/logo.webp'} height={150} width={150} alt='' />
         {/* </div> */}
 
         <h1 className="text-5xl font-bold text-white my-3">
@@ -48,7 +48,7 @@ export default function DesktopCallbackPage() {
 
         {status === 'redirecting' ? (
           <div className="flex flex-col items-center gap-4 text-zinc-400">
-            <Loader2 className="animate-spin text-indigo-400" size={24} />
+            <Loader className="animate-spin text-indigo-400" size={24} />
             <p>Returning you to the desktop app...</p>
           </div>
         ) : (
@@ -63,7 +63,7 @@ export default function DesktopCallbackPage() {
             <p className="text-sm text-zinc-400 leading-relaxed mb-4">
               The desktop app should now be opening automatically. You can safely close this browser tab.
             </p>
-            
+
             <a
               href={deepLink}
               className="px-6 py-2.5 glass-button-primary  rounded-full  font-medium transition-colors"

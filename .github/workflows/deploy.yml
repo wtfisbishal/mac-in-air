@@ -1,0 +1,57 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+ 
+      - name: Restore npm Cache and Install
+        working-directory: ./web
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./web/backend
+        run: npm run build
+
+      - name: Build Frontend
+        working-directory: ./web/frontend
+        run: npm run build
+
+      - name: SSH into DigitalOcean and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /opt/apps/mac-in-wind
+            
+            git fetch origin
+            git reset --hard origin/main
+            
+            cd web/backend
+            npm ci
+            npm run build
+            pm2 reload backend
+            
+            cd ../frontend
+            npm ci
+            npm run build
+            pm2 reload frontend
+            
+            # Health Check
+            curl -f http://localhost:4000/health || exit 1
