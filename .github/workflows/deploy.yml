@@ -53,8 +53,8 @@ jobs:
             cd /opt/apps/mac-in-air
 
             git fetch origin
-            git checkout main
-            git pull origin main
+            git reset --hard origin/main
+            git clean -fd
 
             cd web/backend
             npm ci
