@@ -37,21 +37,25 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
+          debug: true
           script: |
-            cd /opt/apps/mac-in-wind
-            
+            set -ex
+            pwd
+            ls
+            cd /opt/apps/mac-in-air
+
             git fetch origin
-            git reset --hard origin/main
-            
+            git checkout main
+            git pull origin main
+
             cd web/backend
             npm ci
             npm run build
-            pm2 reload backend
-            
+            pm2 reload server
+
             cd ../frontend
             npm ci
             npm run build
             pm2 reload frontend
-            
-            # Health Check
-            curl -f http://localhost:4000/health || exit 1
+
+            curl -f http://localhost:4000/health
