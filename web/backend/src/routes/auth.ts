@@ -6,7 +6,7 @@ import { loginRateLimiter, registerRateLimiter } from '../middleware/rateLimiter
 const router = Router();
 
 // POST /auth/register
-router.post('/register', registerRateLimiter, async (req: Request, res: Response): Promise<void> => {
+router.post('/register',  async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {

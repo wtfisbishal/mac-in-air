@@ -166,7 +166,7 @@ export function setupDesktopHandlers(io: SocketServer, socket: Socket): void {
       }
 
 
-    }, 30000);
+    }, 100);
   });
 
   // keep-alive — desktop sends this every ~25 s to prevent Render's idle timeout

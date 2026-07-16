@@ -304,7 +304,9 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     <React.Fragment key={idx}>
       <button
         type="button"
-        onPointerDown={(e) => { e.preventDefault(); handleKey(kd); }}
+        // onPointerDown={(e) => { e.preventDefault(); handleKey(kd); }}
+         onMouseDown={(e) => e.preventDefault()}
+        onClick={() => handleKey(kd)}
         className={['mkb-key', kd.cls ?? 'mkb-w-12', isActive(kd.key) ? 'mkb-key--active' : ''].join(' ')}
         aria-label={typeof kd.label === 'string' ? kd.label : kd.key}
       >

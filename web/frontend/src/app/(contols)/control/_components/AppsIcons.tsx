@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { ArrowLeft, Search, RefreshCw, Play, Loader } from 'lucide-react';
+import {  Search, RefreshCw, Play, Loader } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useToast } from '@/hooks/useToast';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useDevice } from '@/hooks/useDevices';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -43,14 +42,9 @@ function AppIcon({ name, icon, }: { name: string; icon?: string | null; }) {
 }
 
 export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
-
   const { toast } = useToast();
-  const router = useRouter();
-
-  const { data: device  } = useDevice(deviceId!);
-
-   const [search, setSearch] = useState('');
-
+  const { data: device } = useDevice(deviceId!);
+  const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
   const fetchApps = async () => {
@@ -61,7 +55,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
     };
 
     if (!result.success) {
-       toast('Could not reach desktop agent', result?.message);
+      toast('Could not reach desktop agent', result?.message);
       return [];
     }
 
@@ -71,7 +65,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
   const { data: apps = [], isLoading: loading, refetch } = useQuery({
     queryKey: ['apps', deviceId],
     queryFn: fetchApps,
-    // enabled: !!deviceId
+    enabled: !!deviceId,
     staleTime: Infinity,
     gcTime: 24 * 60 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -102,7 +96,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
- 
+
   const openAppMutation = useMutation({
     mutationFn: async (app: AppInfo) => {
       const result = await sendCommand('OPEN_APP', {
@@ -126,33 +120,18 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
   return (
     <>
 
-      {deviceId && device && <div className="flex items-center  justify-between mb-5 animate-fade-up">
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="btn  glass-panel-dark  !rounded-2xl !p-3">
-            <ArrowLeft size={16} />
-          </button>
-          <div>
-            <h1 className="text-lg max-md:text-sm font-bold text-white leading-tight">
-              Apps — <span className="text-indigo-400 capitalize"> {device?.user}'s {device.name}</span>
-            </h1>
-            <p className="text-xs text-slate-500">
-              {loading ? 'Loading…' : `${filtered.length} of ${apps.length} apps`}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
+      {device && <div className="flex items-end  justify-end mb-5 animate-fade-up">
 
 
-          <button
-            onClick={() => refetch()}
-            disabled={loading}
-            className="btn  glass-panel-dark  !rounded-3xl  p-2"
-            title="Refresh app list"
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          </button>
-        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={loading}
+          className="btn  glass-panel-dark  !rounded-3xl  p-2"
+          title="Refresh app list"
+        >
+          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+        </button>
+
       </div>}
 
       {!loading && filtered.length > 0 && <div className="relative animate-spotlight glass-panel-dark py-1 px-5 w-1/2 max-md:w-[90%] max-md:ml-5  mx-auto flex items-center justify-between !rounded-full mb-4 animate-fade-up delay-1">
@@ -173,7 +152,14 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
             ✕
           </button>
         )}
-      </div>}
+
+
+      </div>
+
+      }
+      <p className="text-sm text-center text-slate-300">
+        {loading ? 'Loading…' : `${filtered.length} of ${apps.length} apps`}
+      </p>
 
       <div className="flex-1 h-full ">
 
@@ -194,9 +180,9 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
         )}
 
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-10 mx-auto gap-3 animate-fade-in pb-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-6 mx-auto gap-3 animate-fade-in pb-4">
             {filtered.map((app) => {
-               return (
+              return (
                 <button
                   key={app.path}
                   onClick={() => openAppMutation.mutate(app)}

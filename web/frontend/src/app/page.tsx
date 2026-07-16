@@ -101,6 +101,21 @@ export default function Home() {
           </div>
         </section>
 
+
+          {/* video sections  */}
+
+        <section className="h-screen pt-20 max-md:min-h-fit flex flex-col justify-between w-full fle x flex-">
+          <div>
+            <p className="text-center font-semibold mb-3 text-gray-300 uppercase mb-3 tracking-[0.2em] " >Demos</p>
+            <h2 className="text-4xl text-center logo1 sm:text-5xl font-bold text-gray-200  ">
+              Control end to end
+              <br />
+              <span className="text-gray-400 text-3xl font-light">With Secure Environment.</span>
+            </h2>
+          </div>
+          <DemoVideoSection />
+        </section>
+
         {/*   Features   */}
         <section className="py-28 px-4 sm:px-8 max-w-6xl mx-auto">
           <div className="text-center mb-16 scroll-fade-in">
@@ -356,4 +371,33 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+const DemoVideoSection = () => {
+  return (
+    <div className=" w-full h-[80%] max-md:mt-20 max-md:min-h-screen flex justify-center  max-md:flex-col max-md:gap-5  items-center">
+
+      <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4  h-full w-[40%] max-md:w-full px-5">
+        <div>
+          {/* <p>Demo</p> */}
+          <h1 className="logo1 font-bold text-5xl max-md:text-4xl">In your phone . </h1>
+        </div>
+
+        <div className=" h-[600px] w-[290px] max-md:h-[502px] max-md:w-[243px]  border-[5px] border-[#ffffff4f] rounded-4xl">
+
+        </div>
+      </div>
+      <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4 h-full w-[60%] max-md:w-full max-md:border-t max-md:border-x-0 max-md:pt-16  border-x border-[#ffffff4f] px-5 ">
+        <div>
+          {/* <p>Demo</p> */}
+          <h1 className="logo1 font-bold text-5xl  max-md:text-4xl">In another Pc . </h1>
+        </div>
+
+        <div className="  w-[750px] h-[400px] max-md:h-[232px] max-md:w-full [243px] border-[5px] border-[#ffffff4f] rounded-4xl">
+
+        </div>
+      </div>
+
+    </div>
+  )
 }

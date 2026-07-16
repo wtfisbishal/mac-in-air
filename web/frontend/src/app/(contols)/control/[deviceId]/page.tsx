@@ -1,14 +1,13 @@
 'use client';
 
-import { use, useEffect, useRef, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { use, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
+import { redirect, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  MonitorOff, Keyboard, MousePointer2, Power,
+  MonitorOff, Keyboard, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
   Link as Link2, ShieldAlert, X, Loader,
-  LayoutGrid,
-  Mouse
+  LayoutGrid,Mouse
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -16,9 +15,9 @@ import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
 import Image from 'next/image';
-import AppsIcons from '../../apps/_components/AppsIcons';
+import AppsIcons from '../_components/AppsIcons';
 import { useFullscreen } from '@/hooks/useFullscreen';
-import NormalKeyboard from '../_components/NormalKeyboard';
+// import NormalKeyboard from '../_components/NormalKeyboard';
 import MacKeybar from '../_components/MacKeybar';
 import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
@@ -28,6 +27,14 @@ interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
 
+interface controlsProps {
+  toggleStream: () => void;
+  streaming: boolean;
+  setMouseCapture: Dispatch<SetStateAction<boolean>>;
+  mouseCapture: boolean;
+  setKbCapture: Dispatch<SetStateAction<boolean>>;
+  kbCapture: boolean
+}
 export default function ControlPage({ params }: PageProps) {
   const { deviceId } = use(params);
   const router = useRouter();
@@ -69,7 +76,7 @@ export default function ControlPage({ params }: PageProps) {
     }
   }, []);
 
-  // for stop streaming on unmount -- --- - 
+  // for stop streaming on unmount ------ 
   const streamingRef = useRef(streaming);
   const sessionIdRef = useRef(sessionId);
 
@@ -85,7 +92,20 @@ export default function ControlPage({ params }: PageProps) {
         socket.emit('screen-share-stop', { sessionId: sessionIdRef.current });
       }
     };
-  }, []); // - --  -- 
+  }, []); // ----- 
+
+  useEffect(() => {
+    const socket = getSocket();
+    const handler = (updatedDevice: any) => {
+      console.log("updated device is ", updatedDevice);
+      if (updatedDevice.deviceId === deviceId && !updatedDevice.isOnline) {
+        toast(`${device?.name || ''} went offline`, 'error');
+        redirect('/home');
+      }
+    };
+    socket.on('device-status-changed', handler);
+    return () => { socket.off('device-status-changed', handler); };
+  }, []);
 
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
@@ -236,7 +256,7 @@ export default function ControlPage({ params }: PageProps) {
             <X />
           </div>
           <div className='animate-spotlight !transition-all !duration-700  max-md:py-5  max-md:p-0  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
-            <AppsIcons />
+            <AppsIcons deviceId={deviceId} />
           </div>
         </div>}
 
@@ -298,12 +318,12 @@ export default function ControlPage({ params }: PageProps) {
           {/* Screen */}
           <div
             ref={controlAreaRef}
-            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh]  relative items-start justify-start gap-3 min-w-0   `}
+            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh] max-md:overflow-hidden relative items-start   ${fullscreen ? ' max-md:pt-[35%]' : 'justify-start'}  gap-3 min-w-0   `}
             tabIndex={-1}
             style={{ outline: 'none' }}
           >
             {/* Canvas */}
-            <div className=" w-full items-center flex flex-col  rounded-2xl overflow-hidden relative animate-fade-up delay-2">
+            <div className=" w-full items-center flex flex-col max-md:gap-3 rounded-2xl overflow-hidden relative animate-fade-up delay-2">
               {fullscreen && (
                 <div className="flex gap-2">
 
@@ -312,7 +332,7 @@ export default function ControlPage({ params }: PageProps) {
                     <Minimize2 size={12} /> Exit
                   </button>
 
-                  
+
                 </div>
 
               )}
@@ -339,17 +359,16 @@ export default function ControlPage({ params }: PageProps) {
             <div className={` w-[220px] flex-shrink-0 flex max-md:backdrop-blur-3xl max-md:bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
-              <Link
-                href={`/apps/${deviceId}`}
-
-                className="glass-panel-dark rounded-full p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
+              <div
+                onClick={() => setVisiblePanel(true)}
+                className="glass-panel-dark rounded-full cursor-pointer p-2 px-4 flex w-full items-center gap-2.5 hover:border-indigo-500/20 transition-colors group"
               >
                 <Image src={'/apps.webp'} loading='lazy' height={35} width={35} alt='apps' />
                 <div>
                   <p className=" font-semibold text-slate-200 group-hover:text-white">App Launcher  </p>
                   <p className=' text-sm'>(⌥ + space)</p>
                 </div>
-              </Link>
+              </div>
               {/*  shortcuts   */}
               <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-3">Shortcuts</p>
@@ -388,7 +407,7 @@ export default function ControlPage({ params }: PageProps) {
               </div>
 
               {/* Virtual Joystick */}
-              <div className="glass-panel-dark max-md:hidden  rounded-3xl p-4 flex flex-col items-center">
+              {/* <div className="glass-panel-dark max-md:hidden  rounded-3xl p-4 flex flex-col items-center">
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-4 self-start">Joystick</p>
                 <VirtualJoystick
                   screenW={screenSize.w}
@@ -401,7 +420,7 @@ export default function ControlPage({ params }: PageProps) {
                     Enable Mouse to use joystick
                   </p>
                 )}
-              </div>
+              </div> */}
 
               {/* System actions */}
               <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
@@ -501,7 +520,8 @@ export default function ControlPage({ params }: PageProps) {
   );
 }
 
-const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setKbCapture, kbCapture }: any) => {
+
+const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setKbCapture, kbCapture }: controlsProps) => {
   return (
     <>
       <button
@@ -525,7 +545,7 @@ const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setK
       {/* Keyboard */}
       <button
         onClick={() => setKbCapture(p => !p)} className={`ctrl-btn ${kbCapture ? 'active' : ''}`}
-       >
+      >
         <Keyboard size={20} />
       </button>
 

@@ -1,6 +1,6 @@
 'use client';
 import { getSocket } from "@/lib/socket";
-import { MonitorOff, Volume2, VolumeX, MousePointer2, Move, Hand } from "lucide-react";
+import { MonitorOff, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function ScreenCanvas({
@@ -305,7 +305,7 @@ export default function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className={`relative w-full bg-black flex items-center justify-center rounded-2xl overflow-hidden touch-none `}
+      className={`relative w-full bg-black flex items-center justify-center rounded max-md:rounded-none overflow-hidden touch-none `}
       style={{ aspectRatio: displaySize?.width && displaySize?.height ? `${displaySize.width}/${displaySize.height}` : '16/9', cursor: 'none' }}
       onMouseMove={e => {
         if (isMouseDown) {
@@ -382,30 +382,30 @@ export default function ScreenCanvas({
       )}
 
       {/* Mobile Touch Controls */}
-      {hasFrame && mouseCapture && (
-        <div className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center  px-1 py-1.5 rounded-full glass-panel-card  z-50">
+     {hasFrame && mouseCapture &&   (
+        <div className="pointer-events-auto text-xs absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center  px-1 py-1 rounded-full glass-panel-card  z-50">
           <button
             onClick={(e) => { e.stopPropagation(); setTouchMode('move'); }}
             className={`p-2 rounded-full transition-colors ${touchMode === 'move' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
             title="Mouse Move Mode"
           >
-            <MousePointer2 size={16} />
+            Click
           </button>
-          <div className="w-[1px] h-5 bg-slate-700/50 mx-1"></div>
+          <div className=" h-5 bg-slate-700/50"></div>
           <button
             onClick={(e) => { e.stopPropagation(); setTouchMode('scroll'); }}
             className={`p-2 rounded-full transition-colors ${touchMode === 'scroll' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
             title="Scroll Mode"
           >
-            <Move size={16} />
+            Scroll
           </button>
-          <div className="w-[1px] h-5 bg-slate-700/50 mx-1"></div>
+          <div className=" h-5 bg-slate-700/50 "></div>
           <button
             onClick={(e) => { e.stopPropagation(); setTouchMode('drag'); }}
             className={`p-2 rounded-full transition-colors ${touchMode === 'drag' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
             title="Drag Mode"
           >
-            <Hand size={16} />
+            Drag
           </button>
         </div>
       )}

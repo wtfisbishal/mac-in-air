@@ -95,10 +95,6 @@ function PairPageContent() {
         <div className="animate-spotlight h-fit mt-20 max-md:mt-40 w-full flex items-center justify-center p-6">
           <div className="text-center flex flex-col items-center  animate-fade-up ">
 
-            <div className="w-20 h-20 bg-  drop-shadow-emerald-500 drop-shadow-2xl flex items-center justify-center mx-auto mb-5">
-              <CheckCircle size={36} className="text-emerald-400" />
-            </div>
-
             <h2 className="text-2xl font-bold text-emerald-500 mb-2">Connected to !</h2>
             <p className="text-slate-400 text-sm mb-4">
               <span className="text-white text-7xl max-md:text-5xl font-extrabold">{paired.name}</span>

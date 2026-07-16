@@ -2,18 +2,16 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Circle, Zap, Link as Link3, Wifi, WifiOffIcon, } from 'lucide-react';
-import { useDevices, DEVICES_KEY } from '@/hooks/useDevices';
+import { Monitor, Cpu, HardDrive, Plus, RefreshCw,  Link as Link3, Wifi, WifiOffIcon, } from 'lucide-react';
+import { useDevices} from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
-import { useQueryClient } from '@tanstack/react-query';
-import type { Device } from '@/types';
+ import type { Device } from '@/types';
 
 function DeviceCard({ device }: { device: Device }) {
-  const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
-
+  // const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
    return (
     <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel-card rounded-3xl p-5 transition-all   group
       ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
@@ -21,7 +19,7 @@ function DeviceCard({ device }: { device: Device }) {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl border border-indigo-500/10 flex items-center justify-center text-4xl">
-            {platform}
+            
           </div>
           <div>
             <p className="text-sm font-semibold text-white leading-tight capitalize"> {device?.user}'s {device.name}</p>
@@ -73,22 +71,20 @@ export default function DashboardPage() {
   const { data: devices, isLoading, isError , isRefetching ,  refetch } = useDevices();
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
-  const qc = useQueryClient();
- 
+   
   useEffect(() => {
     if (!socket) return;
-    const handler = (data: { deviceId: string; isOnline: boolean }) => {
-      qc.setQueryData<Device[]>(DEVICES_KEY, prev =>
-        prev?.map(d => d.id === data.deviceId ? { ...d, isOnline: data.isOnline } : d)
-      );
-      toast(`Device ${data.isOnline ? 'came online' : 'went offline'}`, data.isOnline ? 'success' : 'info');
+    const handler = (device: Device) => {
+      toast(` ${device?.name || 'Device'} ${device.isOnline ? 'came online' : 'went offline'}`, device.isOnline ? 'success' : 'info');
     };
     socket.on('device-status-changed', handler);
     return () => { socket.off('device-status-changed', handler); };
-  }, [socket, qc, toast]);
+  }, [socket, toast]);
 
   const online = devices?.filter(d => d.isOnline).length ?? 0;
   const total = devices?.length ?? 0;
+
+  console.log(devices)
  
   return (
     <AppLayout>
