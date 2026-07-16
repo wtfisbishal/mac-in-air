@@ -2,24 +2,26 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, Plus, RefreshCw,  Link as Link3, Wifi, WifiOffIcon, } from 'lucide-react';
-import { useDevices} from '@/hooks/useDevices';
+import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Wifi, WifiOffIcon, } from 'lucide-react';
+import { useDevices } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
- import type { Device } from '@/types';
+import type { Device } from '@/types';
 
 function DeviceCard({ device }: { device: Device }) {
-  // const platform = device.platform === 'darwin' ? '' : device.platform === 'win32' ? '🪟' : '🐧';
-   return (
+  return (
     <div className={`bg-gradient-to-t  from-[#0E161B] to-[#374750 glass-panel-card rounded-3xl p-5 transition-all   group
       ${device.isOnline ? ' ' : 'border border-white/[0.04] opacity-70'}`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl border border-indigo-500/10 flex items-center justify-center text-4xl">
-            
+          <div className="   flex items-center justify-center ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
+              <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
+            </svg>
           </div>
           <div>
             <p className="text-sm font-semibold text-white leading-tight capitalize"> {device?.user}'s {device.name}</p>
@@ -59,7 +61,7 @@ function DeviceCard({ device }: { device: Device }) {
           href={`/control/${device.id}`}
           className={`btn !rounded-full glass-button-primary flex-1 text-xs py-2 ${device.isOnline ? 'glass-button-primary' : 'glass-button opacity-40 pointer-events-none'}`}
         >
-            Control
+          Control
         </Link>
 
       </div>
@@ -68,10 +70,10 @@ function DeviceCard({ device }: { device: Device }) {
 }
 
 export default function DashboardPage() {
-  const { data: devices, isLoading, isError , isRefetching ,  refetch } = useDevices();
+  const { data: devices, isLoading, isError, isRefetching, refetch } = useDevices();
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
-   
+
   useEffect(() => {
     if (!socket) return;
     const handler = (device: Device) => {
@@ -81,30 +83,21 @@ export default function DashboardPage() {
     return () => { socket.off('device-status-changed', handler); };
   }, [socket, toast]);
 
-  const online = devices?.filter(d => d.isOnline).length ?? 0;
+  const online = devices?.filter((d: { isOnline: boolean }) => d.isOnline).length ?? 0;
   const total = devices?.length ?? 0;
 
-  console.log(devices)
- 
   return (
     <AppLayout>
       <div className=" !p-7 max-md:w-full  w-[70%] mx-auto">
         {/* Header */}
-        <div className="flex items-center max-md:items-start max-md:gap-4 max-md:flex-col justify-between mb-7 animate-fade-up">
+        <div className="flex items-center  max-md:gap-4 justify-between mb-7 animate-fade-up">
+          <h1 className="text-6xl   font-extrabold   tracking-tight">MACS</h1>
 
-          <div>
-            <h1 className="text-6xl   font-extrabold mb-5 tracking-tight">MACS</h1>
-          </div>
+          <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
+            <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={18} />
 
-          <div className="flex items-center max-md:gap-6 max-md:w-full   gap-3">
-            <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
-              <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={13} /> {isLoading ? 'Refreshing...' : 'Refresh'}
-               
-            </button>
-            <Link href="/pair" className=" flex items-center gap-3 glass-button-primary rounded-full px-5 !py-2  text-[15px] font-semibold cursor-pointer">
-              <Link3 size={14} /> Pair Device
-            </Link>
-          </div>
+          </button>
+
 
         </div>
 
@@ -128,7 +121,7 @@ export default function DashboardPage() {
 
         {/* Device list */}
         <div className="animate-fade-up delay-2">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Devices</h2>
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Your Macs</h2>
 
           {isLoading && (
             <div className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
@@ -166,7 +159,7 @@ export default function DashboardPage() {
 
           {!isLoading && !isError && devices && devices.length > 0 && (
             <div className="grid grid-cols-2 w-full max-md:grid-cols-1 gap-4">
-              {devices.map(d => <DeviceCard key={d.id} device={d} />)}
+              {devices.map((d: Device) => <DeviceCard key={d.id} device={d} />)}
             </div>
           )}
         </div>

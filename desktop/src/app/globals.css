@@ -44,8 +44,12 @@ body {
   background-color: #0b0b11;
   font-family: "Montserrat", sans-serif;
 }
-.logo{
-     background-image: linear-gradient(294deg, #2D3BF6  -28%, #ffffff 105%);
+.logo {
+   background-image: linear-gradient(180deg, #ffffff 33%, #ffffffad 41%, #0f0f0f 90%);
+    background-clip: text;
+  -webkit-background-clip: text; 
+   color: transparent;
+  /* font-family: bosch !important; */
 }
  
  

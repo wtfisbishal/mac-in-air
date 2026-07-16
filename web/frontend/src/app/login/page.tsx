@@ -127,27 +127,4 @@ export default function LoginPage() {
   );
 }
 
-function SwiftAppleLogo() {
-  return (
-    <div className="flex items-center justify-center p-4 bg-gray-950 rounded-xl w-fit cursor-pointer group">
-      <div className="relative flex items-center text-5xl transition-transform duration-300 group-hover:scale-105">
-
-        {/* Neon Wind Trail */}
-        <span className="absolute -left-8 text-cyan-400 opacity-70 blur-[1px] drop-shadow-[0_0_12px_rgba(34,211,238,0.9)] transition-all duration-300 group-hover:-left-10 group-hover:opacity-100">
-          💨
-        </span>
-
-        {/* Core Apple */}
-        <span className="relative z-10 text-gray-100 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-          
-        </span>
-
-      </div>
-
-      {/* Optional Typography */}
-      <span className="ml-4 text-2xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-cyan-400">
-        MAC in AIR
-      </span>
-    </div>
-  );
-}
+ 

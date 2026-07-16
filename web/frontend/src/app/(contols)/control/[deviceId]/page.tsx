@@ -7,7 +7,7 @@ import {
   MonitorOff, Keyboard, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
   Link as Link2, ShieldAlert, X, Loader,
-  LayoutGrid,Mouse
+  LayoutGrid, Mouse
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
@@ -314,13 +314,12 @@ export default function ControlPage({ params }: PageProps) {
         {/*   Main area */}
         <div
           ref={fullScreenRef}
-          className={`flex max-md:flex-col gap-4 flex-1 ${kbCapture ? ' pb-[230px] max-md:pb-[0px] ' : ' mb '} min-h-0 ${fullscreen ? 'h-full' : ''}`}>
+          className={`flex max-md:flex-col overflow-hidden gap-4 flex-1 ${kbCapture ? ' pb-[230px] max-md:pb-[0px] ' : ' mb '} min-h-0 ${fullscreen ? ' h-full ' : ''}`}>
           {/* Screen */}
           <div
             ref={controlAreaRef}
-            className={`flex-1 flex flex-col min-h-screen max-md:min-h-[50vh] max-md:overflow-hidden relative items-start   ${fullscreen ? ' max-md:pt-[35%]' : 'justify-start'}  gap-3 min-w-0   `}
+            className={` flex-1   flex-col min-h-screen max-md:h-[50vh] max-md:overflow-hidden relative items-start   ${fullscreen ? ' max-md:pt-[10%]' : 'justify-start'}  gap-3 min-w-0   `}
             tabIndex={-1}
-            style={{ outline: 'none' }}
           >
             {/* Canvas */}
             <div className=" w-full items-center flex flex-col max-md:gap-3 rounded-2xl overflow-hidden relative animate-fade-up delay-2">
@@ -350,6 +349,17 @@ export default function ControlPage({ params }: PageProps) {
             {kbCapture && (
               <div className="  w-full animate-fade-up flex flex-col gap-3 ">
                 <MacKeybar dataChannel={dataChannel} onCommand={(type) => emit(type)} />
+              </div>
+            )}
+
+            {mouseCapture && (
+              <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
+                <VirtualJoystick
+                  screenW={screenSize.w}
+                  screenH={screenSize.h}
+                  enabled={mouseCapture}
+                  dataChannel={dataChannel}
+                />
               </div>
             )}
           </div>
@@ -407,20 +417,15 @@ export default function ControlPage({ params }: PageProps) {
               </div>
 
               {/* Virtual Joystick */}
-              {/* <div className="glass-panel-dark max-md:hidden  rounded-3xl p-4 flex flex-col items-center">
-                <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold mb-4 self-start">Joystick</p>
+              <div className="glass-panel-dark max-md:hidden  rounded-3xl p-4 flex flex-col items-center">
                 <VirtualJoystick
                   screenW={screenSize.w}
                   screenH={screenSize.h}
                   enabled={mouseCapture}
                   dataChannel={dataChannel}
                 />
-                {!mouseCapture && (
-                  <p className="text-[10px] text-slate-600 mt-3 text-center">
-                    Enable Mouse to use joystick
-                  </p>
-                )}
-              </div> */}
+
+              </div>
 
               {/* System actions */}
               <div className="glass-panel-dark rounded-3xl p-4 max-md:p-2 max-md:px-3">
@@ -504,6 +509,7 @@ export default function ControlPage({ params }: PageProps) {
         }
 
 
+
         {mouseCapture && (
           <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
             <VirtualJoystick
@@ -514,6 +520,7 @@ export default function ControlPage({ params }: PageProps) {
             />
           </div>
         )}
+
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
