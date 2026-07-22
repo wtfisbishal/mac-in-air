@@ -9,6 +9,7 @@ import { logInfo, logError } from '../utils/logger';
 export interface CommandPayload {
   type: string;
   payload?: any;
+  fromSocketId?: string; // Set by backend relay
 }
 
 export interface CommandResult {

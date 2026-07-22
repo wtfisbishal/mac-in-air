@@ -13,9 +13,13 @@ function GlobalDeviceListener() {
   const { socket } = useSocket();
   const qc = useQueryClient();
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    if (!socket) return;
-    const handler = (payload: { deviceId: string; isOnline: boolean }) => {
+    if (!socket || !user) return;
+    const handler = (payload: { deviceId: string; isOnline: boolean; ownerEmail: string }) => {
+      if (payload.ownerEmail !== user.email) return;
+
       qc.setQueryData<Device[]>(DEVICES_KEY, prev => {
         const current = prev || [];
         const exists = current.find(d => d.id === payload.deviceId);

@@ -16,8 +16,7 @@ export function useAuth() {
     const t = localStorage.getItem(TOKEN_KEY);
     const u = localStorage.getItem(USER_KEY);
     if (t) setToken(t);
-    if (u) { try { setUser(JSON.parse(u)); } catch { 
-       } }
+    if (u) { try { setUser(JSON.parse(u)); } catch { } }
     setReady(true);
   }, []);
 

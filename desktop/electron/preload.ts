@@ -1,12 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  
+
   // Permissions
   getMediaAccessStatus: () => ipcRenderer.invoke('get-media-access-status'),
   checkAccessibility: () => ipcRenderer.invoke('check-accessibility'),
   requestAccessibility: () => ipcRenderer.invoke('request-accessibility'),
-  requestRecoading:()=>ipcRenderer.invoke('request-media-access'),
+  requestRecoading: () => ipcRenderer.invoke('request-media-access'),
   checkAutomation: () => ipcRenderer.invoke('check-automation'),
   getAllPermissions: () => ipcRenderer.invoke('get-all-permissions'),
 
@@ -18,9 +18,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getConnectionStatus: () => ipcRenderer.invoke('get-connection-status'),
   getDeviceInfo: () => ipcRenderer.invoke('get-device-info'),
 
-  // Pairing
-  getPairingCode: () => ipcRenderer.invoke('get-pairing-code'),
-  refreshPairingCode: () => ipcRenderer.invoke('refresh-pairing-code'),
+  // Google Auth
+  getAuthState: () => ipcRenderer.invoke('auth-get-state'),
+  signInWithGoogle: () => ipcRenderer.invoke('auth-sign-in'),
+  signOut: () => ipcRenderer.invoke('auth-sign-out'),
+  onAuthStateChanged: (callback: (state: any) => void) => {
+    ipcRenderer.on('auth-state-changed', (_event, state) => callback(state));
+  },
+
+  // Master Key
+  hasMasterKey: () => ipcRenderer.invoke('master-key-has'),
+  setupMasterKey: (password: string) => ipcRenderer.invoke('master-key-setup', password),
+  clearMasterKey: () => ipcRenderer.invoke('master-key-clear'),
 
   // Active web sessions
   getConnectedClients: () => ipcRenderer.invoke('get-connected-clients'),

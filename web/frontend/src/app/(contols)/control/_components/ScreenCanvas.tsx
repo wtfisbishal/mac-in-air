@@ -7,7 +7,7 @@ export default function ScreenCanvas({
   deviceId,
   pairToken,
   onMouseEvent,
-  mouseCapture ,
+  mouseCapture,
   onScreenSize,
   displaySize,
   onDataChannel,
@@ -22,7 +22,6 @@ export default function ScreenCanvas({
     height: number,
     scaleFactor: number
   };
-   
   onDataChannel?: (dc: RTCDataChannel | null) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,14 +43,14 @@ export default function ScreenCanvas({
       socket.emit('join-device', { deviceId, pairToken },
         (res?: { success: boolean; message?: string }) => {
           if (res?.success === false) {
-            sessionStorage.removeItem(`rmac_pair_${deviceId}`)
+            sessionStorage.removeItem(`pairToken_${deviceId}`)
+            window.location.reload(); // Force reload to show lock screen again
           }
          }
       );
     };
 
     joinDevice();
-    
 
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
@@ -145,18 +144,16 @@ export default function ScreenCanvas({
       }
     };
     
-    socket.on('connect', joinDevice);
     socket.on('webrtc-offer', handleOffer);
     socket.on('webrtc-ice-candidate', handleIceCandidate);
 
     return () => {
-      socket.off('connect', joinDevice);
       socket.off('webrtc-offer', handleOffer);
       socket.off('webrtc-ice-candidate', handleIceCandidate);
       onDataChannel?.(null); // notify parent that channel is gone
       pc.close();
     };
-  }, [deviceId, pairToken]);
+  }, [deviceId]);
 
  
   useEffect(() => {

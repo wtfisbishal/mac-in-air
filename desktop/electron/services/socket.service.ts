@@ -1,4 +1,3 @@
-
 import { io, Socket } from 'socket.io-client';
 import { commandService, CommandPayload } from './command.service';
 import { screenService } from './screen.service';
@@ -6,23 +5,24 @@ import { logInfo, logError, logWarn } from '../utils/logger';
 import { machineIdSync } from 'node-machine-id';
 import { BACKEND_URL } from '../utils';
 import { screen } from 'electron';
+import { authService } from './auth.service';
+import { masterKeyService } from './master-key.service';
+import os from 'os';
 
 export interface WebClient {
   socketId: string;
   connectedAt: number;
 }
+
 const KEEP_ALIVE_INTERVAL_MS = 30000;
 
 export class SocketService {
   private socket: Socket | null = null;
   private backendUrl: string = BACKEND_URL;
   private _isConnected: boolean = false;
-  private pairingCode: string | null = null;
-  private deviceId: string = machineIdSync();;
+  private deviceId: string = machineIdSync();
   private connectedClients: WebClient[] = [];
   private keepAliveTimer: ReturnType<typeof setInterval> | null = null;
-
-
   private reconnectWatchdog: ReturnType<typeof setInterval> | null = null;
 
   public get isConnected(): boolean {
@@ -32,10 +32,16 @@ export class SocketService {
   public connect(url?: string) {
     if (url) this.backendUrl = url;
 
+    const backendToken = authService.getBackendToken();
+    const ownerEmail = authService.getEmail();
+
+    if (!backendToken || !ownerEmail) {
+      logWarn('SocketService', 'Not connecting — no auth token. Desktop must sign in with Google first.');
+      return;
+    }
+
     this.socket = io(this.backendUrl, {
-      // Start with polling (works everywhere including Render), then upgrade to WS
       transports: ['websocket', 'polling'],
-      // Reconnection — retry forever so the desktop auto-recovers from Render sleep
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -43,40 +49,54 @@ export class SocketService {
       randomizationFactor: 0.5,
       autoConnect: true,
       timeout: 20000,
-      query: { role: 'desktop' }, // tells backend to route to setupDesktopHandlers
+      query: { role: 'desktop' },
+      // Authenticate with the backend JWT
+      auth: { token: backendToken },
     });
 
     this.startReconnectWatchdog();
 
-    // helpers
     const display = screen.getPrimaryDisplay();
 
+    const announceDevice = async () => {
+      const currentOwnerEmail = authService.getEmail();
+      if (!currentOwnerEmail) {
+        logWarn('SocketService', 'Cannot announce device — no owner email');
+        return;
+      }
 
-    const announceDevice = () => {
-      this.socket?.emit(
-        'device-online',
-        {
-          deviceId: this.deviceId,
-          name: require('os').hostname(),
-          platform: process.platform,
-          arch: process.arch,
-          user: require('os').userInfo().username,
-          display: {
-            width: display.size.width,
-            height: display.size.height,
-            scaleFactor: display.scaleFactor
-          }
+      const payload: any = {
+        deviceId: this.deviceId,
+        name: os.hostname(),
+        platform: os.platform(),
+        arch: os.arch(),
+        user: os.userInfo().username,
+        ownerEmail: currentOwnerEmail,
+        display: {
+          width: display.size.width,
+          height: display.size.height,
+          scaleFactor: display.scaleFactor,
         },
-        () => { }
-      );
+      };
+
+      const hasMaster = await masterKeyService.hasMasterKey();
+      if (hasMaster) {
+        const challengeData = await masterKeyService.getPairingChallenge(this.deviceId);
+        if (challengeData) {
+          payload.masterSalt = challengeData.salt;
+          payload.pairingChallenge = challengeData.challenge;
+        }
+      }
+
+      this.socket?.emit('device-online', payload, () => {
+        logInfo('SocketService', 'Registered with backend successfully');
+      });
     };
 
     const startKeepAlive = () => {
       this.stopKeepAlive();
       this.keepAliveTimer = setInterval(() => {
         if (this.socket?.connected) {
-          // Lightweight ping — the server will just ignore unknown events,
-          // but it's enough traffic to reset Render's 30-s idle timer.
           this.socket.emit('keep-alive');
         }
       }, KEEP_ALIVE_INTERVAL_MS);
@@ -84,25 +104,24 @@ export class SocketService {
 
     this.socket.on('connect', () => {
       this._isConnected = true;
-      this.pairingCode = null; // reset to get always a fresh code
       logInfo('SocketService', 'Connected to backend', { id: this.socket?.id });
       announceDevice();
       startKeepAlive();
-
       console.log('transport:', this.socket?.io.engine.transport.name);
     });
 
     this.socket.io.engine.on('upgrade', () => {
-      console.log(
-        'upgraded:',
-        this.socket?.io.engine.transport.name
-      );
+      console.log('upgraded:', this.socket?.io.engine.transport.name);
     });
 
+    // Handle auth errors from backend
+    this.socket.on('auth-error', (data: { message: string }) => {
+      logError('SocketService', 'Auth error from backend', data.message);
+      this._isConnected = false;
+    });
 
     this.socket.on('disconnect', (reason) => {
       this._isConnected = false;
-
       logWarn('SocketService', 'Disconnected from backend', { reason });
 
       if (reason === 'transport close') {
@@ -111,7 +130,7 @@ export class SocketService {
         }, 1000);
       }
 
-      logInfo('SocketService', 'Screen share stopped by disconnecting ',);
+      logInfo('SocketService', 'Screen share stopped by disconnecting');
       screenService.stopScreenShare();
     });
 
@@ -131,12 +150,10 @@ export class SocketService {
       logError('SocketService', 'All reconnection attempts failed');
     });
 
-    //  Listen for commands from backend  
+    // Listen for commands from backend
     this.socket.on('command', async (payload: CommandPayload, callback?: (result: any) => void) => {
       logInfo('SocketService', 'Received command', payload);
       const result = await commandService.handleCommand(payload);
-
-      // Send result back to backend
       if (callback) {
         callback(result);
       } else {
@@ -144,13 +161,7 @@ export class SocketService {
       }
     });
 
-    // Listen for pairing completion 
-    this.socket.on('pairing-complete', (data) => {
-      logInfo('SocketService', 'Device pairing complete', data);
-      this.pairingCode = null;
-    });
-
-    // Track web client sessions  
+    // Track web client sessions
     this.socket.on('web-client-connected', (data: { socketId: string; connectedAt: number }) => {
       this.connectedClients = this.connectedClients.filter(c => c.socketId !== data.socketId);
       this.connectedClients.push(data);
@@ -162,7 +173,7 @@ export class SocketService {
       logInfo('SocketService', 'Web client disconnected', data);
     });
 
-    //  Listen for screen share requests 
+    // Listen for screen share requests
     this.socket.on('screen-share-request', async (data) => {
       logInfo('SocketService', 'Screen share requested', { sessionId: data.sessionId });
       try {
@@ -174,14 +185,13 @@ export class SocketService {
       }
     });
 
-    //  Listen for execute actions (during screen share) 
+    // Listen for execute actions (during screen share)
     this.socket.on('execute-action', (data) => {
       logInfo('SocketService', 'Action received', data.action.type);
-      // Actions will be executed based on type (mouse, keyboard, etc)
       commandService.handleCommand(data.action);
     });
 
-    //  Listen for screen share stop 
+    // Listen for screen share stop
     this.socket.on('screen-share-stop', (data) => {
       logInfo('SocketService', 'Screen share stopped', { sessionId: data.sessionId });
       screenService.stopScreenShare();
@@ -200,7 +210,7 @@ export class SocketService {
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'answer', ...data });
     });
-    //After Offer/Answer exchange, peers still need to discover network paths.
+
     this.socket.on('webrtc-ice-candidate', (data) => {
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('webrtc-signaling', { type: 'ice-candidate', ...data });
@@ -218,80 +228,6 @@ export class SocketService {
     }, 30000);
   }
 
-  public async getPairingCode(): Promise<string | null> {
-    // If we already have a code cached, return it immediately
-    if (this.pairingCode) {
-      return this.pairingCode;
-    }
-
-    if (!this.socket) {
-      return null;
-    }
-
-    // Wait up to 3s  if not  connected
-    if (!this.socket.connected) {
-      await new Promise<void>((resolve) => {
-        this.socket?.once('connect', resolve);
-        setTimeout(resolve, 3000);
-      });
-    }
-
-    if (!this.socket.connected) {
-      return null;
-    }
-
-    // Request directly from backend
-    return new Promise<string | null>((resolve) => {
-      this.socket!.timeout(5000).emit(
-        'request-pairing-code',
-        { deviceId: this.deviceId },
-        (err: Error | null, response: any) => {
-          if (err) {
-            logError('SocketService', 'getPairingCode timed out', err.message);
-            resolve(null);
-            return;
-          }
-          if (response?.success) {
-            this.pairingCode = response.code;
-            logInfo('SocketService', 'Got pairing code on demand', { code: response.code });
-            resolve(response.code);
-          } else {
-            resolve(null);
-          }
-        }
-      );
-    });
-  }
-
-  public async refreshPairingCode(): Promise<string | null> {
-
-    if (!this.socket) return null;
-
-    if (!this.socket.connected) {
-      await new Promise<void>((resolve) => {
-        this.socket?.once('connect', resolve);
-        setTimeout(resolve, 3000);
-      });
-    }
-
-    if (!this.socket.connected) {
-      logWarn('SocketService', 'Not connected to backend');
-      return null;
-    }
-
-    return new Promise<string | null>((resolve) => {
-      this.socket?.emit('request-pairing-code', { deviceId: this.deviceId, forceRefresh: true }, (response: any) => {
-        if (response?.success) {
-          this.pairingCode = response.code;
-          logInfo('SocketService', 'Refreshed pairing code');
-          resolve(response.code);
-        } else {
-          logError('SocketService', 'Failed to refresh pairing code', response?.error);
-          resolve(null);
-        }
-      });
-    });
-  }
   public getConnectedClients(): WebClient[] {
     return this.connectedClients;
   }
@@ -316,6 +252,15 @@ export class SocketService {
       const { BrowserWindow } = require('electron');
       BrowserWindow.getAllWindows()[0]?.webContents.send('stop-webrtc');
     }
+  }
+
+  // Reconnect with a fresh token after sign-in
+  public reconnectWithAuth() {
+    if (this.socket) {
+      this.disconnect();
+      this.socket = null;
+    }
+    this.connect();
   }
 }
 

@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, Plus, RefreshCw, Wifi, WifiOffIcon, } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, RefreshCw, Wifi, WifiOffIcon, LogOut } from 'lucide-react';
 import { useDevices } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/hooks/useAuth';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
+import { useRouter } from 'next/navigation';
 import type { Device } from '@/types';
 
 function DeviceCard({ device }: { device: Device }) {
@@ -73,15 +75,25 @@ export default function DashboardPage() {
   const { data: devices, isLoading, isError, isRefetching, refetch } = useDevices();
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!socket) return;
-    const handler = (device: Device) => {
-      toast(` ${device?.name || 'Device'} ${device.isOnline ? 'came online' : 'went offline'}`, device.isOnline ? 'success' : 'info');
+    if (!socket || !user) return;
+    const handler = (data: { deviceId: string; isOnline: boolean; ownerEmail: string }) => {
+      if (data.ownerEmail === user.email) {
+        toast(`Device ${data.isOnline ? 'came online' : 'went offline'}`, data.isOnline ? 'success' : 'info');
+        refetch();
+      }
     };
     socket.on('device-status-changed', handler);
     return () => { socket.off('device-status-changed', handler); };
-  }, [socket, toast]);
+  }, [socket, toast, refetch, user]);
+
+  const handleSignOut = useCallback(() => {
+    logout();
+    router.replace('/login');
+  }, [logout, router]);
 
   const online = devices?.filter((d: { isOnline: boolean }) => d.isOnline).length ?? 0;
   const total = devices?.length ?? 0;
@@ -93,12 +105,18 @@ export default function DashboardPage() {
         <div className="flex items-center  max-md:gap-4 justify-between mb-7 animate-fade-up">
           <h1 className="text-6xl   font-extrabold   tracking-tight">MACS</h1>
 
-          <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
-            <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={18} />
-
-          </button>
-
-
+          <div className="flex items-center gap-3">
+            {user?.picture && (
+              <img src={user.picture} alt={user.name || user.email} className="w-8 h-8 rounded-full border border-white/10" />
+            )}
+            <button onClick={handleSignOut} className="flex items-center gap-2 glass-button rounded-full px-4 !py-2 text-[13px] font-semibold cursor-pointer text-red-400 hover:text-red-300">
+              <LogOut size={15} />
+              Sign Out
+            </button>
+            <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
+              <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -149,11 +167,11 @@ export default function DashboardPage() {
           {!isLoading && !isError && devices?.length === 0 && (
             <div className=" glass-panel-dark rounded-3xl p-12 text-center  ">
               <Monitor size={36} className="text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400 font-medium">No devices yet</p>
-              <p className="text-slate-600 text-sm mt-1">Pair your Mac to get started</p>
-              <Link href="/pair" className="btn glass-button-primary !rounded-full mx-auto mt-4 text-sm">
-                <Plus size={14} /> Pair Device
-              </Link>
+              <p className="text-slate-400 font-medium">No Macs online</p>
+              <p className="text-slate-600 text-sm mt-1 leading-relaxed">
+                Open the desktop app on your Mac and sign in with the same Google account.
+                Your Mac will appear here automatically.
+              </p>
             </div>
           )}
 

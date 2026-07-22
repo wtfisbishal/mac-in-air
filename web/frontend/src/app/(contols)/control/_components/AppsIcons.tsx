@@ -55,7 +55,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
     };
 
     if (!result.success) {
-      toast('Could not reach desktop agent', result?.message);
+      toast('Could not reach desktop agent', 'error');
       return [];
     }
 

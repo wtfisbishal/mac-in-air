@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import nipplejs from 'nipplejs';
+import type nipplejsType from 'nipplejs';
 
 interface VirtualJoystickProps {
   screenW: number;
@@ -27,7 +27,7 @@ function sendMouseEvent(
 
 export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel }: VirtualJoystickProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const managerRef = useRef<ReturnType<typeof nipplejs.create> | null>(null);
+  const managerRef = useRef<ReturnType<typeof nipplejsType.create> | null>(null);
   const rafRef = useRef<number | null>(null);
   const cursorRef = useRef({ x: screenW / 2, y: screenH / 2 });
   // normalised velocity components [-1, 1] set by joystick; zero when released
@@ -72,46 +72,52 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
   useEffect(() => {
     if (!containerRef.current || !enabled) return;
 
-    const manager = nipplejs.create({
-      zone: containerRef.current,
-      mode: 'static',
-      position: { left: '50%', top: '50%' },
-      color: '#6366f1',
-      size: 60,
-      restOpacity: 0.75,
-      fadeTime: 150,
-      multitouch: false,
-    });
-    managerRef.current = manager;
+    let manager: ReturnType<typeof nipplejsType.create>;
+    
+    import('nipplejs').then((module) => {
+      const nipplejs = module.default || module;
+      manager = nipplejs.create({
+        zone: containerRef.current!,
+        mode: 'static',
+        position: { left: '50%', top: '50%' },
+        color: '#6366f1',
+        size: 60,
+        restOpacity: 0.75,
+        fadeTime: 150,
+        multitouch: false,
+      });
+      managerRef.current = manager;
 
-    // nipplejs v1 InternalEvent shape: { type, target, data: JoystickEventData }
-    manager.on('move', (evt: any) => {
-      const d = evt?.data || evt;
-      if (!d || !d.vector) return;
-      
-      // nipplejs vector.x is positive right. The user reported it moving right when dragging left, 
-      // so we invert vx to match their expectation if their touch input maps backwards.
-      const vx: number = d.vector.x; 
-      
-      // nipplejs vector.y is positive UP. Screen coordinates are positive DOWN.
-      const vy: number = -d.vector.y; 
+      manager.on('move', (evt: any) => {
+        const d = evt?.data || evt;
+        if (!d || !d.vector) return;
+        
+        // nipplejs vector.x is positive right. The user reported it moving right when dragging left, 
+        // so we invert vx to match their expectation if their touch input maps backwards.
+        const vx: number = d.vector.x; 
+        
+        // nipplejs vector.y is positive UP. Screen coordinates are positive DOWN.
+        const vy: number = -d.vector.y; 
 
-      velRef.current = { vx, vy };
-      startLoop();
-    });
+        velRef.current = { vx, vy };
+        startLoop();
+      });
 
-    manager.on('start', () => {
-      // Reset cursor to current position on new drag; loop started by first 'move'
-      lastEmitRef.current = 0;
-    });
+      manager.on('start', () => {
+        // Reset cursor to current position on new drag; loop started by first 'move'
+        lastEmitRef.current = 0;
+      });
 
-    manager.on('end', () => {
-      stopLoop();
+      manager.on('end', () => {
+        stopLoop();
+      });
     });
 
     return () => {
       stopLoop();
-      manager.destroy();
+      if (managerRef.current) {
+        managerRef.current.destroy();
+      }
       managerRef.current = null;
     };
    }, [enabled, screenW, screenH]);

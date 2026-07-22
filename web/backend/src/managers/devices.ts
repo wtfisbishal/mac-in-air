@@ -10,12 +10,14 @@ class DeviceManager {
     arch: string;
     socketId: string;
     user: string;
+    ownerEmail: string; // authenticated Google email
     display: {
-      width: number,
-      height: number,
-      scaleFactor: number
-    }
-
+      width: number;
+      height: number;
+      scaleFactor: number;
+    };
+    masterSalt?: string;
+    pairingChallenge?: string;
   }): Device {
     const existing = this.devices.get(deviceId);
 
@@ -26,21 +28,23 @@ class DeviceManager {
       arch: data.arch,
       isOnline: true,
       user: data.user,
+      ownerEmail: data.ownerEmail,
       display: {
         width: data.display.width,
         height: data.display.height,
-        scaleFactor: data.display.scaleFactor
+        scaleFactor: data.display.scaleFactor,
       },
+      masterSalt: data.masterSalt,
+      pairingChallenge: data.pairingChallenge,
       socketId: data.socketId,
       connectedAt: existing?.connectedAt ?? Date.now(),
       pairedRooms: existing?.pairedRooms ?? new Set(),
     };
 
     this.devices.set(deviceId, device);
-    console.log(`[DeviceManager] Device registered: ${deviceId} (${data.user} )`);
+    console.log(`[DeviceManager] Device registered: ${deviceId} (owner: ${data.ownerEmail})`);
     return device;
   }
-
 
   markOffline(socketId: string): Device | null {
     for (const [, device] of this.devices) {
@@ -57,9 +61,7 @@ class DeviceManager {
     return this.devices.get(deviceId);
   }
 
-
   // Get device by socket ID (for disconnect handling).
-
   getDeviceBySocketId(socketId: string): Device | undefined {
     for (const [, device] of this.devices) {
       if (device.socketId === socketId) return device;
@@ -67,33 +69,56 @@ class DeviceManager {
     return undefined;
   }
 
-
   // Return all known devices.
   getAllDevices(): Device[] {
-    return Array.from(this.devices.values()).map((d) => ({
-      ...d,
-      pairedRooms: d.pairedRooms, // keep internal but serialize below
-    }));
+    return Array.from(this.devices.values());
   }
 
+  // Safe serializable list for API responses — filtered by owner email.
+  listForEmail(email: string): Omit<Device, 'pairedRooms' | 'socketId'>[] {
+    return Array.from(this.devices.values())
+      .filter((d) => d.ownerEmail === email)
+      .map(({ id, name, user, ownerEmail, masterSalt, pairingChallenge, platform, arch, isOnline, connectedAt, display }) => ({
+        id,
+        name,
+        platform,
+        arch,
+        user,
+        ownerEmail,
+        masterSalt,
+        pairingChallenge,
+        isOnline,
+        connectedAt,
+        display,
+      }));
+  }
 
-  // Safe serializable list for API responses.
+  // Get a single device only if it belongs to the given email.
+  getDeviceForEmail(deviceId: string, email: string): Device | undefined {
+    const device = this.devices.get(deviceId);
+    if (!device) return undefined;
+    if (device.ownerEmail !== email) return undefined;
+    return device;
+  }
+
+  // Legacy — returns all (used internally only).
   listForApi(): Omit<Device, 'pairedRooms' | 'socketId'>[] {
-    return Array.from(this.devices.values()).map(({ id, name, user, platform, arch, isOnline, connectedAt, display }) => ({
+    return Array.from(this.devices.values()).map(({ id, name, user, ownerEmail, masterSalt, pairingChallenge, platform, arch, isOnline, connectedAt, display }) => ({
       id,
       name,
       platform,
       arch,
       user,
+      ownerEmail,
+      masterSalt,
+      pairingChallenge,
       isOnline,
       connectedAt,
-      display
+      display,
     }));
   }
 
-
-  //  Add a paired frontend to a device.
-
+  // Add a paired frontend to a device.
   addPairedRoom(deviceId: string, frontendSocketId: string): void {
     const device = this.devices.get(deviceId);
     if (device) {
@@ -102,7 +127,6 @@ class DeviceManager {
   }
 
   // Remove a paired frontend from a device.
-
   removePairedRoom(deviceId: string, frontendSocketId: string): void {
     const device = this.devices.get(deviceId);
     if (device) {

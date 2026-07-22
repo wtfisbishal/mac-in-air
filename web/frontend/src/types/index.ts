@@ -5,17 +5,21 @@ export interface Device {
   arch: string;
   isOnline: boolean;
   connectedAt: number;
-  user:string,
-  display:{
-    width:number,
-    height:number,
-    scaleFactor:number
-  }
+  user: string;
+  ownerEmail: string;
+  masterSalt?: string;
+  display: {
+    width: number;
+    height: number;
+    scaleFactor: number;
+  };
 }
 
 export interface AuthUser {
   id: string;
   email: string;
+  name?: string | null;
+  picture?: string | null;
 }
 
 export interface CommandResult {
@@ -30,7 +34,6 @@ export interface ScreenFrame {
   width: number;
   height: number;
 }
- 
 
 export interface Action {
   label: string;

@@ -2,27 +2,30 @@
 
 import { use, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { redirect, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
   MonitorOff, Keyboard, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
-  Link as Link2, ShieldAlert, X, Loader,
-  LayoutGrid, Mouse
+  ShieldAlert, X, Loader,
+  LayoutGrid, Mouse,
+  EyeOff,
+  Eye
 } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useDevice } from '@/hooks/useDevices';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
+import { apiPairDevice } from '@/lib/api';
+import { computePairingChallenge } from '@/lib/pairing-crypto';
 import Image from 'next/image';
 import AppsIcons from '../_components/AppsIcons';
 import { useFullscreen } from '@/hooks/useFullscreen';
-// import NormalKeyboard from '../_components/NormalKeyboard';
 import MacKeybar from '../_components/MacKeybar';
 import { Action } from '@/types';
 import { ACTIONS } from '@/lib/utils';
 import ScreenCanvas from '../_components/ScreenCanvas';
 import VirtualJoystick from '../_components/VirtualJoystick';
+import { useMutation } from '@tanstack/react-query';
 interface PageProps {
   params: Promise<{ deviceId: string }>;
 }
@@ -41,15 +44,16 @@ export default function ControlPage({ params }: PageProps) {
   const { data: device, isLoading } = useDevice(deviceId);
   const { toasts, toast, dismiss } = useToast();
 
-  const [pairToken, setPairToken] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [pairToken, setPairToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem(`rmac_pair_${deviceId}`);
+    const token = sessionStorage.getItem(`pairToken_${deviceId}`);
     setPairToken(token);
     setAuthChecked(true);
-
   }, [deviceId]);
+
+
 
   const [humburgerOpen, setHamburgerOpen] = useState(false);
   const [streaming, setStreaming] = useState(false);
@@ -99,13 +103,13 @@ export default function ControlPage({ params }: PageProps) {
     const handler = (updatedDevice: any) => {
       console.log("updated device is ", updatedDevice);
       if (updatedDevice.deviceId === deviceId && !updatedDevice.isOnline) {
-        toast(`${device?.name || ''} went offline`, 'error');
+        toast(`${device?.name || 'Device'} went offline`, 'error');
         redirect('/home');
       }
     };
     socket.on('device-status-changed', handler);
     return () => { socket.off('device-status-changed', handler); };
-  }, []);
+  }, [deviceId, device?.name, toast]);
 
   // Focus trap ref for keyboard capture
   const controlAreaRef = useRef<HTMLDivElement>(null);
@@ -211,27 +215,6 @@ export default function ControlPage({ params }: PageProps) {
 
 
 
-  if (!pairToken) return (
-    <AppLayout>
-      <div className="w-full flex items-center-safe justify-center">
-        <div className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
-            <ShieldAlert size={32} className="text-red-400" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Not Authorized</h2>
-          <p className="text-slate-400 text-sm max-md:w-[90%] mx-auto mb-6">
-            You must pair this device before you can control it.
-            Pairing tokens expire after 30 min  or when you close the tab.
-          </p>
-          <Link href={`/pair/?d=${device?.name}&&u=${device?.user}`} className="btn !rounded-full glass-button-primary">
-            <Link2 size={20} />
-            Pair Device
-          </Link>
-        </div>
-      </div>
-    </AppLayout>
-  );
-
   if (!device) return (
     <AppLayout>
       <div className="w-full flex items-center-safe justify-center">
@@ -243,6 +226,21 @@ export default function ControlPage({ params }: PageProps) {
           </button>
         </div>
       </div>
+    </AppLayout>
+  );
+
+  if (!pairToken && device.masterSalt) return (
+    <AppLayout>
+      <LockScreen
+        deviceId={deviceId}
+        deviceName={device?.name ?? deviceId}
+        saltHex={device.masterSalt}
+        onUnlock={(token) => {
+          sessionStorage.setItem(`pairToken_${deviceId}`, token);
+          setPairToken(token);
+        }}
+      />
+      <ToastContainer toasts={toasts} dismiss={dismiss} />
     </AppLayout>
   );
 
@@ -337,7 +335,7 @@ export default function ControlPage({ params }: PageProps) {
               )}
               <ScreenCanvas
                 deviceId={deviceId}
-                pairToken={pairToken}
+                pairToken={pairToken!}
                 onMouseEvent={handleMouseEvent}
                 mouseCapture={mouseCapture}
                 displaySize={device.display}
@@ -558,4 +556,127 @@ const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setK
 
     </>
   )
+}
+
+function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: string; saltHex: string; onUnlock: (token: string) => void; deviceName: string }) {
+  const [masterPassword, setMasterPassword] = useState('');
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [error, setError] = useState('');
+  const { toast } = useToast();
+  const [showPw, setShowPw] = useState(false);
+
+  // const handleUnlock = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError('');
+  //   setIsUnlocking(true);
+
+  //   try {
+  //     if (!saltHex) {
+  //       throw new Error('Device is missing master key salt');
+  //     }
+
+  //     // Derive challenge locally
+  //     const challenge = await computePairingChallenge(masterPassword, saltHex, deviceId);
+
+  //     const res = await apiPairDevice(deviceId, challenge);
+  //     setIsUnlocking(false);
+
+  //     if (res.success && res.pairToken) {
+  //       toast('Device unlocked', 'success');
+  //       onUnlock(res.pairToken);
+  //     } else {
+  //       setError(res.message || 'Invalid master key');
+  //       toast('Invalid master key', 'error');
+  //     }
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     setError(err.message || 'Failed to authenticate');
+  //     setIsUnlocking(false);
+  //   }
+  // };
+
+   const mutation = useMutation({
+    mutationFn: async () => {
+      if (saltHex && !masterPassword) throw new Error('Enter your master password');
+ 
+      let pairingChallenge: string | undefined;
+      if (saltHex && masterPassword) {
+        pairingChallenge = await computePairingChallenge(masterPassword, saltHex, deviceId);
+      }
+
+      const result = await apiPairDevice(deviceId,  pairingChallenge! );
+      return result;
+    },
+    onSuccess: (data) => {
+      if (data?.pairToken) {
+        toast('Device paired! Loading control…', 'success');
+        onUnlock(data.pairToken);
+      }
+    },
+    onError: (err: Error) => toast(err.message, 'error'),
+  });
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate();
+  };
+
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center max-md:p-3 p-6">
+      <div className="w-full   flex flex-col items-center gap-6 animate-fade-up">
+        <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mx-auto mb-5">
+          <Lock size={32} className="text-yellow-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Device is Locked</h2>
+        <p className="text-slate-400 text-sm mx-auto mb-6">
+          This device is protected by a Master Key. Please enter it to connect.
+        </p>
+
+        <form onSubmit={submit} className="w-full flex flex-col gap-4">
+          <div
+              className="w-full rounded-3xl p-6 flex flex-col gap-4"
+          >
+            {/* Password field */}
+            <div className="flex flex-col gap-2">
+            
+              <div className="max-md:w-full w-100 mx-auto relative">
+                <input
+                  id="inline-pair-password"
+                  type={showPw ? 'text' : 'password'}
+                  value={masterPassword}
+                  onChange={e => setMasterPassword(e.target.value)}
+                  placeholder="Your master password"
+                  className="w-100 max-md:w-full border-b border-white/15 font-bold px-4 py-3 pr-11 text-4xl text-white placeholder-slate-600 focus:outline-none focus:border-white placeholder:text-xl transition-colors"
+                  autoComplete="current-password"
+                  autoFocus
+                  disabled={mutation.isPending}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+              
+            </div>
+
+            <button
+              id="inline-pair-submit"
+              type="submit"
+              disabled={mutation.isPending || (!masterPassword && !!saltHex)}
+              className="flex max-md:w-full w-100 mx-auto items-center justify-center gap-2 glass-button-primary rounded-full px-5 py-2.5 text-sm font-semibold cursor-pointer  disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              {mutation.isPending
+                ? <><Loader size={16} className="animate-spin" /> Connecting…</>
+                : <><Power size={16} /> Connect to {deviceName}</>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }

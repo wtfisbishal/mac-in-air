@@ -15,7 +15,6 @@ const Navigation = () => {
     
     const navItems = [
         { href: '/home', title: 'Home' },
-        { href: '/pair', title: 'Pair' },
         { href: '/settings', title: 'Settings' },
     ]
     const { fullscreen  } = useFullscreen();

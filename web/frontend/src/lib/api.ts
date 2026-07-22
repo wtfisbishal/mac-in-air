@@ -1,6 +1,6 @@
 import type { Device, CommandResult } from '@/types';
 
-export const URL = process.env.NEXT_PUBLIC_API_URL ;
+export const URL = process.env.NEXT_PUBLIC_API_URL;
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -24,20 +24,16 @@ async function req<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function apiLogin(email: string, password: string) {
-  return req<{ token: string; user: { id: string; email: string } }>('/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-}
-
-export async function apiRegister(email: string, password: string) {
-  return req<{ token: string; user: { id: string; email: string } }>('/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+// Exchange a Google idToken for a backend JWT
+export async function apiGoogleAuth(idToken: string) {
+  return req<{ token: string; user: { id: string; email: string; name?: string | null; picture?: string | null } }>(
+    '/auth/google',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    }
+  );
 }
 
 export async function fetchDevices(): Promise<Device[]> {
@@ -60,10 +56,11 @@ export async function sendCommand(
   });
 }
 
-export async function pairDevice(code: string, frontendSocketId: string) {
-  return req<{success: boolean;device: Device;}>('/pair', {
+// Join a device using pairingChallenge (for Master Key)
+export async function apiPairDevice(deviceId: string, pairingChallenge: string): Promise<{ success: boolean; pairToken: string; message?: string }> {
+  return req<{ success: boolean; pairToken: string; message?: string }>('/pair', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, frontendSocketId }),
+    headers: authHeaders(),
+    body: JSON.stringify({ deviceId, pairingChallenge }),
   });
 }

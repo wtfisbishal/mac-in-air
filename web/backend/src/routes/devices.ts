@@ -7,26 +7,29 @@ import { deviceReadRateLimiter, deviceCommandRateLimiter } from '../middleware/r
 
 const router = Router();
 
-// GET /devices — list all known devices
-router.get('/', requireAuth, deviceReadRateLimiter, (_req: Request, res: Response): void => {
-  res.json(deviceManager.listForApi());
+// GET /devices — list devices owned by the authenticated user's email
+router.get('/', requireAuth, deviceReadRateLimiter, (req: Request, res: Response): void => {
+  const email = (req as any).user.email;
+  res.json(deviceManager.listForEmail(email));
 });
 
-// GET /devices/:id — get a single device
+// GET /devices/:id — get a single device (must belong to authenticated user)
 router.get('/:id', requireAuth, deviceReadRateLimiter, (req: Request, res: Response): void => {
-  const device = deviceManager.getDevice(req.params.id);
+  const email = (req as any).user.email;
+  const device = deviceManager.getDeviceForEmail(req.params.id, email);
 
   if (!device) {
     res.status(404).json({ message: 'Device not found' });
     return;
   }
 
-  const { id, name, platform, arch, isOnline,user , display , connectedAt } = device;
-  res.json({ id, name, platform, arch, isOnline,user,display, connectedAt });
+  const { id, name, platform, arch, isOnline, user, ownerEmail, display, connectedAt, masterSalt } = device;
+  res.json({ id, name, platform, arch, isOnline, user, ownerEmail, display, connectedAt, masterSalt });
 });
 
-// POST /devices/:id/commands — relay a command to the device
+// POST /devices/:id/commands — relay a command to the device (must belong to authenticated user)
 router.post('/:id/commands', requireAuth, deviceCommandRateLimiter, (req: Request, res: Response): void => {
+  const email = (req as any).user.email;
   const { id } = req.params;
   const command: CommandPayload = req.body;
 
@@ -35,7 +38,7 @@ router.post('/:id/commands', requireAuth, deviceCommandRateLimiter, (req: Reques
     return;
   }
 
-  const device = deviceManager.getDevice(id);
+  const device = deviceManager.getDeviceForEmail(id, email);
 
   if (!device) {
     res.status(404).json({ message: 'Device not found' });
