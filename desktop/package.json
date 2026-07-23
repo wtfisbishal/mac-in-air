@@ -1,6 +1,6 @@
 {
   "name": "MACinAIR",
-  "version": "1.0.7",
+  "version": "1.0.6",
   "description": "A MAC app ",
   "author": "Bishal Kandi",
   "license": "MIT",
@@ -16,7 +16,7 @@
     "build:next": "next build",
     "build:main": "tsc -p tsconfig.main.json",
     "build": "npm run build:next && npm run build:main",
-    "release": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder --publish always",
+    "release": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" dotenv -e .env -- electron-builder --publish always",
     "package": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder",
     "package:mac": "npm run build && NODE_OPTIONS=\"--experimental-require-module\" electron-builder --mac",
     "postinstall": "NODE_OPTIONS=\"--experimental-require-module\" electron-builder install-app-deps"
@@ -44,6 +44,7 @@
     "@types/react-dom": "^19.1.0",
     "autoprefixer": "^10.5.0",
     "concurrently": "^9.1.2",
+    "dotenv-cli": "^11.0.0",
     "electron": "^41.7.1",
     "electron-builder": "^26.0.0",
     "next": "^15.3.2",

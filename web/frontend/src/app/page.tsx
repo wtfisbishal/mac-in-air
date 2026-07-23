@@ -155,13 +155,13 @@ export default function Home() {
 
         <section className="py-20 px-4  z-10 relative   ">
 
-          <div className=" w-[80%] max-md:w-[97%] mx-auto">
+          <div className=" w-[70%] max-md:w-[97%] mx-auto">
             <div className="text-center mb-14 scroll-fade-in">
 
               <p className="text-xs font-semibold tracking-[0.2em] text-gray-300 uppercase mb-3">Setup</p>
               <h2 className="text-4xl font-bold  tracking-tight" style={{ letterSpacing: "-0.025em" }}>
                 Ready in
-                <span className="text-clip bg-clip-text text-transparent bg-gradient-to-t from-[#5d43ab] to-[#a88df9] text-8xl "> 4 </span> steps.
+                <span className="text-clip bg-clip-text text-transparent bg-gradient-to-t from-[#5d43ab] to-[#a88df9] text-8xl "> 3 </span> steps.
               </h2>
 
             </div>
@@ -172,12 +172,12 @@ export default function Home() {
                 <span className="traffic-light" style={{ background: "#28C840" }} />
 
               </div>
-              <div className="grid sm:grid-cols-4  mt-5 !text-white gap-8 relative z-10">
+              <div className="grid sm:grid-cols-3  mt-5 !text-white gap-8 relative z-10">
                 {[
                   {
                     step: "01",
                     title: "Install the Mac App",
-                    desc: "Download the lightweight Mac app and complete the installation in just a few seconds.",
+                    desc: "Download the Mac app and complete the sign-in just a few seconds.",
                     additional: ' xattr -cr "/Applications/MAC in AIR.app" '
                   },
                   {
@@ -187,11 +187,6 @@ export default function Home() {
                   },
                   {
                     step: "03",
-                    title: "Pair Your Device",
-                    desc: "Open the Pair section in the Mac app, copy the pairing code, and enter it on the web application."
-                  },
-                  {
-                    step: "04",
                     title: "Take Control",
                     desc: "Once the devices are paired, you can stream your Mac, click, type, and control it remotely from anywhere."
                   }
@@ -317,6 +312,7 @@ export default function Home() {
           </div>
         </section>
 
+        <SecuritySections />
 
         <section className=" w-[70%] max-md:w-[95%]  shadow-[#f7f7f7]  shadow-xl my-20 mt-32 glass-panel-dark overflow-hidden relative mx-auto rounded-4xl flex justify-between flex-col h-[600px]    ">
 
@@ -417,3 +413,169 @@ const DemoVideoSection = () => {
     </div>
   )
 }
+
+
+
+const SecuritySections = () => {
+  return (
+    <section className="py-28 px-4 sm:px-8 relative overflow-hidden">
+
+      {/* bg glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+        <div className="  rounded-full bg-[#28d957] opacity-[0.06] blur-[110px] " style={{ width: 700, height: 500, }} />
+      </div>
+
+      <div className="max-w-7xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-20 scroll-fade-in logo1">
+          <p className="text-sm font-semibold tracking-[0.2em] text-gray-400 uppercase mb-3">Security</p>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white">
+            Encrypted end-to-end.
+            <br />
+            <span className="text-gray-400 font-light">Your stream never touches our servers.</span>
+          </h2>
+        </div>
+
+        {/* ── Diagram  */}
+        <div className="scroll-fade-in">
+
+          {/*   Browser   Windows PC */}
+          <div className="flex items-center">
+
+            {/*  Browser mockup  */}
+            <div className="flex-shrink-0 w-[250px] max-md:w-[110px]">
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-[#141420] shadow-2xl shadow-black/50">
+                {/* browser chrome bar */}
+                <div className="bg-[#1e1e2e] px-3 py-1.5 flex items-center gap-2">
+                  <div className="flex gap-1.5 max-md:hidden">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                  </div>
+                  <div className="flex-1 bg-[#0d0d18] w-fit rounded-full px-2 py-0.5 flex items-center gap-1.5 text-[8px] text-emerald-400">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    macinair.bishal.online
+                  </div>
+                </div>
+                <Image className=" w-full" height={100} width={200} src="/stream.webp" alt="" />
+              </div>
+              <p className="text-center text-[10px] text-gray-500 mt-2">Your Browser</p>
+            </div>
+
+            {/*  Encrypted Tunnel  */}
+            <div className="flex-1 relative mx-3 max-md:mx-1" style={{ height: 4 }}>
+              {/* glow line */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/50 via-emerald-400 to-emerald-500/50" />
+              <div className="absolute inset-0 rounded-full blur-sm bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent" />
+
+              {/* packets L→R (stream) */}
+              {[0, 0.7, 1.4].map((d) => (
+                <div key={`lr${d}`} style={{
+                  position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#4ade80', boxShadow: '0 0 8px #4ade80',
+                  animation: `pkt-lr 2.2s linear ${d}s infinite`,
+                }} />
+              ))}
+              {/* packets R→L (pairing) */}
+              {[0.4, 1.1].map((d) => (
+                <div key={`rl${d}`} style={{
+                  position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#818cf8', boxShadow: '0 0 8px #818cf8',
+                  animation: `pkt-rl 2.2s linear ${d}s infinite`,
+                }} />
+              ))}
+
+              {/* Lock badge (center) */}
+              <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%,-50%)',
+                width: 40, height: 40, borderRadius: '50%',
+                background: '#031a0e',
+                border: '2px solid #22c55e',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                animation: 'lock-glow 2.4s ease-in-out infinite',
+                zIndex: 10,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+
+              {/* label above tunnel */}
+              <div style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+                className="text-[10px] text-emerald-400 font-mono">
+                WebRTC DTLS-SRTP
+              </div>
+            </div>
+
+            {/* macbook mockup */}
+            <div className="flex-shrink-0 w-[250px]  relative max-md:w-[110px]">
+
+              <div className="w-[50px] absolute h-4 top-0 left-[40%] flex justify-center items-center rounded z-10 bg-black red-50 max-md:w-[130px] ">
+               <div className=" h-0.5 w-0.5 bg-green-500  rounded-full"></div>
+              </div>
+
+
+              <div className="rounded-t-xl overflow-hidden border-8 border-black /10 bg-[#141420] shadow-2xl shadow-black/50">
+                <div className=" ">
+                  <img className="w-full h-full" src="sec2.png" alt="" />
+
+                </div>
+
+                <div className="w-[290px] absolute h-3 -left-5 flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1] rounded-b-md z-10 bg-[#7C7C7C] max-md:w-[130px] ">
+                  <div className="w-[100px] bg-[#5e5e5e] h-2  shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl"/>
+                </div>
+              </div>
+              <p className="text-center text-[10px] text-gray-500 mt-2 ">Your Windows PC</p>
+            </div>
+          </div>
+
+          {/* Server: bypassed */}
+          <div className="flex flex-col items-center mt-3">
+            {/* dashed vertical line */}
+            <div style={{ width: 1, height: 28, borderLeft: '1.5px dashed rgba(100,116,139,0.3)' }} />
+            {/* server card */}
+            <div style={{ animation: 'float-srv 3.5s ease-in-out infinite' }}
+              className="flex items-center gap-3 border border-red-500/[0.4] bg-red-500/10 [] rounded-3xl px-5 py-3">
+              <div className="opacity-40">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fb2c36" strokeWidth="1.5" strokeLinecap="round">
+                  <rect x="2" y="2" width="20" height="8" rx="2" /><rect x="2" y="14" width="20" height="8" rx="2" />
+                  <line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-[12px] font-semibold text-red-500/70">Backend server</p>
+                <p className="text-[10px] text-red-600/60">Signaling only — never sees your stream or keystrokes</p>
+              </div>
+              <div className="ml-1 text-[9px] font-mono bg-red-900/20 border border-red-700/40 rounded-lg px-2 py-1 text-red-500/50 whitespace-nowrap">
+                No content
+              </div>
+            </div>
+            <p className="text-[11px] text-red-500 mt-2">Stream travels peer-to-peer · server is bypassed</p>
+          </div>
+
+          {/* Legend */}
+          <div className="mt-10 flex flex-wrap justify-center gap-3 text-[11px]">
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
+              Live stream — WebRTC DTLS-SRTP
+            </span>
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#818cf8', boxShadow: '0 0 6px #818cf8' }} />
+              Pairing — HMAC-SHA256 (in-browser)
+            </span>
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.07] text-slate-500">
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#475569' }} />
+              Signaling only — no data
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  )
+}
+

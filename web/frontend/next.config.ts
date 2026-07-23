@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
         hostname:'cdn.jim-nielsen.com',
         port:'',
         pathname:'/**'
+      },
+          {
+        protocol:'https',
+        hostname:'s3-new.macosicons.com',
+        port:'',
+        pathname:'/**'
       }
     ]
   },

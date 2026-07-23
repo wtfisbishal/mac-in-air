@@ -511,3 +511,25 @@ body {
 }
 
 
+
+
+  @keyframes pkt-lr {
+    0%   { left: 2%;  opacity: 0; }
+    6%   { opacity: 1; }
+    94%  { opacity: 1; }
+    100% { left: 98%; opacity: 0; }
+  }
+  @keyframes pkt-rl {
+    0%   { left: 98%; opacity: 0; }
+    6%   { opacity: 1; }
+    94%  { opacity: 1; }
+    100% { left: 2%;  opacity: 0; }
+  }
+  @keyframes lock-glow {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(34,197,94,.2), 0 0 20px 4px rgba(34,197,94,.1); }
+    50%       { box-shadow: 0 0 0 10px rgba(34,197,94,.07), 0 0 32px 8px rgba(34,197,94,.2); }
+  }
+  @keyframes float-srv {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-4px); }
+  }

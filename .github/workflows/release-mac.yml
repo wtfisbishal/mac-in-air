@@ -28,7 +28,13 @@ jobs:
 
       - name: Create placeholder .env file
         working-directory: ./desktop
-        run: touch .env
+        shell: bash
+        run: |
+          echo "NEXT_PUBLIC_BACKEND_URL=https://mac-in-wind.onrender.com" > .env
+          echo "NEXT_PUBLIC_DESKTOP_CALLBACK_URL=https://macinair.bishal.online/desktop-callback" >> .env
+          echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=488531878241-tfoqda9qpv49qrctn7shap2os19696mf.apps.googleusercontent.com" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+ 
 
       - name: Install dependencies
         working-directory: ./desktop
