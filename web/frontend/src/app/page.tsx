@@ -2,11 +2,12 @@
 
 import { useState, useEffect, } from "react";
 import Link from "next/link";
-import MacKeyBoard from "@uiw/react-mac-keyboard";
 import Image from "next/image";
 import { Battery, Search, Wifi } from "lucide-react";
 import { features, macApps, useScrollReveal } from "@/lib/utils";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
+import MacKeyboard from "@/components/ui/MacbookKeyboard";
+import MagicMouse from "@/components/ui/MagicMouse";
 
 
 export default function Home() {
@@ -104,9 +105,12 @@ export default function Home() {
 
           <div className=" mt-10  py-20  w-full">
             <p className="text-xs font-semibold tracking-[0.2em] text-center text-gray-400 uppercase mb-3">Control fully Keyboard and Mouse </p>
-            <MacKeyBoard
-              className="w-fit  drop-shadow-[#9b9b9b75] drop-shadow-2xl "
-            />
+ 
+            <div className="w-full flex max-md:flex-row-reverse max-md:justify-end items-center   justify-center">
+              <MacKeyboard />
+              <MagicMouse className={' drop-shadow-[0_5px_10px_#ffffff57]'} />
+            </div>
+
           </div>
         </section>
 
@@ -362,7 +366,7 @@ export default function Home() {
                 <div className=" h-1 w-1 bg-green-500 ml-10 rounded-full"></div>
               </div>
               <Image
-                src="/desk.webp"
+                src="/desk.png"
                 alt="Desktop"
                 fill loading="lazy"
                 className="object-cover object-top-left rounded -xl  !w-full !h-[400px] "
@@ -433,27 +437,26 @@ const SecuritySections = () => {
           <h2 className="text-4xl sm:text-5xl font-bold text-white">
             Encrypted end-to-end.
             <br />
-            <span className="text-gray-400 font-light">Your stream never touches our servers.</span>
+            <span className="text-gray-400 max-md:text-xl  font-light">Your stream never touches our servers.</span>
           </h2>
         </div>
 
-        {/* ── Diagram  */}
-        <div className="scroll-fade-in">
 
-          {/*   Browser   Windows PC */}
+        <div className="scroll-fade-in">
+          {/*   Browser  */}
           <div className="flex items-center">
 
             {/*  Browser mockup  */}
-            <div className="flex-shrink-0 w-[250px] max-md:w-[110px]">
-              <div className="rounded-xl overflow-hidden border border-white/10 bg-[#141420] shadow-2xl shadow-black/50">
+            <div className="flex-shrink-0 w-[250px] max-md:w-[120px]">
+              <div className="rounded-xl max-md:rounded-md overflow-hidden border border-white/10 bg-[#141420] shadow-2xl shadow-black/50">
                 {/* browser chrome bar */}
-                <div className="bg-[#1e1e2e] px-3 py-1.5 flex items-center gap-2">
-                  <div className="flex gap-1.5 max-md:hidden">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                <div className="bg-[#1e1e2e22] px-2 py-0.5 max-md:px-0 flex items-center gap-1">
+                  <div className="flex gap-1 max-md:hidden">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-500/70" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/70" />
                   </div>
-                  <div className="flex-1 bg-[#0d0d18] w-fit rounded-full px-2 py-0.5 flex items-center gap-1.5 text-[8px] text-emerald-400">
+                  <div className=" bg-[#0d0d18b3]  w-fit rounded-full px-2  flex items-center gap-1.5 text-[8px max-md: text-[5px] text-emerald-400">
                     <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                     macinair.bishal.online
                   </div>
@@ -469,7 +472,7 @@ const SecuritySections = () => {
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/50 via-emerald-400 to-emerald-500/50" />
               <div className="absolute inset-0 rounded-full blur-sm bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent" />
 
-              {/* packets L→R (stream) */}
+
               {[0, 0.7, 1.4].map((d) => (
                 <div key={`lr${d}`} style={{
                   position: 'absolute', top: '50%', transform: 'translateY(-50%)',
@@ -478,7 +481,7 @@ const SecuritySections = () => {
                   animation: `pkt-lr 2.2s linear ${d}s infinite`,
                 }} />
               ))}
-              {/* packets R→L (pairing) */}
+
               {[0.4, 1.1].map((d) => (
                 <div key={`rl${d}`} style={{
                   position: 'absolute', top: '50%', transform: 'translateY(-50%)',
@@ -488,7 +491,7 @@ const SecuritySections = () => {
                 }} />
               ))}
 
-              {/* Lock badge (center) */}
+
               <div style={{
                 position: 'absolute', top: '50%', left: '50%',
                 transform: 'translate(-50%,-50%)',
@@ -512,21 +515,21 @@ const SecuritySections = () => {
             </div>
 
             {/* macbook mockup */}
-            <div className="flex-shrink-0 w-[250px]  relative max-md:w-[110px]">
+            <div className="flex-shrink-0 w-[250px]  relative max-md:w-[120px]">
 
-              <div className="w-[50px] absolute h-4 top-0 left-[40%] flex justify-center items-center rounded z-10 bg-black red-50 max-md:w-[130px] ">
-               <div className=" h-0.5 w-0.5 bg-green-500  rounded-full"></div>
+              <div className="w-[50px]  absolute h-4 max-md:h-3 top-0 max-md:left-[25%] left-[40%] flex justify-center items-center rounded z-10 bg-black   ">
+                <div className=" h-0.5 w-0.5 bg-green-500  rounded-full"></div>
               </div>
 
 
-              <div className="rounded-t-xl overflow-hidden border-8 border-black /10 bg-[#141420] shadow-2xl shadow-black/50">
+              <div className="rounded-t-xl max-md:rounded-md overflow-hidden border-8 max-md:border-4 border-black /10 bg-[#141420] shadow-2xl shadow-black/50">
                 <div className=" ">
                   <img className="w-full h-full" src="sec2.png" alt="" />
 
                 </div>
 
-                <div className="w-[290px] absolute h-3 -left-5 flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1] rounded-b-md z-10 bg-[#7C7C7C] max-md:w-[130px] ">
-                  <div className="w-[100px] bg-[#5e5e5e] h-2  shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl"/>
+                <div className="w-[290px] absolute h-3 max-md:h-2 -left-5 max-md:-left-3 flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1] rounded-b-md z-10 bg-[#7C7C7C] max-md:w-[140px] ">
+                  <div className="w-[100px] max-md:w-[40px] bg-[#5e5e5e] h-2  max-md:h-1 shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl" />
                 </div>
               </div>
               <p className="text-center text-[10px] text-gray-500 mt-2 ">Your Windows PC</p>

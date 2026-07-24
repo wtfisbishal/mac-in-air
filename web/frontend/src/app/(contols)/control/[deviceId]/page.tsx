@@ -5,7 +5,7 @@ import { redirect, useRouter } from 'next/navigation';
 import {
   MonitorOff, Keyboard, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
-  ShieldAlert, X, Loader,
+   X, Loader,
   LayoutGrid, Mouse,
   EyeOff,
   Eye
@@ -560,41 +560,9 @@ const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setK
 
 function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: string; saltHex: string; onUnlock: (token: string) => void; deviceName: string }) {
   const [masterPassword, setMasterPassword] = useState('');
-  const [isUnlocking, setIsUnlocking] = useState(false);
-  const [error, setError] = useState('');
   const { toast } = useToast();
   const [showPw, setShowPw] = useState(false);
-
-  // const handleUnlock = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError('');
-  //   setIsUnlocking(true);
-
-  //   try {
-  //     if (!saltHex) {
-  //       throw new Error('Device is missing master key salt');
-  //     }
-
-  //     // Derive challenge locally
-  //     const challenge = await computePairingChallenge(masterPassword, saltHex, deviceId);
-
-  //     const res = await apiPairDevice(deviceId, challenge);
-  //     setIsUnlocking(false);
-
-  //     if (res.success && res.pairToken) {
-  //       toast('Device unlocked', 'success');
-  //       onUnlock(res.pairToken);
-  //     } else {
-  //       setError(res.message || 'Invalid master key');
-  //       toast('Invalid master key', 'error');
-  //     }
-  //   } catch (err: any) {
-  //     console.error(err);
-  //     setError(err.message || 'Failed to authenticate');
-  //     setIsUnlocking(false);
-  //   }
-  // };
-
+ 
    const mutation = useMutation({
     mutationFn: async () => {
       if (saltHex && !masterPassword) throw new Error('Enter your master password');
@@ -628,7 +596,7 @@ function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: str
           <Lock size={32} className="text-yellow-400" />
         </div>
         <h2 className="text-xl font-bold text-white mb-2">Device is Locked</h2>
-        <p className="text-slate-400 text-sm mx-auto mb-6">
+        <p className="text-slate-400 max-md:text-center max-md:text-xs text-sm mx-auto mb-6">
           This device is protected by a Master Key. Please enter it to connect.
         </p>
 

@@ -26,16 +26,13 @@ export default function SettingsPage() {
         <div className="space-y-5 animate-fade-up delay-1">
 
           <div className="glass-panel-card rounded-3xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <User size={15} className="text-indigo-400" />
-              <p className="text-sm font-semibold text-white">Account</p>
-            </div>
-            <div className="bg-black/20 rounded-xl p-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-sm font-bold text-indigo-300 border border-indigo-500/10">
-                {user?.email?.charAt(0).toUpperCase() ?? 'U'}
+            
+            <div className="  rounded-xl p-3 flex items-center gap-3">
+              <div className="w-20 h-20 glass-button-primary p-1  overflow-hidden rounded-full  flex items-center justify-center text-sm font-bold  ">
+                <Image height={100} width={100} className=' rounded-full' src={user?.picture!} alt="" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-200">{user?.email ?? '—'}</p>
+                <p className="text-xl font-bold text-slate-200">{user?.email ?? '—'}</p>
                 <p className="text-xs text-slate-500">Logged in</p>
               </div>
             </div>

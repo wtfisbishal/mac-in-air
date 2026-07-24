@@ -1,23 +1,24 @@
 'use client'
+import { useAuth } from '@/hooks/useAuth'
 import { useFullscreen } from '@/hooks/useFullscreen'
 import { Laptop } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {   useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const Navigation = () => {
     const path = usePathname()
-    const control = path.startsWith('/control') || path.startsWith('/apps')
     const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 })
+    const { user, logout } = useAuth();
 
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
-    const profileRef = useRef<HTMLAnchorElement | null>(null)
-    
+
     const navItems = [
         { href: '/home', title: 'Home' },
         { href: '/settings', title: 'Settings' },
     ]
-    const { fullscreen  } = useFullscreen();
+    const { fullscreen } = useFullscreen();
 
     useEffect(() => {
         const activeIndex = navItems.findIndex((item) => item.href === path)
@@ -36,9 +37,9 @@ const Navigation = () => {
         }
     }, [path])
 
-    
-    if(fullscreen){
-        return null ;
+
+    if (fullscreen) {
+        return null;
     }
 
 
@@ -61,28 +62,17 @@ const Navigation = () => {
 
                     return (
                         <Link key={item.href} href={item.href} ref={(el) => { itemRefs.current[index] = el }}
-                            className={`relative px-6 py-2 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'}`} >
+                            className={`relative px-4 py-0.5 center flex-col rounded-full transition-all duration-300   ${isActive ? 'text-white' : 'text-[#d3d3d3b4] hover:text-white'}`} >
 
-                            <p className=' text-[13px]'>
+                            {user && item.href === '/settings' ? <>
+                                <Image height={10} width={10} className=' w-10 w-10 rounded-full' src={user.picture!} alt="" />
+                            </> : <p className=' text-[13px]'>
                                 {item.title}
-                            </p>
+                            </p>}
                         </Link>
                     )
                 })}
             </div>
-
-            {/* Profile Button */}
-            {control && <div className='pointer-events-auto glass-panel-dark backdrop-blur-[10px] bg-[#ffffff08] relative  border border-[#d3d3d325] max-md:w-20 w-24 h-12 rounded-full'>
-                <Link
-                    ref={profileRef}
-                    href={path}
-                    className={`relative center w-full h-full rounded-full gap-2 flex items-center justify-center  bg-[#ffffff1b] border-none text-white `}>
-
-                    {/* <Laptop size={18} /> */}
-                    <p className=' max-md:text-xs text-sm'> Control</p>
-
-                </Link>
-            </div>}
 
 
         </div>

@@ -75,9 +75,8 @@ export default function DashboardPage() {
   const { data: devices, isLoading, isError, isRefetching, refetch } = useDevices();
   const { socket } = useSocket();
   const { toasts, toast, dismiss } = useToast();
-  const { user, logout } = useAuth();
-  const router = useRouter();
-
+  const { user } = useAuth();
+ 
   useEffect(() => {
     if (!socket || !user) return;
     const handler = (data: { deviceId: string; isOnline: boolean; ownerEmail: string }) => {
@@ -90,10 +89,7 @@ export default function DashboardPage() {
     return () => { socket.off('device-status-changed', handler); };
   }, [socket, toast, refetch, user]);
 
-  const handleSignOut = useCallback(() => {
-    logout();
-    router.replace('/login');
-  }, [logout, router]);
+   
 
   const online = devices?.filter((d: { isOnline: boolean }) => d.isOnline).length ?? 0;
   const total = devices?.length ?? 0;
@@ -104,19 +100,10 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center  max-md:gap-4 justify-between mb-7 animate-fade-up">
           <h1 className="text-6xl   font-extrabold   tracking-tight">MACS</h1>
+          <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
+            <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={18} />
+          </button>
 
-          <div className="flex items-center gap-3">
-            {user?.picture && (
-              <img src={user.picture} alt={user.name || user.email} className="w-8 h-8 rounded-full border border-white/10" />
-            )}
-            <button onClick={handleSignOut} className="flex items-center gap-2 glass-button rounded-full px-4 !py-2 text-[13px] font-semibold cursor-pointer text-red-400 hover:text-red-300">
-              <LogOut size={15} />
-              Sign Out
-            </button>
-            <button onClick={() => refetch()} disabled={isLoading || isRefetching} className="flex items-center gap-3 glass-button  rounded-full px-5 !py-2 text-[15px] font-semibold cursor-pointer">
-              <RefreshCw className={`${isLoading || isRefetching ? 'animate-spin' : ''}`} size={18} />
-            </button>
-          </div>
         </div>
 
         {/* Stats */}

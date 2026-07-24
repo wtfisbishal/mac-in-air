@@ -40,19 +40,18 @@ function AuthCompleteContent() {
       <div className="text-center flex flex-col items-center gap-4">
         {status === 'processing' && (
           <>
-            <Loader size={32} className="animate-spin text-indigo-400" />
+            <Loader size={19} className="animate-spin  " />
             <p className="text-slate-300 text-sm">Completing sign-in…</p>
           </>
         )}
         {status === 'success' && (
           <>
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+            
             <p className="text-emerald-400 font-semibold">Signed in successfully!</p>
             <p className="text-slate-400 text-sm">Redirecting to dashboard…</p>
+            <div>
+              <Loader className='animate-spin ' size={19}/>
+            </div>
           </>
         )}
         {status === 'error' && (
@@ -81,7 +80,7 @@ export default function AuthCompletePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <Loader size={32} className="animate-spin text-indigo-400" />
+        <Loader size={32} className="animate-spin  " />
       </div>
     }>
       <AuthCompleteContent />

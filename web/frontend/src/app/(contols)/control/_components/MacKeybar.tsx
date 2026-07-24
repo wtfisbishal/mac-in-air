@@ -74,19 +74,7 @@ interface KeyDef {
 }
 
 const FN_ROW: KeyDef[] = [
-  { label: 'Esc', key: 'escape', cls: 'mkb-w-12' },
-  // { label: 'F1',  key: 'f1',  cls: 'mkb-w-10' },
-  // { label: 'F2',  key: 'f2',  cls: 'mkb-w-10' },
-  // { label: 'F3',  key: 'f3',  cls: 'mkb-w-10' },
-  // { label: 'F4',  key: 'f4',  cls: 'mkb-w-10' },
-  // { label: 'F5',  key: 'f5',  cls: 'mkb-w-10', sep: true },
-  // { label: 'F6',  key: 'f6',  cls: 'mkb-w-10' },
-  // { label: 'F7',  key: 'f7',  cls: 'mkb-w-10' },
-  // { label: 'F8',  key: 'f8',  cls: 'mkb-w-10', sep: true },
-  // { label: 'F9',  key: 'f9',  cls: 'mkb-w-10' },
-  // { label: 'F10', key: 'f10', cls: 'mkb-w-11' },
-  // { label: 'F11', key: 'f11', cls: 'mkb-w-11' },
-  // { label: 'F12', key: 'f12', cls: 'mkb-w-11' },
+  { label: 'Esc', key: 'escape', cls: 'mkb-w-12' }, 
 ];
 
 const NAV_ROW: KeyDef[] = [
@@ -96,8 +84,7 @@ const NAV_ROW: KeyDef[] = [
   { label: 'End', key: 'end', cls: 'mkb-w-20' },
   { label: 'PgUp', key: 'pageup', cls: 'mkb-w-20' },
   { label: 'PgDn', key: 'pagedown', cls: 'mkb-w-20' },
-  // SHORTCUT_CMD: prefix → fires as a socket command (not keyboard shortcut)
-  {
+   {
     label: <span className="mkb-mod-label"><span className="mkb-mod-sym" style={{ fontSize: 13 }}>⊞</span><span className="mkb-mod-name">Mission</span></span>,
     key: 'SHORTCUT_CMD:MISSION_CONTROL', cls: 'mkb-w-20'
   },
@@ -157,7 +144,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     setTimeout(() => setPressedKeys(p => { const n = new Set(p); n.delete(key); return n; }), 150);
   }, []);
 
-  // ── Physical keyboard listener  
+  //  Physical keyboard listener  
   useEffect(() => {
     const held = new Set<string>();
 
@@ -207,7 +194,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     };
   }, [dataChannel, flash]);
 
-  // ── Mobile input handler: forward native input events into emitKey ──
+  //  Mobile input handler: forward native input events into emitKey 
   const handleMobileInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
     const text = input.value;
@@ -238,11 +225,11 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
     }
   }, [dataChannel, flash]);
 
-  // ── Button click handler  
+  //  Button click handler  
   const handleKey = useCallback((keyDef: KeyDef) => {
     const { key } = keyDef;
 
-    // ── Socket-level system command: SHORTCUT_CMD:COMMAND_TYPE ──
+    //  Socket-level system command: SHORTCUT_CMD:COMMAND_TYPE 
     // Used for actions robotjs cannot handle (Mission Control, media keys, etc.)
     if (key.startsWith('SHORTCUT_CMD:')) {
       const commandType = key.slice('SHORTCUT_CMD:'.length);
@@ -251,7 +238,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
       return;
     }
 
-    // ── Preset keyboard shortcut: SHORTCUT:key:mod1+mod2 ──
+    //  Preset keyboard shortcut: SHORTCUT:key:mod1+mod2 
     if (key.startsWith('SHORTCUT:')) {
       const parts = key.split(':'); // ['SHORTCUT', 'up', 'control+shift']
       const robotKey = parts[1];
@@ -261,7 +248,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
       return; // do NOT disarm sticky mods
     }
 
-    // ── Modifier toggle (sticky) ──
+    //  Modifier toggle (sticky) 
     if (key.startsWith('MOD:')) {
       const mod = key.slice(4) as ModName | 'capslock';
 
@@ -282,7 +269,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
       return;
     }
 
-    // ── Regular key: fire with sticky mods then disarm ──
+    //  Regular key: fire with sticky mods then disarm 
     const mods = [...stickyModsRef.current];
     flash(key);
     emitKey(key, mods, dataChannel);
@@ -319,7 +306,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
   return (
     <div className="bg-[#eeeeee] rounded-4xl  px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
 
-      {/* ── Hidden input — keeps mobile soft keyboard open ── */}
+      {/*  Hidden input — keeps mobile soft keyboard open  */}
       {isMobile && (
         <>
           <input
