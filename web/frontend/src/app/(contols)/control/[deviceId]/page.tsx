@@ -5,8 +5,8 @@ import { redirect, useRouter } from 'next/navigation';
 import {
   MonitorOff, Keyboard, Power,
   Moon, Lock, ArrowLeft, Maximize2, Minimize2,
-   X, Loader,
-  LayoutGrid, Mouse,
+  X, Loader,
+  PanelRightClose, Mouse,
   EyeOff,
   Eye
 } from 'lucide-react';
@@ -253,7 +253,7 @@ export default function ControlPage({ params }: PageProps) {
           <div onClick={() => setVisiblePanel(false)} className="flex items-center gap-2 absolute right-7 top-7 max-md:top-6 max-md:right-4 rounded-full py-2 cursor-pointer px-5 glass-panel-dark">
             <X />
           </div>
-          <div className='animate-spotlight !transition-all !duration-700  max-md:py-5  max-md:p-0  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
+          <div className='animate-spotlight transition-all! duration-700!  max-md:py-5  max-md:p-1  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
             <AppsIcons deviceId={deviceId} />
           </div>
         </div>}
@@ -282,7 +282,6 @@ export default function ControlPage({ params }: PageProps) {
               {/* Stream toggle */}
 
               <Controls toggleStream={toggleStream} streaming={streaming} setMouseCapture={setMouseCapture} mouseCapture={mouseCapture} setKbCapture={setKbCapture} kbCapture={kbCapture} />
-
               <div className="w-px h-4   bg-white/[0.06]" />
 
               {ACTIONS.map(a => (
@@ -297,10 +296,10 @@ export default function ControlPage({ params }: PageProps) {
 
               {(
                 <button onClick={() => { setHamburgerOpen(!humburgerOpen); }} className={`${!humburgerOpen ? 'bg-[#ffffff0d] text-[#94a3b8] ' : ' bg-[#6366f126] text-[#a5b4fc] '} bg-[#ffffff0d] px-3 py-2 rounded-full  hidden max-md:flex `}>
-                  <LayoutGrid size={20} />
+                  <PanelRightClose size={20} />
                 </button>
               )}
-              <button onClick={() => { setFullscreen(true); toggleFullscreen() }} className="btn glass-panel-dark !rounded-3xl  p-2">
+              <button onClick={() => { setFullscreen(true); toggleFullscreen() }} className="btn glass-panel-dark !rounded-3xl ">
                 <Maximize2 size={15} />
               </button>
             </div>
@@ -364,7 +363,7 @@ export default function ControlPage({ params }: PageProps) {
 
           {/*  Side panel */}
           {!fullscreen && (
-            <div className={` w-[220px] flex-shrink-0 flex max-md:backdrop-blur-3xl max-md:bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[300px] right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
+            <div className={` w-[220px] flex-shrink-0 flex max-md:backdrop-blur-3xl max-md:bg-[#ffffff05] max-md:${humburgerOpen ? ' absolute ' : 'hidden '} max-md:w-[250px]  right-5 top-40  max-md:pb-4 max-md:rounded-3xl max-md:p-4 pb-20 flex-col gap-3 animate-fade-up delay-2 `}>
 
               {/* Apps launcher */}
               <div
@@ -406,9 +405,9 @@ export default function ControlPage({ params }: PageProps) {
                         }
                         toast(`Sent: ${s.label}`, 'info');
                       }}
-                      className="w-full max-md:w-fit max-md:border border-[#ffffff66] flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
+                      className="w-full max-md:w-fit max-md:border max-md:bg-linear-to-t to-[#f8f7f741] from-[#58585803] border-[#969393] flex items-center justify-between px-3 py-2  !rounded-full 4xl cursor-pointer hover:bg-white/[0.04] transition-colors group"
                     >
-                      <span className="text-xs text-slate-400   group-hover:text-slate-200">{s.label}</span>
+                      <span className="text-xs text-slate-400 max-md:text-slate-100  group-hover:text-slate-200">{s.label}</span>
                     </button>
                   ))}
                 </div>
@@ -438,10 +437,10 @@ export default function ControlPage({ params }: PageProps) {
                     <button
                       key={a.type}
                       onClick={() => { setWarning(a.type) }}
-                      className={`w-full max-md:w-fit max-md:border border-[#ffffff66] max-md:rounded-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
+                      className={`w-full max-md:w-fit max-md:border max-md:bg-linear-to-t to-[#f8f7f741] from-[#58585803] border-[#969393]  max-md:rounded-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-xs font-medium transition-colors
                         ${['RESTART', 'SHUTDOWN'].includes(a.type)
-                          ? 'text-red-400/70 hover:text-red-400 hover:bg-red-500/[0.06]'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                          ? 'text-red-400/70 max-md:text-red-500 hover:text-red-400 hover:bg-red-500/[0.06]'
+                          : 'text-slate-400 hover:text-slate-200 max-md:text-slate-100 hover:bg-white/[0.04]'
                         }`}
                     >
                       <a.icon size={13} />
@@ -533,7 +532,7 @@ const Controls = ({ toggleStream, streaming, setMouseCapture, mouseCapture, setK
         onClick={toggleStream}
         className={`ctrl-btn !rounded-full ${streaming ? 'active' : ''}`}
       >
-        <span className={`w-2 h-2 rounded-full ${streaming ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+        <span className={`w-2 h-2 max-md:text-xs rounded-full ${streaming ? 'bg-emerald-400' : 'bg-slate-600'}`} />
         {streaming ? 'Streaming' : 'Start Stream'}
       </button>
 
@@ -562,17 +561,17 @@ function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: str
   const [masterPassword, setMasterPassword] = useState('');
   const { toast } = useToast();
   const [showPw, setShowPw] = useState(false);
- 
-   const mutation = useMutation({
+
+  const mutation = useMutation({
     mutationFn: async () => {
       if (saltHex && !masterPassword) throw new Error('Enter your master password');
- 
+
       let pairingChallenge: string | undefined;
       if (saltHex && masterPassword) {
         pairingChallenge = await computePairingChallenge(masterPassword, saltHex, deviceId);
       }
 
-      const result = await apiPairDevice(deviceId,  pairingChallenge! );
+      const result = await apiPairDevice(deviceId, pairingChallenge!);
       return result;
     },
     onSuccess: (data) => {
@@ -590,23 +589,19 @@ function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: str
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center max-md:p-3 p-6">
-      <div className="w-full   flex flex-col items-center gap-6 animate-fade-up">
-        <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mx-auto mb-5">
-          <Lock size={32} className="text-yellow-400" />
-        </div>
+    <div className="w-full  h-screen flex items-center justify-center max-md:p-3 p-6">
+      <div className="w-full -mt-40  flex flex-col items-center gap-6 animate-fade-up">
+        <Lock size={52} />
         <h2 className="text-xl font-bold text-white mb-2">Device is Locked</h2>
-        <p className="text-slate-400 max-md:text-center max-md:text-xs text-sm mx-auto mb-6">
+        <p className="text-slate-400 max-md:text-center max-md:text-xs text-sm mx-auto ">
           This device is protected by a Master Key. Please enter it to connect.
         </p>
 
-        <form onSubmit={submit} className="w-full flex flex-col gap-4">
-          <div
-              className="w-full rounded-3xl p-6 flex flex-col gap-4"
-          >
+        <form onSubmit={submit} className="w-full  -mt-5 flex flex-col gap-4">
+          <div className="w-full rounded-3xl p-6 flex flex-col gap-4">
             {/* Password field */}
             <div className="flex flex-col gap-2">
-            
+
               <div className="max-md:w-full w-100 mx-auto relative">
                 <input
                   id="inline-pair-password"
@@ -628,7 +623,7 @@ function LockScreen({ deviceId, saltHex, onUnlock, deviceName }: { deviceId: str
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              
+
             </div>
 
             <button

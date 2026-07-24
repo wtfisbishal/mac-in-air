@@ -180,7 +180,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
         )}
 
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(105px,1fr))] mt-6 mx-auto gap-3 animate-fade-in pb-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))]  max-md:grid-cols-[repeat(auto-fill,minmax(75px,1fr))] mt-6 mx-auto gap-3 animate-fade-in pb-4">
             {filtered.map((app) => {
               return (
                 <button
@@ -194,11 +194,11 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
                   <div className="w-20 h-20 relative">
                     <AppIcon name={app.name} icon={app.icon} />
-                    {openAppMutation.isPending && (
+                    {/* {openAppMutation.isPending && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
                         <Loader size={20} className="animate-spin text-white" />
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   <span className="text-[11px] text-slate-300 group-hover:text-white font-medium text-center leading-tight line-clamp-2 w-full">

@@ -32,7 +32,7 @@ export default function WebRTCManager() {
           stream = await navigator.mediaDevices.getDisplayMedia({
             audio: true,
             video: {
-              frameRate: { ideal: 30, max: 30 },
+              frameRate: { ideal: 30, max: 60 },
             } as any,
           });
 
@@ -50,7 +50,7 @@ export default function WebRTCManager() {
                 chromeMediaSource: 'desktop',
                 chromeMediaSourceId: sourceId,
                 minFrameRate: 15,
-                maxFrameRate: 30,
+                maxFrameRate: 60,
               },
             } as any,
           });

@@ -304,7 +304,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
   );
 
   return (
-    <div className="bg-[#eeeeee] rounded-4xl  px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
+    <div className="bg-[#4d4c4c2c] border border-[#ffffff3f] rounded-4xl  px-3 py-2 flex flex-col gap-[7px] w-full overflow-x-scroll" tabIndex={-1}>
 
       {/*  Hidden input — keeps mobile soft keyboard open  */}
       {isMobile && (
@@ -339,7 +339,7 @@ export default function MacKeybar({ dataChannel, onCommand }: MacKeybarProps) {
                 e.preventDefault();
                 hiddenInputRef.current?.focus();
               }}
-              className="self-center text-xs font-medium text-slate-500 bg-white/60 hover:bg-white/80 border border-slate-200 px-3   py-1 rounded-full transition-colors mb-1"
+              className="self-center text-xs font-medium text-slate-100 bg-linear-to-t to-[#f8f7f778] from-[#58585803] border border-[#969393] px-3   py-1 rounded-full transition-colors mb-1"
             >
               ⌨️ Tap to type
             </button>

@@ -68,7 +68,7 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
     velRef.current = { vx: 0, vy: 0 };
   };
 
-  // ── nipplejs setup  
+  // nipplejs setup  
   useEffect(() => {
     if (!containerRef.current || !enabled) return;
 
@@ -80,8 +80,8 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
         zone: containerRef.current!,
         mode: 'static',
         position: { left: '50%', top: '50%' },
-        color: '#6366f1',
-        size: 60,
+        // color: '#808080',
+        size: 80,
         restOpacity: 0.75,
         fadeTime: 150,
         multitouch: false,

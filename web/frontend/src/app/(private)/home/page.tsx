@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, RefreshCw, Wifi, WifiOffIcon, LogOut } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, RefreshCw, Wifi, WifiOffIcon, LogOut, Power } from 'lucide-react';
 import { useDevices } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
@@ -61,9 +61,10 @@ function DeviceCard({ device }: { device: Device }) {
       <div className="flex gap-2">
         <Link
           href={`/control/${device.id}`}
-          className={`btn !rounded-full glass-button-primary flex-1 text-xs py-2 ${device.isOnline ? 'glass-button-primary' : 'glass-button opacity-40 pointer-events-none'}`}
+          className={`btn rounded-full! glass-button-primary flex-1  py-1 ${device.isOnline ? 'glass-button-primary' : 'glass-button opacity-40 cursor-not-allowed pointer-events-none'}`}
         >
-          Control
+          {/* Control */}
+          <Power size={20}/>
         </Link>
 
       </div>
@@ -109,11 +110,11 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 max-md:grid-cols-2  gap-4 mb-7 animate-fade-up delay-1">
           {[
-            { label: 'Online Now', value: online, icon: Wifi, color: 'text-emerald-400' },
+            { label: 'Online', value: online, icon: Wifi, color: 'text-emerald-400' },
             { label: 'Offline', value: total - online, icon: WifiOffIcon, color: 'text-red-500' },
           ].map(s => (
             <div key={s.label} className="glass-panel-dark !rounded-3xl p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#ffffff45] flex items-center justify-center">
+              <div className="w-10 h-10 flex items-center justify-center">
                 <s.icon size={18} className={s.color} />
               </div>
               <div>

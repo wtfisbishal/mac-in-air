@@ -58,7 +58,7 @@ export default function Home() {
 
         <div className=" bg- mac-bg-gradient">
           <MacbookScroll
-            src={`/bg2.webp`}
+            src={`/sec2.png`}
           />
         </div>
 
@@ -105,7 +105,7 @@ export default function Home() {
 
           <div className=" mt-10  py-20  w-full">
             <p className="text-xs font-semibold tracking-[0.2em] text-center text-gray-400 uppercase mb-3">Control fully Keyboard and Mouse </p>
- 
+
             <div className="w-full flex max-md:flex-row-reverse max-md:justify-end items-center   justify-center">
               <MacKeyboard />
               <MagicMouse className={' drop-shadow-[0_5px_10px_#ffffff57]'} />
@@ -265,8 +265,27 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="w-full max-md:w-[90%] mx-auto mt-7 flex justify-center items-center">
-            <Image loading="eager" className=" z-[2]  stream-img-shadow rounded-4xl max-md:rounded-3xl animate-spotlight  " src="/stream.webp" alt="" height={400} width={1000} />
+          <div className="w-full relative  max-md:w-[80%] mx-auto mt-7 flex justify-center items-center">
+
+            <div className="w-[130px] max-md:w-[50px] absolute h-7 max-md:h-3 top-3 max-md:top-1 max-md:left-[43%] left-[47%] flex justify-center items-center max-md:rounded rounded-md z-10 bg-black   ">
+              <div className=" h-1 w-1 bg-green-500  rounded-full"></div>
+            </div>
+
+
+            <div className="border-[18px] max-md:border-[8px] rounded-t-2xl max-md:rounded-t-xl border-[#070707] ">
+              <Image loading="eager" className=" z-[2] w-[900px] max-md:w-full stream-img-shadow     " src="/stream.png" alt="" height={400} width={1000} />
+
+              <div className=" bg-[#303030] amber-50 h-5 max-md:h-3" />
+
+            </div>
+
+            <div className="w-[1050px] max-md:w-[380px] absolute h-7 max-md:h-3.5 left-[19.5%] max-md:-left-[7%] max-md:-bottom-2 -bottom-5  flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1,0px_12px_41px_12px_#00000080] max-md:rounded-b-md  rounded-b-xl z-10 bg-[#7C7C7C]  ">
+              <div className="w-[180px] max-md:w-[80px] bg-[#5e5e5e] h-4  max-md:h-2 shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl" />
+
+              <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl left-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
+              <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl right-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
+            </div>
+
           </div>
         </section>
 
@@ -424,11 +443,6 @@ const SecuritySections = () => {
   return (
     <section className="py-28 px-4 sm:px-8 relative overflow-hidden">
 
-      {/* bg glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
-        <div className="  rounded-full bg-[#28d957] opacity-[0.06] blur-[110px] " style={{ width: 700, height: 500, }} />
-      </div>
-
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
@@ -461,7 +475,7 @@ const SecuritySections = () => {
                     macinair.bishal.online
                   </div>
                 </div>
-                <Image className=" w-full" height={100} width={200} src="/stream.webp" alt="" />
+                <Image className=" w-full" height={100} width={200} src="/stream.webp" alt="" loading="lazy" />
               </div>
               <p className="text-center text-[10px] text-gray-500 mt-2">Your Browser</p>
             </div>
@@ -508,7 +522,7 @@ const SecuritySections = () => {
               </div>
 
               {/* label above tunnel */}
-              <div style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+              <div style={{ position: 'absolute', bottom: 25, left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
                 className="text-[10px] text-emerald-400 font-mono">
                 WebRTC DTLS-SRTP
               </div>
@@ -524,7 +538,7 @@ const SecuritySections = () => {
 
               <div className="rounded-t-xl max-md:rounded-md overflow-hidden border-8 max-md:border-4 border-black /10 bg-[#141420] shadow-2xl shadow-black/50">
                 <div className=" ">
-                  <img className="w-full h-full" src="sec2.png" alt="" />
+                  <Image height={200} width={200} className="w-full h-full" src="/sec2.png" alt="" loading="lazy" />
 
                 </div>
 

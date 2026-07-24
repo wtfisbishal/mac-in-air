@@ -1,4 +1,4 @@
-import { StatusBadge } from './StatusBadge';
+
 import { motion } from 'framer-motion'
 interface DeviceCardProps {
   hostname: string;
@@ -15,7 +15,6 @@ interface DeviceCardProps {
     height: number,
     scaleFactor: number
   }
-
 }
 
 function formatBytes(bytes: number): string {
@@ -49,7 +48,7 @@ export function DeviceCard({
         delay: 0.1,
         duration: 0.6,
       }}
-      className="p-5 rounded-xl drop-shadow-2xl drop-shadow-[#4d4d4d] glass-panel-card  drop-shadow-2xl drop-shadow-[#0000006d] transition-colors">
+      className="p-5 rounded-xl bg-black/20 glass-panel-dark ">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16  flex items-center justify-center text-4xl">
@@ -64,21 +63,21 @@ export function DeviceCard({
           </div>
         </div>
 
-        <StatusBadge status={isConnected ? 'online' : 'offline'} label={isConnected ? 'ONLINE' : 'OFFLINE'} />
+        <h1 className=' text-7xl text-[#2B2B32] text-shadow-[-2px_2px_1px_#1a1a1e] font-bold'>{isConnected ? 'ONLINE' : 'OFFLINE'} </h1>
 
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14] ">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl ">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">CPUs</p>
           <p className="text-sm font-medium">{cpus} cores</p>
         </div>
-        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14] ">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl ">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Memory</p>
           <p className="text-sm font-medium">{formatBytes(freeMemory)} free</p>
           <p className="text-[10px] text-gray-200">of {formatBytes(totalMemory)}</p>
         </div>
-        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl shadow-xl shadow-[#ffffff14]">
+        <div className="p-3 rounded-2xl glass-panel-car bg-[#00000063] border border-[#ffffff2f] backdrop-blur-2xl">
           <p className="text-[10px] text-gray-200 uppercase tracking-wider mb-1">Uptime</p>
           <p className="text-sm font-medium">{formatUptime(uptime)}</p>
         </div>

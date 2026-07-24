@@ -107,14 +107,14 @@
  
         /* base key */
         .mkb-key {
-        background: #f3f4f6;
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 1px 0 #9ca3af,0 2px 4px rgba(0,0,0,0.18);
-        color: #1f2937;
+        background: #0f0f0f0a;
+        background: linear-gradient(0deg, #58585803 22%, #f8f7f778 141%);
+        border-radius: 15px;
+        box-shadow: 0 1px 0 #9ca3afc8,0 2px 4px rgba(0,0,0,0.18);
+        color: #f2f3f5;
         font-size: 11px;
         font-weight: 500;
-       height: 34px;
+       height: 30px;
        width: fit-content;
         padding: 0 15px;
         display: flex;
