@@ -475,7 +475,7 @@ const SecuritySections = () => {
                     macinair.bishal.online
                   </div>
                 </div>
-                <Image className=" w-full" height={100} width={200} src="/stream.webp" alt="" loading="lazy" />
+                <Image className=" w-full" height={100} width={200} src="/stream.png" alt="" loading="lazy" />
               </div>
               <p className="text-center text-[10px] text-gray-500 mt-2">Your Browser</p>
             </div>

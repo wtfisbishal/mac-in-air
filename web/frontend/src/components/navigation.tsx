@@ -1,7 +1,5 @@
 'use client'
-import { useAuth } from '@/hooks/useAuth'
-import { useFullscreen } from '@/hooks/useFullscreen'
-import { Laptop } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth' 
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,7 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 const Navigation = () => {
     const path = usePathname()
     const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 })
-    const { user, logout } = useAuth();
+    const { user  } = useAuth();
 
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
 
@@ -18,8 +16,7 @@ const Navigation = () => {
         { href: '/home', title: 'Home' },
         { href: '/settings', title: 'Settings' },
     ]
-    const { fullscreen } = useFullscreen();
-
+ 
     useEffect(() => {
         const activeIndex = navItems.findIndex((item) => item.href === path)
 
@@ -36,12 +33,7 @@ const Navigation = () => {
             setPillStyle({ left: 0, width: 0, opacity: 0 })
         }
     }, [path])
-
-
-    if (fullscreen) {
-        return null;
-    }
-
+ 
 
     return (
         <div className={`   top-0 z-[100] w-full buttombar  flex items-center justify-center max-md:gap-2 gap-5 h-[80px] pointer-events-none `}>

@@ -65,7 +65,7 @@ export default function ControlPage({ params }: PageProps) {
   // joystick needs to know the actual Mac screen size for cursor clamping
   const [screenSize, setScreenSize] = useState({ w: device?.display?.width ?? 1920, h: device?.display?.height ?? 1080 });
 
-  // ── WebRTC data channel for peer-to-peer mouse & keyboard control ──────────
+  // WebRTC data channel for peer-to-peer mouse & keyboard control 
   // Populated by ScreenCanvas once the desktop opens the 'control' data channel.
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
@@ -204,7 +204,7 @@ export default function ControlPage({ params }: PageProps) {
       console.error("Fullscreen request failed:", error);
     }
   };
-
+ 
   if (isLoading || !authChecked) return (
     <AppLayout>
       <div className="min-h-screen  w-full flex items-center justify-center">
@@ -244,6 +244,7 @@ export default function ControlPage({ params }: PageProps) {
     </AppLayout>
   );
 
+ 
   return (
     <AppLayout>
       <div className={` flex w-full flex-col min-h-screen relative ${fullscreen ? 'p-0' : '   p-5'}`}>

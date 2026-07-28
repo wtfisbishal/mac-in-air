@@ -21,7 +21,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader size={24} className="animate-spin text-indigo-400" />
+        <Loader size={24} className="animate-spin " />
       </div>
     );
   }
@@ -30,7 +30,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader size={24} className="animate-spin text-indigo-400" />
+        <Loader size={24} className="animate-spin " />
       </div>
     );
   }

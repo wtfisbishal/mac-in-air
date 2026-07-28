@@ -47,14 +47,3 @@ export function useDevice(id: string) {
     }
   });
 }
-
-export function useSendCommand(deviceId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ type, payload }: { type: string; payload?: Record<string, unknown> }) =>
-      sendCommand(deviceId, type, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: DEVICES_KEY });
-    },
-  });
-}

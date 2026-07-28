@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { Monitor, Cpu, HardDrive, RefreshCw, Wifi, WifiOffIcon, LogOut, Power } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, RefreshCw, Wifi, WifiOffIcon, Power } from 'lucide-react';
 import { useDevices } from '@/hooks/useDevices';
 import { useSocket } from '@/hooks/useSocket';
 import { useToast } from '@/hooks/useToast';
 import { useAuth } from '@/hooks/useAuth';
 import { ToastContainer } from '@/components/Toast';
 import AppLayout from '@/components/AppLayout';
-import { useRouter } from 'next/navigation';
-import type { Device } from '@/types';
+ import type { Device } from '@/types';
 
 function DeviceCard({ device }: { device: Device }) {
   return (

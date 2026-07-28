@@ -510,9 +510,7 @@ body {
   color: white !important;
 }
 
-
-
-
+ 
   @keyframes pkt-lr {
     0%   { left: 2%;  opacity: 0; }
     6%   { opacity: 1; }

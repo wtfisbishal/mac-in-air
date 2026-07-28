@@ -35,7 +35,7 @@ export default function SettingsPage() {
             </div>
               <button
               onClick={handleLogout}
-              className="w-full flex mt-5 items-center gap-3 px-3 py-2.5 glass-button-red "
+              className="w-fit flex mt-5 rounded-2xl! items-center gap-3 px-6 py-2.5 glass-button-red "
             >
               <LogOut size={15} />
               Sign out

@@ -25,7 +25,7 @@ function LoginContent() {
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader size={24} className="animate-spin text-indigo-400" />
+        <Loader size={24} className="animate-spin " />
       </div>
     );
   }
@@ -43,7 +43,7 @@ function LoginContent() {
         {/* Card */}
         <div className="glass-panel-dark animate-spotlight rounded-4xl p-7 animate-fade-up delay-1">
 
-          {/* Error message */}
+          
           {error && (
             <div className="mb-4 px-4 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
               {decodeURIComponent(error).replace(/_/g, ' ')}
@@ -60,12 +60,11 @@ function LoginContent() {
                 Your Macs will appear automatically.
               </p>
             </div>
-
-            {/* Google Sign-In button */}
+ 
             <button
               id="google-signin-btn"
               onClick={handleGoogleSignIn}
-              className="flex items-center justify-center gap-3 w-full glass-button-primary !rounded-2xl py-3 px-5 text-[15px] font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center justify-center gap-3 w-full glass-button-primary rounded-2xl! py-3 px-5 text-[15px] font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -96,7 +95,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <Loader size={24} className="animate-spin text-indigo-400" />
+        <Loader size={24} className="animate-spin " />
       </div>
     }>
       <LoginContent />

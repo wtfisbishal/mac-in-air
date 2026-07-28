@@ -34,7 +34,7 @@ router.post('/', requireAuth, pairRateLimiter, (req: Request, res: Response): vo
     return;
   }
 
-  // Security: only the device owner can pair with it
+  // only the device owner can pair with it
   if (device.ownerEmail.toLowerCase() !== userEmail.toLowerCase()) {
     res.status(403).json({ message: 'Access denied: this device belongs to a different account.' });
     return;
@@ -104,12 +104,12 @@ router.post('/', requireAuth, pairRateLimiter, (req: Request, res: Response): vo
     success: true,
     pairToken,
     device: {
-      id:         device.id,
-      name:       device.name,
-      platform:   device.platform,
-      arch:       device.arch,
-      isOnline:   device.isOnline,
-      user:       device.user,
+      id: device.id,
+      name: device.name,
+      platform: device.platform,
+      arch: device.arch,
+      isOnline: device.isOnline,
+      user: device.user,
       ownerEmail: device.ownerEmail,
       masterSalt: device.masterSalt,
     },
