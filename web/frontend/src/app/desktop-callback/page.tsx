@@ -38,10 +38,7 @@ export default function DesktopCallbackPage() {
         animate={{ opacity: 1, y: 0 }}
         className=" text-center flex flex-col items-center"
       >
-        {/* <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 text-indigo-400"> */}
-        <Image src={'/logo.webp'} height={150} width={150} alt='' />
-        {/* </div> */}
-
+        
         <h1 className="text-5xl font-bold text-white my-3">
           MAC in AIR
         </h1>

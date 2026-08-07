@@ -247,8 +247,8 @@ export default function Home() {
         <section className="flex  relative flex-col max-md:h-[60vh] h-screen justify-center items-center stream-s-g radient text-[#2a2a4a] bg-[#e4dfff]">
 
 
-          <div className="stream-s-gradient absolute w-[200%] h-[49%] -top-40  b order border-black ">
-          </div>
+          <div className="stream-s-gradient absolute w-[200%] h-[49%] -top-40  b order border-black " />
+
           <div className="stream-e-gradient absolute w-[200%] h-[67%]  b order border-black -bottom-32 max-md:-bottom-36 "></div>
 
           <div className="text-center max-md:-mt-14 scroll-fade-in">
@@ -265,7 +265,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="w-full relative  max-md:w-[80%] mx-auto mt-7 flex justify-center items-center">
+          <div className="w-full relative max-md:px-[9%] mx-auto mt-7 flex justify-center items-center">
 
             <div className="w-[130px] max-md:w-[50px] absolute h-7 max-md:h-3 top-3 max-md:top-1 max-md:left-[43%] left-[47%] flex justify-center items-center max-md:rounded rounded-md z-10 bg-black   ">
               <div className=" h-1 w-1 bg-green-500  rounded-full"></div>
@@ -279,11 +279,15 @@ export default function Home() {
 
             </div>
 
-            <div className="w-[1050px] max-md:w-[380px] absolute h-7 max-md:h-3.5 left-[19.5%] max-md:-left-[7%] max-md:-bottom-2 -bottom-5  flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1,0px_12px_41px_12px_#00000080] max-md:rounded-b-md  rounded-b-xl z-10 bg-[#7C7C7C]  ">
-              <div className="w-[180px] max-md:w-[80px] bg-[#5e5e5e] h-4  max-md:h-2 shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl" />
+            <div className=" w-full px-2   absolute flex items-center justify-center left-0   max-md:-bottom-2 -bottom-5">
 
-              <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl left-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
-              <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl right-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
+              <div className="w-[1050px] max-md:w-[480px]  relative h-7 max-md:h-3.5     flex justify-center  shadow-[inset_0px_-12px_11px_-2px_#000000a1,0px_12px_41px_12px_#00000080] max-md:rounded-b-md  rounded-b-xl z-10 bg-[#7C7C7C]  ">
+                <div className="w-[180px] max-md:w-[80px] bg-[#5e5e5e] h-4  max-md:h-2 shadow-[inset_3px_3px_6px_0_#000000a1]  rounded-b-2xl" />
+
+                {/* //grip pad */}
+                <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl left-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
+                <div className="absolute -bottom-2 max-md:-bottom-1 w-20 max-md:w-10 bg-[#5e5e5e] h-2 max-md:h-1 rounded-b-3xl right-[7%] shadow-[inset_3px_3px_6px_0_#000000a1] " />
+              </div>
             </div>
 
           </div>

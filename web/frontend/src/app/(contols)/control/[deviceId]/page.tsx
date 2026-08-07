@@ -255,7 +255,7 @@ export default function ControlPage({ params }: PageProps) {
             <X />
           </div>
           <div className='animate-spotlight transition-all! duration-700!  max-md:py-5  max-md:p-1  max-md:mt-10 mt-0  w-[80%] max-md:w-[95%] glass-panel-card p-4   rounded-4xl   h-[90%] max-md:h-[80%] overflow-y-scroll  '>
-            <AppsIcons deviceId={deviceId} />
+            <AppsIcons setVisiblePanel={setVisiblePanel} deviceId={deviceId} />
           </div>
         </div>}
 

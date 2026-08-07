@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, Dispatch, SetStateAction } from 'react';
 import {  Search, RefreshCw, Play, Loader } from 'lucide-react';
 import { getSocket } from '@/lib/socket';
 import { useToast } from '@/hooks/useToast';
@@ -41,7 +41,7 @@ function AppIcon({ name, icon, }: { name: string; icon?: string | null; }) {
   );
 }
 
-export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
+export default function AppsIcons({ deviceId, setVisiblePanel }: { deviceId?: string | null, setVisiblePanel:  Dispatch<SetStateAction<boolean>> }) {
   const { toast } = useToast();
   const { data: device } = useDevice(deviceId!);
   const [search, setSearch] = useState('');
@@ -107,6 +107,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
     onSuccess: (_, app) => {
       toast(`Opened ${app.name}`, 'success');
+      setVisiblePanel(false);
     },
 
     onError: (err: Error) => {
@@ -194,11 +195,7 @@ export default function AppsIcons({ deviceId }: { deviceId?: string | null }) {
 
                   <div className="w-20 h-20 relative">
                     <AppIcon name={app.name} icon={app.icon} />
-                    {/* {openAppMutation.isPending && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
-                        <Loader size={20} className="animate-spin text-white" />
-                      </div>
-                    )} */}
+                    
                   </div>
 
                   <span className="text-[11px] text-slate-300 group-hover:text-white font-medium text-center leading-tight line-clamp-2 w-full">
