@@ -5,8 +5,14 @@ export function GET() {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const redirectUri = process.env.NEXT_PUBLIC_FRONTEND_CALLBACK_URL;
 
-  if (!clientId || !redirectUri) {
-    return new Response(JSON.stringify({ error: 'OAuth not configured' }), {
+  if (!redirectUri) {
+    return new Response(JSON.stringify({ error: 'OAuth not configured  RURL' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (!clientId) {
+    return new Response(JSON.stringify({ error: 'OAuth not configured C.ID' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
