@@ -518,17 +518,27 @@ export default function ControlPage({ params }: PageProps) {
             </div>
           )
         }
- 
-        {/* {mouseCapture && (
-          <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
-            <VirtualJoystick
-              screenW={screenSize.w}
-              screenH={screenSize.h}
-              enabled={mouseCapture}
-              dataChannel={dataChannel}
-            />
+
+        {/* ── Mobile joystick fixed overlay — outside all overflow-hidden containers ── */}
+        {mouseCapture && (
+          <div
+            className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-center items-end pb-6 pt-3 animate-fade-up"
+            style={{
+              background: 'linear-gradient(to top, rgba(10,10,20,0.92) 60%, transparent)',
+              backdropFilter: 'blur(2px)',
+              pointerEvents: 'none',
+            }}
+          >
+            <div style={{ pointerEvents: 'all' }}>
+              <VirtualJoystick
+                screenW={screenSize.w}
+                screenH={screenSize.h}
+                enabled={mouseCapture}
+                dataChannel={dataChannel}
+              />
+            </div>
           </div>
-        )} */}
+        )}
 
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

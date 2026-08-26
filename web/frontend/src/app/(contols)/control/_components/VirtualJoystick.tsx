@@ -7,19 +7,19 @@ interface VirtualJoystickProps {
   screenW: number;
   screenH: number;
   enabled: boolean;
-   dataChannel?: RTCDataChannel | null;
+  dataChannel?: RTCDataChannel | null;
 }
 
 // Speed presets — multiplier applied on top of MAX_SPEED
 const SPEED_PRESETS: { label: string; value: number }[] = [
-  { label: '1×',   value: 1.0 },
+  { label: '1×', value: 1.0 },
   { label: '1.5×', value: 1.5 },
-  { label: '2×',   value: 2.0 },
+  { label: '2×', value: 2.0 },
 ];
 
 // tunables
-const MAX_SPEED = 6;    // px per frame at full joystick deflection (at 1× speed)
-const THROTTLE  = 16;   // emit at most every ~16 ms (~60 fps); desktop side throttles anyway
+const MAX_SPEED = 5;    // px per frame at full joystick deflection (at 1× speed)
+const THROTTLE = 16;   // emit at most every ~16 ms (~60 fps); desktop side throttles anyway
 const SMOOTHING = 0.18; // lower = smoother but sluggish; 0.18 feels natural
 
 function sendMouseEvent(
@@ -27,23 +27,23 @@ function sendMouseEvent(
   type: 'MOUSE_MOVE' | 'MOUSE_CLICK',
   payload: Record<string, unknown>
 ) {
-   if (dataChannel && dataChannel.readyState === 'open') {
+  if (dataChannel && dataChannel.readyState === 'open') {
     dataChannel.send(JSON.stringify({ type, payload }));
     return;
-  }  
+  }
 }
 
 export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel }: VirtualJoystickProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const managerRef   = useRef<ReturnType<typeof nipplejsType.create> | null>(null);
-  const rafRef       = useRef<number | null>(null);
-  const cursorRef    = useRef({ x: screenW / 2, y: screenH / 2 });
+  const managerRef = useRef<ReturnType<typeof nipplejsType.create> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const cursorRef = useRef({ x: screenW / 2, y: screenH / 2 });
 
   // Raw joystick target velocity [-1, 1]; smoothed velocity accumulated over frames
-  const rawVelRef    = useRef({ vx: 0, vy: 0 });
+  const rawVelRef = useRef({ vx: 0, vy: 0 });
   const smoothVelRef = useRef({ vx: 0, vy: 0 });
 
-  const lastEmitRef  = useRef(0);
+  const lastEmitRef = useRef(0);
 
   // Speed multiplier — kept in both state (for UI) and ref (for RAF loop)
   const [speedIdx, setSpeedIdx] = useState(0);
@@ -53,7 +53,7 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
   const dcRef = useRef(dataChannel);
   useEffect(() => { dcRef.current = dataChannel; }, [dataChannel]);
 
-  // ── animation loop ──────────────────────────────────────────────────────────
+  //  animation loop  
   const startLoop = () => {
     if (rafRef.current !== null) return;
 
@@ -91,25 +91,25 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    rawVelRef.current    = { vx: 0, vy: 0 };
+    rawVelRef.current = { vx: 0, vy: 0 };
     // Let smoothing decay naturally — don't hard-reset so release feels smooth
   };
 
-  // nipplejs setup ─────────────────────────────────────────────────────────────
+  // nipplejs setup ─
   useEffect(() => {
     if (!containerRef.current || !enabled) return;
 
     let manager: ReturnType<typeof nipplejsType.create>;
-    
+
     import('nipplejs').then((module) => {
       const nipplejs = module.default || module;
       manager = nipplejs.create({
         zone: containerRef.current!,
         mode: 'static',
-        position: { left: '50%', top: '50%' },
+        position: { left: '50%', top: '54%' },
         size: 80,
         restOpacity: 0.75,
-        fadeTime: 150,
+         fadeTime: 150,
         multitouch: false,
       });
       managerRef.current = manager;
@@ -118,7 +118,7 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
         const d = evt?.data || evt;
         if (!d || !d.vector) return;
 
-        const vx: number =  d.vector.x;
+        const vx: number = d.vector.x;
         const vy: number = -d.vector.y; // nipplejs y is positive UP; screen is positive DOWN
 
         rawVelRef.current = { vx, vy };
@@ -144,7 +144,7 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
       }
       managerRef.current = null;
     };
-   }, [enabled, screenW, screenH]);
+  }, [enabled, screenW, screenH]);
 
   // Clamp virtual cursor when screen dimensions change
   useEffect(() => {
@@ -164,74 +164,44 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
 
   return (
     <div
-      className={`flex flex-col items-center gap-2 transition-opacity duration-200 ${
-        enabled ? 'opacity-100' : 'opacity-30 pointer-events-none'
-      }`}
+      className={`flex flex-col items-center gap-2 transition-opacity duration-200 ${enabled ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}
     >
-      {/* ── Joystick with speed badge in center ── */}
+      {/* Speed pill —  */}
+      <button
+        onPointerDown={e => e.stopPropagation()}
+        onTouchStart={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); cycleSpeed(); }}
+        style={{
+          touchAction: 'manipulation', 
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: 999,
+          padding: '4px 16px',
+          fontSize: 11,
+          fontWeight: 800,
+          color: '#fff',
+          letterSpacing: '0.3px',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          userSelect: 'none',
+          minWidth: 56,
+          textAlign: 'center' as const,
+        }}
+        className="active:scale-95 mb-4 max-md:-mb-8 max-md:mt-4"
+      >
+        {currentPreset.label}
+      </button>
+
+      {/*  Joystick   */}
       <div
         ref={containerRef}
-        className="relative rounded-full touch-none select-none overflow-hidden"
+        className="rounded-full touch-none select-none"
         style={{
           width: 120,
-          height: 120,
-          border: '1.5px solid rgba(99,102,241,0.25)',
-          boxShadow: '0 0 20px rgba(99,102,241,0.08) inset, 0 4px 20px rgba(0,0,0,0.3)',
+          height: 120, 
         }}
-      >
-        {/* Speed cycle button — centered, tappable but doesn't interfere with joystick drag */}
-        <button
-          onPointerDown={e => e.stopPropagation()}
-          onClick={e => { e.stopPropagation(); cycleSpeed(); }}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 20,
-            background:
-              speedIdx === 0
-                ? 'rgba(30,30,50,0.55)'
-                : speedIdx === 1
-                ? 'linear-gradient(135deg, rgba(99,102,241,0.55), rgba(139,92,246,0.55))'
-                : 'linear-gradient(135deg, rgba(245,158,11,0.65), rgba(239,68,68,0.55))',
-            boxShadow:
-              speedIdx === 0
-                ? '0 0 6px rgba(99,102,241,0.2)'
-                : speedIdx === 1
-                ? '0 0 10px rgba(99,102,241,0.45)'
-                : '0 0 14px rgba(245,158,11,0.55)',
-            border: '1px solid rgba(255,255,255,0.15)',
-            borderRadius: '50%',
-            width: 34,
-            height: 34,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            backdropFilter: 'blur(4px)',
-          }}
-          className="active:scale-90"
-          title={`Speed: ${currentPreset.label} — tap to cycle`}
-        >
-          <span
-            style={{
-              fontSize: speedIdx === 1 ? 9 : 10,
-              fontWeight: 800,
-              color: '#fff',
-              letterSpacing: '-0.3px',
-              lineHeight: 1,
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
-          >
-            {currentPreset.label}
-          </span>
-        </button>
-      </div>
+      />
 
-      {/* ── Click buttons ── */}
+      {/*  Click buttons  */}
       {enabled && (
         <div className="flex gap-3 mt-1">
           <button
