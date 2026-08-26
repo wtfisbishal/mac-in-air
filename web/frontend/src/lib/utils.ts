@@ -15,31 +15,37 @@ export const features = [
     icon: "🖱️",
     title: "Remote Mouse & Keyboard",
     desc: "Full pointer control and keyboard input. Type, click, scroll — every interaction your Mac supports, delivered through the browser.",
+    className:'border-r border-b'
   },
   {
     icon: "📺",
     title: "Live Screen Streaming",
     desc: "Real-time screen mirroring with ultra-low latency. Watch your Mac desktop update live as you work from anywhere in the world.",
+    className:'border-r border-b'
   },
   {
     icon: "🚀",
     title: "Launch Any App",
     desc: "Browse your full application library and open any app with one tap. No switching back — just click and it launches on your Mac.",
+    className:'border-b'
   },
   {
     icon: "🔐",
     title: "End-to-End Encrypted",
     desc: "Every session is secured with AES-256 encryption. Your screen and inputs never leave your private tunnel.",
+    className:'border-r'
   },
   {
     icon: "⌨️",
     title: "Full Keyboard Input",
     desc: "Type naturally with full modifier key support — ⌘, ⌥, ⌃, and Fn combos all work as expected.",
+    className:'border-r'
   },
   {
     icon: "⚡️",
     title: "Ultra-low Latency",
     desc: "WebRTC-powered streaming keeps latency under 30ms on a good connection — indistinguishable from local.",
+    className:'border-'
   },
 ];
 

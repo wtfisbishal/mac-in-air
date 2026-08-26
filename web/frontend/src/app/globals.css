@@ -486,7 +486,7 @@ body {
 @media screen and (max-width: 768px) {
   .mac-bg-gradient{
   background: #e4dfff;
-       background: radial-gradient(440% 165% at 50% 36.8%, #e4dfff -3% 38%, #111119 29%);
+       background: radial-gradient(440% 165% at 50% 36.8%, #EAE9E6 -3% 38%, #111119 29%);
 }
 .ctrl-btn {
   gap: 3px;

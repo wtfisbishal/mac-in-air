@@ -56,12 +56,13 @@ export default function Home() {
     <>
       <div className=" relative min-h-screen overflow-x-hidden">
 
-        <div className=" bg- mac-bg-gradient">
+        <div className=" overflow-hidden b order mac-bg-gradient">
           <MacbookScroll
             src={`/sec2.png`}
           />
         </div>
 
+        <div></div>
 
         {/* Menu Bar */}
 
@@ -84,7 +85,7 @@ export default function Home() {
         </nav>
 
         {/* Hero  */}
-        <section className="min-h-screen  flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
+        <section className="min-h-screen   ! z-[100]! flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden">
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-16 z-10">
             <Link href="/home"
@@ -141,10 +142,10 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  ">
             {features.map((f, i) => (
               <div key={f.title}
-                className=" backdrop-blur-2xl drop-shadow-[#9b9b9b57] drop-shadow-2xl  glass-panel-dark cursor-pointer hover:scale-[1.01]  transition-all duration-500 rounded-4xl p-6 scroll-fade-in"
+                className={` ${f.className || ''} backdrop-blur-2xl border-[#ffffff35] cursor-pointer hover:scale-[1.01]  transition-all duration-500  p-6 scroll-fade-in`}
                 style={{ transitionDelay: `${i * 80}ms` }}>
                 <div className="text-3xl mb-4">{f.icon}</div>
                 <h3 className="text-[15px] font-semibold text-gray-200 mb-2">{f.title}</h3>
@@ -414,28 +415,31 @@ export default function Home() {
 
 const DemoVideoSection = () => {
   return (
-    <div className=" w-full h-[80%] max-md:mt-20 max-md:min-h-screen flex justify-center  max-md:flex-col max-md:gap-5  items-center">
+    <div className=" w-full h-[80%] max-md:mt-20 max-md:min-h-screen    max-md:flex-col max-md:gap-5  items-center">
 
-      <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4  h-full w-[40%] max-md:w-full px-5">
+     <div className=" flex  max-md:flex-col">
+       <div className="  flex flex-col items-center justify-center gap-10 max-md:gap-4  h-full w-[40%] max-md:w-full px-5">
         <div>
           {/* <p>Demo</p> */}
           <h1 className="logo1 font-bold text-5xl max-md:text-4xl">In your phone . </h1>
         </div>
 
-        <div className=" h-[600px] w-[290px] max-md:h-[502px] max-md:w-[243px]  border-[5px] border-[#ffffff4f] rounded-4xl">
-
+        <div className="relative h-[460px] w-[260px] max-md:h-[502px] max-md:w-[243px]  border-[5px] border-[#ffffff4f] rounded-4xl">
+          <div className=" absolute top-4 w-[100px] rounded-full left-[75px] bg-black h-7" /> 
         </div>
       </div>
-      <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4 h-full w-[60%] max-md:w-full max-md:border-t max-md:border-x-0 max-md:pt-16  border-x border-[#ffffff4f] px-5 ">
+      <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4 h-full w-[60%] max-md:w-full  max-md:pt-16 px-5 ">
         <div>
           {/* <p>Demo</p> */}
           <h1 className="logo1 font-bold text-5xl  max-md:text-4xl">In another Pc . </h1>
         </div>
 
-        <div className="  w-[750px] h-[400px] max-md:h-[232px] max-md:w-full [243px] border-[5px] border-[#ffffff4f] rounded-4xl">
+        <div className="relative  w-[750px] h-[400px] max-md:h-[232px] max-md:w-full [243px] border-[5px] border-[#ffffff4f] rounded-4xl">
+          <div className=" absolute -top- w-[150px] rounded-xl left-2/5 [75px] bg-black h-10" /> 
 
         </div>
       </div>
+     </div>
 
     </div>
   )

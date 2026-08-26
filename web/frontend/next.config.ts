@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
       }
     ]
   },
-  allowedDevOrigins: ['172.20.10.8'],
+  allowedDevOrigins: ['192.0.0.2','127.0.0.1'],
   turbopack:{
     root:path.join(__dirname, '..'),
   },

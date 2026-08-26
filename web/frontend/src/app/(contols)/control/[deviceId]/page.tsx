@@ -56,9 +56,9 @@ export default function ControlPage({ params }: PageProps) {
 
 
   const [humburgerOpen, setHamburgerOpen] = useState(false);
-  const [streaming, setStreaming] = useState(false);
-  const [kbCapture, setKbCapture] = useState(false);
-  const [mouseCapture, setMouseCapture] = useState(false);
+  const [streaming, setStreaming] = useState(true);
+  const [kbCapture, setKbCapture] = useState(true);
+  const [mouseCapture, setMouseCapture] = useState(true);
   const [sessionId, setSessionId] = useState('');
   const [warning, setWarning] = useState<string | null>(null);
   const { fullscreen, setFullscreen } = useFullscreen();
@@ -88,6 +88,19 @@ export default function ControlPage({ params }: PageProps) {
     streamingRef.current = streaming;
     sessionIdRef.current = sessionId;
   }, [streaming, sessionId]);
+
+    // Auto-start stream on load
+  const hasAutoStarted = useRef(false);
+  useEffect(() => {
+    if (pairToken && device && !hasAutoStarted.current) {
+      hasAutoStarted.current = true;
+      const socket = getSocket();
+      const sid = `session-${Date.now()}`;
+      setSessionId(sid);
+      socket.emit('screen-share-start', { sessionId: sid, frameRate: 30, quality: 1 });
+    }
+  }, [pairToken, device, streaming]);
+
 
   useEffect(() => {
     return () => {
@@ -345,7 +358,7 @@ export default function ControlPage({ params }: PageProps) {
             </div>
 
             {kbCapture && (
-              <div className="  w-full animate-fade-up flex flex-col gap-3 ">
+              <div className=" mt-5 w-full animate-fade-up flex flex-col gap-3 ">
                 <MacKeybar dataChannel={dataChannel} onCommand={(type) => emit(type)} />
               </div>
             )}
@@ -505,10 +518,8 @@ export default function ControlPage({ params }: PageProps) {
             </div>
           )
         }
-
-
-
-        {mouseCapture && (
+ 
+        {/* {mouseCapture && (
           <div className="animate-fade-up hidden max-md:flex justify-center mt-4 pb-4">
             <VirtualJoystick
               screenW={screenSize.w}
@@ -517,7 +528,7 @@ export default function ControlPage({ params }: PageProps) {
               dataChannel={dataChannel}
             />
           </div>
-        )}
+        )} */}
 
       </div>
       <ToastContainer toasts={toasts} dismiss={dismiss} />

@@ -302,7 +302,7 @@ export default function ScreenCanvas({
   return (
     <div
       ref={wrapRef}
-      className={`relative w-full bg-black flex items-center justify-center rounded max-md:rounded-none overflow-hidden touch-none `}
+      className={`relative w-full bg-black flex  items-center justify-center rounded max-md:rounded-none overflow-hidden touch-none `}
       style={{ aspectRatio: displaySize?.width && displaySize?.height ? `${displaySize.width}/${displaySize.height}` : '16/9', cursor: 'none' }}
       onMouseMove={e => {
         if (isMouseDown) {
