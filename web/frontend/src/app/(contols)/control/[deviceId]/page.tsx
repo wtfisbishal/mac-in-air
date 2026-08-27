@@ -529,14 +529,7 @@ export default function ControlPage({ params }: PageProps) {
               pointerEvents: 'none',
             }}
           >
-            <div style={{ pointerEvents: 'all' }}>
-              <VirtualJoystick
-                screenW={screenSize.w}
-                screenH={screenSize.h}
-                enabled={mouseCapture}
-                dataChannel={dataChannel}
-              />
-            </div>
+             
           </div>
         )}
 

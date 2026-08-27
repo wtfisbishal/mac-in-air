@@ -18,9 +18,9 @@ const SPEED_PRESETS: { label: string; value: number }[] = [
 ];
 
 // tunables
-const MAX_SPEED = 5;    // px per frame at full joystick deflection (at 1× speed)
+const MAX_SPEED = 4;    // px per frame at full joystick deflection (at 1× speed)
 const THROTTLE = 16;   // emit at most every ~16 ms (~60 fps); desktop side throttles anyway
-const SMOOTHING = 0.18; // lower = smoother but sluggish; 0.18 feels natural
+const SMOOTHING = 0.20; // lower = smoother but sluggish; 0.18 feels natural
 
 function sendMouseEvent(
   dataChannel: RTCDataChannel | null | undefined,
@@ -106,10 +106,10 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
       manager = nipplejs.create({
         zone: containerRef.current!,
         mode: 'static',
-        position: { left: '50%', top: '54%' },
+        position: { left: '50%', top: '50%' },
         size: 80,
         restOpacity: 0.75,
-         fadeTime: 150,
+        fadeTime: 150,
         multitouch: false,
       });
       managerRef.current = manager;
@@ -163,61 +163,61 @@ export default function VirtualJoystick({ screenW, screenH, enabled, dataChannel
   const currentPreset = SPEED_PRESETS[speedIdx];
 
   return (
-    <div
-      className={`flex flex-col items-center gap-2 transition-opacity duration-200 ${enabled ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}
-    >
-      {/* Speed pill —  */}
-      <button
-        onPointerDown={e => e.stopPropagation()}
-        onTouchStart={e => e.stopPropagation()}
-        onClick={e => { e.stopPropagation(); cycleSpeed(); }}
-        style={{
-          touchAction: 'manipulation', 
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: 999,
-          padding: '4px 16px',
-          fontSize: 11,
-          fontWeight: 800,
-          color: '#fff',
-          letterSpacing: '0.3px',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          userSelect: 'none',
-          minWidth: 56,
-          textAlign: 'center' as const,
-        }}
-        className="active:scale-95 mb-4 max-md:-mb-8 max-md:mt-4"
-      >
-        {currentPreset.label}
-      </button>
-
-      {/*  Joystick   */}
+   
       <div
-        ref={containerRef}
-        className="rounded-full touch-none select-none"
-        style={{
-          width: 120,
-          height: 120, 
-        }}
-      />
+        className={`flex flex-col items-center gap-2 transition-opacity duration-200 ${enabled ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}
+      >
 
-      {/*  Click buttons  */}
-      {enabled && (
-        <div className="flex gap-3 mt-1">
-          <button
-            onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'left' })}
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
-          >
-            L Click
-          </button>
-          <button
-            onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'right' })}
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
-          >
-            R Click
-          </button>
-        </div>
-      )}
-    </div>
+        {/*  Joystick   */}
+        <div
+          ref={containerRef}
+          className="rounded-full relative   touch-none select-none"
+          style={{
+            width: 120,
+            height: 120,
+          }}
+        />
+
+        {/*  Click buttons  */}
+        {enabled && (
+          <div className="flex gap-3 mt-1">
+            <button
+              onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'left' })}
+              className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+            >
+              L Click
+            </button>
+
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onTouchStart={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); cycleSpeed(); }}
+              style={{
+                touchAction: 'manipulation',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 999,
+                padding: '3px 20px',
+                fontSize: 11,
+                fontWeight: 800,
+                color: '#fff',
+                letterSpacing: '0.3px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                userSelect: 'none', 
+                textAlign: 'center' as const,
+              }}
+              className="active:scale-95 "
+            >
+              {currentPreset.label}
+            </button>
+            <button
+              onClick={() => sendMouseEvent(dataChannel, 'MOUSE_CLICK', { button: 'right' })}
+              className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+            >
+              R Click
+            </button>
+          </div>
+        )}
+      </div> 
   );
 }

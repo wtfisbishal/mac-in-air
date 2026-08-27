@@ -419,13 +419,12 @@ const DemoVideoSection = () => {
 
      <div className=" flex  max-md:flex-col">
        <div className="  flex flex-col items-center justify-center gap-10 max-md:gap-4  h-full w-[40%] max-md:w-full px-5">
-        <div>
-          {/* <p>Demo</p> */}
+        <div> 
           <h1 className="logo1 font-bold text-5xl max-md:text-4xl">In your phone . </h1>
         </div>
 
-        <div className="relative h-[460px] w-[260px] max-md:h-[502px] max-md:w-[243px]  border-[5px] border-[#ffffff4f] rounded-4xl">
-          <div className=" absolute top-4 w-[100px] rounded-full left-[75px] bg-black h-7" /> 
+        <div className="relative h-115 w-65 max-md:h-[502px] max-md:w-[265px]  border-[5px] border-[#ffffff4f] rounded-4xl">
+          <div className=" absolute top-4 w-25 rounded-full left-18.75 max-md:left-[79px] bg-black h-7" /> 
         </div>
       </div>
       <div className=" flex flex-col items-center justify-center gap-10 max-md:gap-4 h-full w-[60%] max-md:w-full  max-md:pt-16 px-5 ">
@@ -435,7 +434,7 @@ const DemoVideoSection = () => {
         </div>
 
         <div className="relative  w-[750px] h-[400px] max-md:h-[232px] max-md:w-full [243px] border-[5px] border-[#ffffff4f] rounded-4xl">
-          <div className=" absolute -top- w-[150px] rounded-xl left-2/5 [75px] bg-black h-10" /> 
+          <div className=" absolute -top- w-[150px] max-md:w-[120px] rounded-xl left-2/5 max-md:left-[33%] bg-black h-10" /> 
 
         </div>
       </div>
